@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Device.cpp" />
+    <ClCompile Include="IWEGameObject.cpp" />
+    <ClCompile Include="IWEMath.cpp" />
+    <ClCompile Include="IWEMesh.cpp" />
+    <ClCompile Include="IWEQuaternion.cpp" />
+    <ClCompile Include="IWETransform.cpp" />
+    <ClCompile Include="IWEVector3.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Device.h" />
+    <ClInclude Include="IWEGameObject.h" />
+    <ClInclude Include="IWEMath.h" />
+    <ClInclude Include="IWEMesh.h" />
+    <ClInclude Include="IWEQuaternion.h" />
+    <ClInclude Include="IWETransform.h" />
+    <ClInclude Include="IWEVector3.h" />
+    <ClInclude Include="stdafx.h" />
+  </ItemGroup>
+</Project>

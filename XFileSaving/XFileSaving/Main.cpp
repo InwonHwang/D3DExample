@@ -4,6 +4,10 @@
 #include <rmxfguid.h>
 #include <rmxftmpl.h>
 #include <cstdio>
+#include <vector>
+
+
+using namespace std;
 
 // global declarations
 LPDIRECT3D9 d3d;
@@ -132,6 +136,14 @@ void cleanD3D(void)
 	d3d->Release();
 }
 
+struct _VERTEX
+{
+	D3DXVECTOR3 pos;     // vertex position
+	D3DXVECTOR3 norm;    // vertex normal
+	float tu;            // texture coordinates
+	float tv;
+};
+
 void SaveTest(void)
 {
 
@@ -155,6 +167,30 @@ void SaveTest(void)
 
 	D3DXLoadMeshFromX(L"tiny.x", D3DXMESH_MANAGED, d3ddev, NULL, NULL, NULL, NULL, &mesh);
 
+
+	LPBYTE pVerts;
+	
+	mesh->LockVertexBuffer(0, (void**)&pVerts);
+
+	// get vertex count
+	int numVerts = mesh->GetNumVertices();
+
+//	for (int i = 0; i<numVerts; i++)
+//	{
+//		D3DXVECTOR3 vec3Vertice;
+//		vec3Vertice.x = pVerts->pos.x;
+//		vec3Vertice.y = pVerts->pos.y;
+//		vec3Vertice.z = pVerts->pos.z;		
+//		/*memcpy(buffer, &vec3Vertice, sizeof(D3DXVECTOR3));
+//		buffer += sizeof(D3DXVECTOR3);
+//*/
+//		pVerts++;
+//	}
+
+	// unlock the vertex buffer
+	
+	
+
 	ID3DXFileSaveData *pRootTransform = NULL;
 	xFileSaveRoot->AddDataObject(TID_D3DRMFrameTransformMatrix,
 		"Root_Transform_Matrix", NULL, size, matWorld, &pRootTransform);
@@ -167,16 +203,11 @@ void SaveTest(void)
 		ID3DXFileSaveData *xFileMeshFrame = NULL;
 		hr = xFileSaveRoot->AddDataObject(TID_D3DRMFrame, buf, NULL, 0, NULL, &xFileMeshFrame);
 
-		
-		LPD3DXBUFFER buffer;
-		mesh->LockVertexBuffer(0, (LPVOID *)&buffer);
-
-		ID3DXFileSaveData *xFileMeshFrame = NULL;
-		hr = xFileSaveRoot->AddDataObject(TID_D3DRMFrame, buf, NULL, 0, buffer, &xFileMeshFrame);
-
 
 		xFileMeshFrame->Release();
 	}
+
+	mesh->UnlockVertexBuffer();
 
 	xFileSave->Save();
 
