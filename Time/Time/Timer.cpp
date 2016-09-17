@@ -1,5 +1,6 @@
 #include "Timer.h"
 
+Timer appTimer;
 UINT32 Timer::__millisecondsFrequency = 0;
 
 Timer::Timer()

@@ -34,3 +34,4 @@ public:
 	void update();	// 시작 ~ 현재 시간 변경
 };
 
+extern Timer AppTimer;
