@@ -1,5 +1,6 @@
 #include <iostream>
 
+// 정렬된 할당자 샘플
 class LinearAllocator
 {
 public:
@@ -15,11 +16,7 @@ public:
        m_currentOffset += size;
        return pMemToReturn;
     }
-    void Free(void* pMem)
-    {
-       // We can't easily free memory in this type of allocator.
-       // Therefore we just ignore this... or you could assert.
-    }
+
 private:
     char* m_pBuffer;
     int m_bufferSize;
