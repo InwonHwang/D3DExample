@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "Device.h"
 #include "ZCamera.h"
+#include "MyTerrain.h"
 
 
 #define SCREEN_WIDTH 640
@@ -9,17 +10,9 @@
 #define KEY_DOWN(vk_code) ((GetAsyncKeyState(vk_code) & 0x8000) ? 1 : 0)
 #define KEY_UP(vk_code) ((GetAsyncKeyState(vk_code) & 0x8000) ? 0 : 1)
 
-ID3DXMesh*                      SourceMesh = 0;
-ID3DXMesh*                      PatchMesh = 0;
-ID3DXMesh*                      TempMesh = 0;
-ID3DXBuffer*					adjBuffer = 0;
-ID3DXPatchMesh*					PatchMesh2 = 0;
-std::vector<D3DMATERIAL9>       Mtrls(0);
-std::vector<IDirect3DTexture9*> Textures(0);
-D3DMATERIAL9					mtrl;
-float Segs = 1.5f;
 
 ZCamera* Camera = NULL;
+MyTerrain* Terrain = 0;
 DWORD g_dwMouseX = 0;
 DWORD g_dwMouseY = 0;
 
@@ -27,7 +20,7 @@ DWORD g_dwMouseY = 0;
 void InitMatrix()
 {
 	D3DXMATRIX matView;
-	D3DXVECTOR3 vEyePt(0.0f, 20.0f, 1.0f);
+	D3DXVECTOR3 vEyePt(0.0f, 100.0f, 1.0f);
 	D3DXVECTOR3 vLookAtPt(0.0f, 0.0f, 0.0f);
 	D3DXVECTOR3 vUpVec(0.0f, 1.0f, 0.0f);
 	D3DXMatrixLookAtLH(&matView, &vEyePt, &vLookAtPt, &vUpVec);
@@ -48,74 +41,6 @@ void InitMatrix()
 
 	Camera->SetView(&vEyePt, &vLookAtPt, &vUpVec);
 }
-
-void InitMesh(void)
-{
-	HRESULT hr = 0;
-	
-	ID3DXBuffer* mtrlBuffer = 0;
-	DWORD        numMtrls = 0;
-
-	hr = D3DXLoadMeshFromX(_T("bigship1.x"), D3DXMESH_SYSTEMMEM, D3DDevice,
-		&adjBuffer, &mtrlBuffer, 0, &numMtrls, &SourceMesh);
-
-	if (FAILED(hr)) DebugError(hr);
-
-	if (mtrlBuffer != 0 && numMtrls != 0)
-	{
-		D3DXMATERIAL* mtrls = (D3DXMATERIAL*)mtrlBuffer->GetBufferPointer();
-
-		for (int i = 0; i < numMtrls; i++)
-		{
-			mtrls[i].MatD3D.Ambient = mtrls[i].MatD3D.Diffuse;
-
-			Mtrls.push_back(mtrls[i].MatD3D);
-			if (mtrls[i].pTextureFilename != 0)
-			{
-				IDirect3DTexture9* tex = 0;
-				D3DXCreateTextureFromFile(D3DDevice, (TCHAR *)mtrls[i].pTextureFilename, &tex);
-				Textures.push_back(tex);
-			}
-			else
-				Textures.push_back(0);
-
-		}
-	}
-	SAFE_RELEASE(mtrlBuffer);
-
-	hr = SourceMesh->OptimizeInplace(D3DXMESHOPT_ATTRSORT | D3DXMESHOPT_COMPACT | D3DXMESHOPT_VERTEXCACHE,
-		(DWORD*)adjBuffer->GetBufferPointer(), (DWORD*)adjBuffer->GetBufferPointer(), 0, 0);		
-	if (FAILED(hr)) DebugError(hr);	
-
-	SAFE_RELEASE(adjBuffer);
-
-	D3DDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-	D3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-	D3DDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
-
-	mtrl.Ambient = D3DXCOLOR(255, 255, 0, 255);
-	mtrl.Diffuse = D3DXCOLOR(255, 255, 0, 255);
-	mtrl.Specular = D3DXCOLOR(255, 255, 0, 255);
-	mtrl.Emissive = D3DXCOLOR(0, 0, 0, 255);
-	mtrl.Power = 2.0f;
-}
-
-void GeneratePatchMesh(float seg)
-{
-	SAFE_RELEASE(PatchMesh);
-
-	HRESULT hr = SourceMesh->CloneMeshFVF(D3DXMESH_WRITEONLY | D3DXMESH_NPATCHES | (SourceMesh->GetOptions() & D3DXMESH_32BIT),
-		SourceMesh->GetFVF(), D3DDevice, &PatchMesh);
-	if (FAILED(hr)) DebugError(hr);
-
-	TempMesh = PatchMesh;
-
-	//CPU Ã³¸®
-	/*SAFE_RELEASE(PatchMesh);
-	HRESULT hr = D3DXTessellateNPatches(SourceMesh, (DWORD*)adjBuffer->GetBufferPointer(), seg, false, &PatchMesh, NULL);
-	if (FAILED(hr)) DebugError(hr);*/
-}
-
 
 void InitLight(void)
 {
@@ -162,26 +87,12 @@ void ProcessMouse(void)
 
 void ProcessKey(void)
 {
-	if (GetAsyncKeyState('W'))
-	{
-		Camera->MoveLocalZ(0.5f);
-		if (Segs < 1.9f) Segs += 0.05f;
-	}
-	if (GetAsyncKeyState('S'))
-	{
-		Camera->MoveLocalZ(-0.5f);		
-		if (Segs > 1.1f) Segs -= 0.05f;
-	}
+	if (GetAsyncKeyState('W')) Camera->MoveLocalZ(0.5f);
+	if (GetAsyncKeyState('S'))Camera->MoveLocalZ(-0.5f);	
 	if (GetAsyncKeyState('A')) Camera->MoveLocalX(-0.5f);
 	if (GetAsyncKeyState('D')) Camera->MoveLocalX(0.5f);
 	if (GetAsyncKeyState('Z')) Camera->RotateLocalX(0.01f);
 	if (GetAsyncKeyState('X')) Camera->RotateLocalY(0.01f);
-}
-
-void ProcessInputs(void)
-{
-	ProcessMouse();
-	ProcessKey();
 }
 
 void Render(void)
@@ -189,23 +100,14 @@ void Render(void)
 	D3DDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0, 32, 64, 128), 1.0f, 0);
 	D3DDevice->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_ARGB(0, 32, 64, 128), 1.0f, 0);
 
+
 	if (D3DDevice->BeginScene());
 	{
-		for (int i = 0; i < Mtrls.size(); i++)
-		{
-			//// draw wireframe outline
-			D3DDevice->SetMaterial(&mtrl);
-			D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
-			//PatchMesh->DrawSubset(i);
-			TempMesh->DrawSubset(i);
-			D3DDevice->SetNPatchMode(0);
-			D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+		D3DXMATRIX I;
+		D3DXMatrixIdentity(&I);
 
-			// draw pmesh
-			/*D3DDevice->SetMaterial(&Mtrls[i]);
-			D3DDevice->SetTexture(0, Textures[i]);
-			SourceMesh->DrawSubset(i);*/
-		}
+		if (Terrain) Terrain->draw(&I, false);
+			
 
 		D3DDevice->EndScene();
 	}
@@ -218,14 +120,7 @@ void Render(void)
 void cleanD3D(void)
 {
 	SAFE_DELETE(Camera);
-	SAFE_RELEASE(PatchMesh2);
-	SAFE_RELEASE(SourceMesh);
-	SAFE_RELEASE(PatchMesh);
-	SAFE_RELEASE(TempMesh);
-
-	for (int i = 0; i < Textures.size(); i++)
-		SAFE_RELEASE(Textures[i]);
-
+	SAFE_DELETE(Terrain);
 	D3D->Release();
 
 	return;
@@ -261,9 +156,11 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	D3D->Init();
 	Camera = new ZCamera;	
 	InitMatrix();
-	InitMesh();
 	InitLight();
-	GeneratePatchMesh(Segs);
+	Terrain = new MyTerrain("coastMountain64.raw", 64, 64, 1, 0.1f);
+	D3DXVECTOR3 lightDirection(0.0f, 1.0f, 0.0f);
+	Terrain->genTexture(&lightDirection);
+	//Terrain->loadTexture(_T("grass.bmp"));
 
 	MSG msg;
 
@@ -280,8 +177,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
 			DispatchMessage(&msg);
 		}
 				
-		ProcessInputs();		
-		GeneratePatchMesh(Segs);
+		ProcessMouse();
+		ProcessKey();
 		Render();
 
 		if (KEY_DOWN(VK_ESCAPE))

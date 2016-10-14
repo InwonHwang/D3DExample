@@ -132,7 +132,7 @@ public:
 };
 
 
-class Test : public ObjectPoolAlloc<Test>
+class Test// : public ObjectPoolAlloc<Test>
 {
 public:
 	Test() { cout << "hello" << endl; }
@@ -156,13 +156,13 @@ int main()
 	Timer t;	
 	t.start();
 
-	boost::object_pool<Test> p;
+	/*boost::object_pool<Test> p;
 
 	Test **temp = new Test*[100000];
 	for (int i = 0; i < 100000; i++)
 	{
 		temp[i] = new Test();
-	}
+	}*/
 
 	//boost::singleton_pool<boost::pool_allocator_tag, sizeof(Test)>::release_memory();
 	//boost::singleton_pool<Test, sizeof(Test), boost::default_user_allocator_new_delete, boost::details::pool::null_mutex>::release_memory();
@@ -172,7 +172,7 @@ int main()
 		p.destroy(temp[i]);
 	}*/
 	
-	delete[] temp;
+	//delete[] temp;
 
 	
 
@@ -194,16 +194,16 @@ int main()
 	//}
 	
 
-	//boost::object_pool<Test> p(10000);
-	//for (int i = 0; i < 10000; ++i)
-	//{
-	//	//Test * const t = p.malloc();//생성자 호출 X
-	//	//p.free(t) //소멸자 호출 X
+	boost::object_pool<Test> p(10000);
+	for (int i = 0; i < 10000; ++i)
+	{
+		//Test * const t = p.malloc();//생성자 호출 X
+		//p.free(t) //소멸자 호출 X
 
-	//	Test * const t = p.construct();//생성자 호출 ㅒ
+		Test * const t = p.();//생성자 호출 ㅒ
 
-	//	p.destroy(t); //소멸자 호출
-	//}
+		p.free(t); //소멸자 호출
+	}
 
 	/*for (int i = 0; i < 10000; i++)
 	{
