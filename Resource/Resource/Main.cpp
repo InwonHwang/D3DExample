@@ -1,36 +1,66 @@
-//-----------------------------------------------------------------------------
-// File: CreateDevice.cpp
-//
-// Desc: This is the first tutorial for using Direct3D. In this tutorial, all
-//       we are doing is creating a Direct3D device and using it to clear the
-//       window.
-//
-// Copyright (c) Microsoft Corporation. All rights reserved.
-//-----------------------------------------------------------------------------
+
 #include "stdafx.h"
 #include "Device.h"
 #include "Font.h"
 #include "Timer.h"
 #include "Mesh.h"
+#include "Material.h"
+#include "MeshRenderer.h"
+#include "Pool.h"
 
 Font *font;
+Mesh *mesh;
+Material *material;
+MeshRenderer *meshRenderer;
 Timer timer;
 
-//-----------------------------------------------------------------------------
-// Name: Render()
-// Desc: Draws the scene
-//-----------------------------------------------------------------------------
-VOID Render()
+void Init()
 {
-	// Clear the backbuffer to a blue color
+	D3DLIGHT9 light;
+
+	ZeroMemory(&light, sizeof(light));
+	light.Type = D3DLIGHT_DIRECTIONAL;
+	light.Diffuse.r = 0.5f;
+	light.Diffuse.g = 0.5f;
+	light.Diffuse.b = 0.5f;
+	light.Diffuse.a = 1.0f;
+
+	D3DVECTOR vecDirection = { -1.0f, -0.3f, -1.0f };
+	light.Direction = vecDirection;
+	D3DDevice->SetLight(0, &light);
+	D3DDevice->LightEnable(0, TRUE);
+}
+
+void Render()
+{
+	D3DXMATRIX matView;
+	D3DXMatrixLookAtLH(&matView,
+		&D3DXVECTOR3(0.0f, 10.0f, 40.0f),
+		&D3DXVECTOR3(0.0f, 0.0f, 0.0f),
+		&D3DXVECTOR3(0.0f, 1.0f, 0.0f));
+	D3DDevice->SetTransform(D3DTS_VIEW, &matView);
+
+	D3DXMATRIX matProjection;
+	D3DXMatrixPerspectiveFovLH(&matProjection,
+		D3DXToRadian(45),
+		800 / 600,
+		1.0f,
+		100.0f);
+	D3DDevice->SetTransform(D3DTS_PROJECTION, &matProjection);
+
+	float index = 1.5f;
+	D3DXMATRIX matRotateY;
+	D3DXMatrixRotationY(&matRotateY, index);
+	D3DDevice->SetTransform(D3DTS_WORLD, &(matRotateY));
 
 	D3DDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0, 32, 64, 128), 1.0f, 0);
+	D3DDevice->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_ARGB(0, 32, 64, 128), 1.0f, 0);
 
 	// Begin the scene
 	if (SUCCEEDED(D3DDevice->BeginScene()))
 	{
 		font->draw();
-
+		meshRenderer->Update();
 		D3DDevice->EndScene();
 	}
 
@@ -51,7 +81,9 @@ LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_DESTROY:
 		font->release();
-		delete font;
+		SAFE_DELETE(font);
+		SAFE_DELETE(mesh);
+		SAFE_DELETE(meshRenderer);
 		D3D->Release();
 		PostQuitMessage(0);
 		return 0;
@@ -81,18 +113,14 @@ INT WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, INT)
 	{
 		sizeof(WNDCLASSEX), CS_CLASSDC, MsgProc, 0L, 0L,
 		GetModuleHandle(NULL), NULL, NULL, NULL, NULL,
-		L"D3D Tutorial", NULL
+		_T("D3D Tutorial"), NULL
 	};
 	RegisterClassEx(&wc);
 
 	// Create the application's window
-	HWND hWnd = CreateWindow(L"D3D Tutorial", L"D3D Tutorial 01: CreateDevice",
+	HWND hWnd = CreateWindow(_T("D3D Tutorial"), _T("D3D Tutorial 01: CreateDevice"),
 		WS_OVERLAPPEDWINDOW, 100, 100, 800, 600,
 		NULL, NULL, wc.hInstance, NULL);
-
-	Mesh *temp = new Mesh();
-
-	delete temp;
 
 	SetActiveWindow(hWnd);
 	timer.SetUp();
@@ -101,17 +129,25 @@ INT WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, INT)
 	if (D3D->Init())
 	{
 		font = new Font();
+		mesh = new Mesh();
+		material = new Material();
+		meshRenderer = new MeshRenderer();		
+
+		mesh->Load(_T("bigship1.x"));
+		material->set();
+		meshRenderer->SetMesh(mesh);
+		meshRenderer->SetSubMesh(material);
 
 		ShowWindow(hWnd, SW_SHOWDEFAULT);
 		UpdateWindow(hWnd);
 
 		MSG msg;
 		
-		static float lastTime = timer.getCurrentTime();
+		static UINT32 lastTime = timer.getCurrentTime();
 
 		while (GetMessage(&msg, NULL, 0, 0))
 		{
-			float curTime = timer.getCurrentTime();
+			UINT32 curTime = timer.getCurrentTime();
 			float timeDelta = (curTime - lastTime) * 0.001f;
 
 			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
@@ -121,7 +157,7 @@ INT WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, INT)
 			}
 			else
 			{
-				std::tstring temp = IntegerToString(1/timeDelta);
+				std::tstring temp = IntegerToString(DWORD(1/timeDelta));
 				font->setString(temp.c_str());
 				Render();
 
@@ -133,9 +169,10 @@ INT WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, INT)
 		}
 	}
 
+	SAFE_DELETE(mesh);
+	SAFE_DELETE(font);
 
-
-	UnregisterClass(L"D3D Tutorial", wc.hInstance);
+	UnregisterClass(_T("D3D Tutorial"), wc.hInstance);
 	return 0;
 }
 

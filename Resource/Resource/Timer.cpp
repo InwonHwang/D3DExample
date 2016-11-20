@@ -32,7 +32,7 @@ UINT32 Timer::calculateTime()
 
 void Timer::start()
 {
-	if (_startTime == 0);
+	if (_startTime == 0)
 		_startTime = calculateTime();
 }
 

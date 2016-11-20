@@ -56,7 +56,7 @@ void Font::setString(const TCHAR *string)
 {
 	_string = string;
 }
-void Font::setRect(float left, float top, float right, float bottom)
+void Font::setRect(long left, long top, long right, long bottom)
 {
 	_rect.left = left;
 	_rect.top = top;

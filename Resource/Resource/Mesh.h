@@ -1,33 +1,33 @@
 #pragma once
 #include "IResourceItem.h"
-#include "ResourcePool.h"
+#include "Pool.h"
 
 class MeshRenderer;
 
 class Mesh : public IResourceItem
 {
+	friend class MeshRenderer;
 private:
 	LPD3DXMESHCONTAINER _d3dxMeshContainer;
 
-protected:
+//protected:
+public:
 	virtual void Save() override;
 	virtual void Load(LPD3DXFILEDATA) override;
 	virtual void Load(TCHAR *) override;
-	virtual void draw();
-
 
 public:
 	Mesh();
-	~Mesh();
+	virtual ~Mesh();
 		
 	void* operator new(size_t size)
-	{
-		return ResourcePool::MeshPool.malloc();
+	{		
+		return ResourcePool::Mesh.malloc();
 	}
 
 	void operator delete(void* _p)
 	{
-		ResourcePool::MeshPool.free((Mesh * const)_p);
+		ResourcePool::Mesh.free((Mesh * const)_p);
 	}
 };
 
