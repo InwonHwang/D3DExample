@@ -22,7 +22,28 @@ void Mesh::Load(LPD3DXFILEDATA xfileData)
 }
 
 void Mesh::Load(TCHAR * fileName)
-{
+{	
 	D3DXLoadMeshFromX(fileName, D3DXMESH_MANAGED, D3DDevice, NULL, NULL, NULL, NULL, &(_d3dxMeshContainer->MeshData.pMesh));
 }
 
+SkinnedMesh::SkinnedMesh()
+{
+	_d3dxMeshContainer = new ANIMMESHCONTAINER();
+}
+SkinnedMesh::~SkinnedMesh()
+{
+
+}
+
+void SkinnedMesh::Save()
+{
+
+}
+void SkinnedMesh::Load(LPD3DXFILEDATA xfileData)
+{
+
+}
+void SkinnedMesh::Load(TCHAR *fileName)
+{
+
+}

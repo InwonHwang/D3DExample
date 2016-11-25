@@ -33,6 +33,11 @@
     <ClCompile Include="MeshRenderer.cpp">
       <Filter>Component</Filter>
     </ClCompile>
+    <ClCompile Include="ResourceManager.cpp" />
+    <ClCompile Include="Transform.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="SkinnedMeshRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IResourceItem.h">
@@ -75,6 +80,15 @@
     <ClInclude Include="MeshRenderer.h">
       <Filter>Component</Filter>
     </ClInclude>
+    <ClInclude Include="Matrix.h" />
+    <ClInclude Include="ResourceManager.h" />
+    <ClInclude Include="Vector2.h" />
+    <ClInclude Include="Vector3.h" />
+    <ClInclude Include="Vector4.h" />
+    <ClInclude Include="Transform.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="SkinnedMeshRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resource">

@@ -17,7 +17,324 @@
 					"_parent": {
 						"$ref": "AAAAAAFF+qBWK6M3Z8Y="
 					},
-					"name": "Main",
+					"name": "Resource",
+					"ownedElements": [
+						{
+							"_type": "UMLClass",
+							"_id": "AAAAAAFYcRstskPer5k=",
+							"_parent": {
+								"$ref": "AAAAAAFF+qBtyKM79qY="
+							},
+							"name": "Mesh",
+							"ownedElements": [
+								{
+									"_type": "UMLGeneralization",
+									"_id": "AAAAAAFYcSG9jkSLs9U=",
+									"_parent": {
+										"$ref": "AAAAAAFYcRstskPer5k="
+									},
+									"source": {
+										"$ref": "AAAAAAFYcRstskPer5k="
+									},
+									"target": {
+										"$ref": "AAAAAAFYcRbbrUN2YfA="
+									},
+									"visibility": "public"
+								}
+							],
+							"visibility": "public",
+							"attributes": [
+								{
+									"_type": "UMLAttribute",
+									"_id": "AAAAAAFYcRzUCkQRTLM=",
+									"_parent": {
+										"$ref": "AAAAAAFYcRstskPer5k="
+									},
+									"name": "_d3dxMeshContainer",
+									"visibility": "protected",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "LPD3DXMESHCONTAINER",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"isDerived": false,
+									"aggregation": "none",
+									"isID": false
+								}
+							],
+							"isAbstract": false,
+							"isFinalSpecialization": false,
+							"isLeaf": false,
+							"isActive": false
+						},
+						{
+							"_type": "UMLClass",
+							"_id": "AAAAAAFYcR52nEQjmMo=",
+							"_parent": {
+								"$ref": "AAAAAAFF+qBtyKM79qY="
+							},
+							"name": "Texture",
+							"ownedElements": [
+								{
+									"_type": "UMLGeneralization",
+									"_id": "AAAAAAFYcSHLMkScH5I=",
+									"_parent": {
+										"$ref": "AAAAAAFYcR52nEQjmMo="
+									},
+									"source": {
+										"$ref": "AAAAAAFYcR52nEQjmMo="
+									},
+									"target": {
+										"$ref": "AAAAAAFYcRbbrUN2YfA="
+									},
+									"visibility": "public"
+								}
+							],
+							"visibility": "public",
+							"attributes": [
+								{
+									"_type": "UMLAttribute",
+									"_id": "AAAAAAFYcR6zE0RNqXc=",
+									"_parent": {
+										"$ref": "AAAAAAFYcR52nEQjmMo="
+									},
+									"name": "_d3dTexture",
+									"visibility": "private",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "LPDIRECT3DTEXTURE9",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"isDerived": false,
+									"aggregation": "none",
+									"isID": false
+								}
+							],
+							"isAbstract": false,
+							"isFinalSpecialization": false,
+							"isLeaf": false,
+							"isActive": false
+						},
+						{
+							"_type": "UMLClass",
+							"_id": "AAAAAAFYcR8IU0RWh4c=",
+							"_parent": {
+								"$ref": "AAAAAAFF+qBtyKM79qY="
+							},
+							"name": "Material",
+							"ownedElements": [
+								{
+									"_type": "UMLGeneralization",
+									"_id": "AAAAAAFYcSHUskStV9w=",
+									"_parent": {
+										"$ref": "AAAAAAFYcR8IU0RWh4c="
+									},
+									"source": {
+										"$ref": "AAAAAAFYcR8IU0RWh4c="
+									},
+									"target": {
+										"$ref": "AAAAAAFYcRbbrUN2YfA="
+									},
+									"visibility": "public"
+								}
+							],
+							"visibility": "public",
+							"attributes": [
+								{
+									"_type": "UMLAttribute",
+									"_id": "AAAAAAFYcR+Aw0SATrU=",
+									"_parent": {
+										"$ref": "AAAAAAFYcR8IU0RWh4c="
+									},
+									"name": "_d3dMaterial9",
+									"visibility": "private",
+									"isStatic": false,
+									"isLeaf": false,
+									"type": "D3DMATERIAL9",
+									"isReadOnly": false,
+									"isOrdered": false,
+									"isUnique": false,
+									"isDerived": false,
+									"aggregation": "none",
+									"isID": false
+								}
+							],
+							"isAbstract": false,
+							"isFinalSpecialization": false,
+							"isLeaf": false,
+							"isActive": false
+						},
+						{
+							"_type": "UMLClass",
+							"_id": "AAAAAAFYcSIFZETDwQQ=",
+							"_parent": {
+								"$ref": "AAAAAAFF+qBtyKM79qY="
+							},
+							"name": "Skinned Mesh",
+							"ownedElements": [
+								{
+									"_type": "UMLGeneralization",
+									"_id": "AAAAAAFYcSI0wkTuQCs=",
+									"_parent": {
+										"$ref": "AAAAAAFYcSIFZETDwQQ="
+									},
+									"source": {
+										"$ref": "AAAAAAFYcSIFZETDwQQ="
+									},
+									"target": {
+										"$ref": "AAAAAAFYcRstskPer5k="
+									},
+									"visibility": "public"
+								}
+							],
+							"visibility": "public",
+							"isAbstract": false,
+							"isFinalSpecialization": false,
+							"isLeaf": false,
+							"isActive": false
+						},
+						{
+							"_type": "UMLInterface",
+							"_id": "AAAAAAFYcRbbrUN2YfA=",
+							"_parent": {
+								"$ref": "AAAAAAFF+qBtyKM79qY="
+							},
+							"name": "IResourceItem",
+							"visibility": "public",
+							"operations": [
+								{
+									"_type": "UMLOperation",
+									"_id": "AAAAAAFYcRb5D0OicmU=",
+									"_parent": {
+										"$ref": "AAAAAAFYcRbbrUN2YfA="
+									},
+									"name": "Save",
+									"visibility": "protected",
+									"isStatic": false,
+									"isLeaf": false,
+									"parameters": [
+										{
+											"_type": "UMLParameter",
+											"_id": "AAAAAAFYcRc1u0OpLT8=",
+											"_parent": {
+												"$ref": "AAAAAAFYcRb5D0OicmU="
+											},
+											"visibility": "public",
+											"isStatic": false,
+											"isLeaf": false,
+											"type": "void",
+											"isReadOnly": false,
+											"isOrdered": false,
+											"isUnique": false,
+											"direction": "return"
+										}
+									],
+									"concurrency": "sequential",
+									"isQuery": false,
+									"isAbstract": true
+								},
+								{
+									"_type": "UMLOperation",
+									"_id": "AAAAAAFYcReL+kOs4fg=",
+									"_parent": {
+										"$ref": "AAAAAAFYcRbbrUN2YfA="
+									},
+									"name": "Load",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"parameters": [
+										{
+											"_type": "UMLParameter",
+											"_id": "AAAAAAFYcRfeOEOzFt0=",
+											"_parent": {
+												"$ref": "AAAAAAFYcReL+kOs4fg="
+											},
+											"name": "LPD3DXFILEDATA",
+											"visibility": "public",
+											"isStatic": false,
+											"isLeaf": false,
+											"type": "",
+											"isReadOnly": false,
+											"isOrdered": false,
+											"isUnique": false,
+											"direction": "in"
+										},
+										{
+											"_type": "UMLParameter",
+											"_id": "AAAAAAFYcRfeOEO0IB8=",
+											"_parent": {
+												"$ref": "AAAAAAFYcReL+kOs4fg="
+											},
+											"visibility": "public",
+											"isStatic": false,
+											"isLeaf": false,
+											"type": "void",
+											"isReadOnly": false,
+											"isOrdered": false,
+											"isUnique": false,
+											"direction": "return"
+										}
+									],
+									"concurrency": "sequential",
+									"isQuery": false,
+									"isAbstract": true
+								},
+								{
+									"_type": "UMLOperation",
+									"_id": "AAAAAAFYcRfqekO3sNM=",
+									"_parent": {
+										"$ref": "AAAAAAFYcRbbrUN2YfA="
+									},
+									"name": "Load",
+									"visibility": "public",
+									"isStatic": false,
+									"isLeaf": false,
+									"parameters": [
+										{
+											"_type": "UMLParameter",
+											"_id": "AAAAAAFYcRhFskO+woc=",
+											"_parent": {
+												"$ref": "AAAAAAFYcRfqekO3sNM="
+											},
+											"name": "TCHAR*",
+											"visibility": "public",
+											"isStatic": false,
+											"isLeaf": false,
+											"type": "",
+											"isReadOnly": false,
+											"isOrdered": false,
+											"isUnique": false,
+											"direction": "in"
+										},
+										{
+											"_type": "UMLParameter",
+											"_id": "AAAAAAFYcRhFskO/O6s=",
+											"_parent": {
+												"$ref": "AAAAAAFYcRfqekO3sNM="
+											},
+											"visibility": "public",
+											"isStatic": false,
+											"isLeaf": false,
+											"type": "void",
+											"isReadOnly": false,
+											"isOrdered": false,
+											"isUnique": false,
+											"direction": "return"
+										}
+									],
+									"concurrency": "sequential",
+									"isQuery": false,
+									"isAbstract": true
+								}
+							],
+							"isAbstract": false,
+							"isFinalSpecialization": false,
+							"isLeaf": false
+						}
+					],
 					"visible": true,
 					"defaultDiagram": true,
 					"ownedViews": [
@@ -110,11 +427,11 @@
 											"containerExtending": false,
 											"left": 0,
 											"top": -16,
-											"width": 73.67724609375,
+											"width": 93.9072265625,
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "(from Model)",
+											"text": "(from Resource)",
 											"horizontalAlignment": 2,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -487,11 +804,11 @@
 											"containerExtending": false,
 											"left": -496,
 											"top": 0,
-											"width": 73.67724609375,
+											"width": 93.9072265625,
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "(from Model)",
+											"text": "(from Resource)",
 											"horizontalAlignment": 2,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -806,11 +1123,11 @@
 											"containerExtending": false,
 											"left": -128,
 											"top": -16,
-											"width": 73.67724609375,
+											"width": 93.9072265625,
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "(from Model)",
+											"text": "(from Resource)",
 											"horizontalAlignment": 2,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -1125,11 +1442,11 @@
 											"containerExtending": false,
 											"left": -144,
 											"top": 0,
-											"width": 73.67724609375,
+											"width": 93.9072265625,
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "(from Model)",
+											"text": "(from Resource)",
 											"horizontalAlignment": 2,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -1873,11 +2190,11 @@
 											"containerExtending": false,
 											"left": 160,
 											"top": -16,
-											"width": 73.67724609375,
+											"width": 93.9072265625,
 											"height": 13,
 											"autoResize": false,
 											"underline": false,
-											"text": "(from Model)",
+											"text": "(from Resource)",
 											"horizontalAlignment": 2,
 											"verticalAlignment": 5,
 											"wordWrap": false
@@ -2219,319 +2536,13 @@
 					]
 				},
 				{
-					"_type": "UMLInterface",
-					"_id": "AAAAAAFYcRbbrUN2YfA=",
+					"_type": "UMLModel",
+					"_id": "AAAAAAFYj2/c984Isj4=",
 					"_parent": {
 						"$ref": "AAAAAAFF+qBWK6M3Z8Y="
 					},
-					"name": "IResourceItem",
-					"visibility": "public",
-					"operations": [
-						{
-							"_type": "UMLOperation",
-							"_id": "AAAAAAFYcRb5D0OicmU=",
-							"_parent": {
-								"$ref": "AAAAAAFYcRbbrUN2YfA="
-							},
-							"name": "Save",
-							"visibility": "protected",
-							"isStatic": false,
-							"isLeaf": false,
-							"parameters": [
-								{
-									"_type": "UMLParameter",
-									"_id": "AAAAAAFYcRc1u0OpLT8=",
-									"_parent": {
-										"$ref": "AAAAAAFYcRb5D0OicmU="
-									},
-									"visibility": "public",
-									"isStatic": false,
-									"isLeaf": false,
-									"type": "void",
-									"isReadOnly": false,
-									"isOrdered": false,
-									"isUnique": false,
-									"direction": "return"
-								}
-							],
-							"concurrency": "sequential",
-							"isQuery": false,
-							"isAbstract": true
-						},
-						{
-							"_type": "UMLOperation",
-							"_id": "AAAAAAFYcReL+kOs4fg=",
-							"_parent": {
-								"$ref": "AAAAAAFYcRbbrUN2YfA="
-							},
-							"name": "Load",
-							"visibility": "public",
-							"isStatic": false,
-							"isLeaf": false,
-							"parameters": [
-								{
-									"_type": "UMLParameter",
-									"_id": "AAAAAAFYcRfeOEOzFt0=",
-									"_parent": {
-										"$ref": "AAAAAAFYcReL+kOs4fg="
-									},
-									"name": "LPD3DXFILEDATA",
-									"visibility": "public",
-									"isStatic": false,
-									"isLeaf": false,
-									"type": "",
-									"isReadOnly": false,
-									"isOrdered": false,
-									"isUnique": false,
-									"direction": "in"
-								},
-								{
-									"_type": "UMLParameter",
-									"_id": "AAAAAAFYcRfeOEO0IB8=",
-									"_parent": {
-										"$ref": "AAAAAAFYcReL+kOs4fg="
-									},
-									"visibility": "public",
-									"isStatic": false,
-									"isLeaf": false,
-									"type": "void",
-									"isReadOnly": false,
-									"isOrdered": false,
-									"isUnique": false,
-									"direction": "return"
-								}
-							],
-							"concurrency": "sequential",
-							"isQuery": false,
-							"isAbstract": true
-						},
-						{
-							"_type": "UMLOperation",
-							"_id": "AAAAAAFYcRfqekO3sNM=",
-							"_parent": {
-								"$ref": "AAAAAAFYcRbbrUN2YfA="
-							},
-							"name": "Load",
-							"visibility": "public",
-							"isStatic": false,
-							"isLeaf": false,
-							"parameters": [
-								{
-									"_type": "UMLParameter",
-									"_id": "AAAAAAFYcRhFskO+woc=",
-									"_parent": {
-										"$ref": "AAAAAAFYcRfqekO3sNM="
-									},
-									"name": "TCHAR*",
-									"visibility": "public",
-									"isStatic": false,
-									"isLeaf": false,
-									"type": "",
-									"isReadOnly": false,
-									"isOrdered": false,
-									"isUnique": false,
-									"direction": "in"
-								},
-								{
-									"_type": "UMLParameter",
-									"_id": "AAAAAAFYcRhFskO/O6s=",
-									"_parent": {
-										"$ref": "AAAAAAFYcRfqekO3sNM="
-									},
-									"visibility": "public",
-									"isStatic": false,
-									"isLeaf": false,
-									"type": "void",
-									"isReadOnly": false,
-									"isOrdered": false,
-									"isUnique": false,
-									"direction": "return"
-								}
-							],
-							"concurrency": "sequential",
-							"isQuery": false,
-							"isAbstract": true
-						}
-					],
-					"isAbstract": false,
-					"isFinalSpecialization": false,
-					"isLeaf": false
-				},
-				{
-					"_type": "UMLClass",
-					"_id": "AAAAAAFYcRstskPer5k=",
-					"_parent": {
-						"$ref": "AAAAAAFF+qBWK6M3Z8Y="
-					},
-					"name": "Mesh",
-					"ownedElements": [
-						{
-							"_type": "UMLGeneralization",
-							"_id": "AAAAAAFYcSG9jkSLs9U=",
-							"_parent": {
-								"$ref": "AAAAAAFYcRstskPer5k="
-							},
-							"source": {
-								"$ref": "AAAAAAFYcRstskPer5k="
-							},
-							"target": {
-								"$ref": "AAAAAAFYcRbbrUN2YfA="
-							},
-							"visibility": "public"
-						}
-					],
-					"visibility": "public",
-					"attributes": [
-						{
-							"_type": "UMLAttribute",
-							"_id": "AAAAAAFYcRzUCkQRTLM=",
-							"_parent": {
-								"$ref": "AAAAAAFYcRstskPer5k="
-							},
-							"name": "_d3dxMeshContainer",
-							"visibility": "protected",
-							"isStatic": false,
-							"isLeaf": false,
-							"type": "LPD3DXMESHCONTAINER",
-							"isReadOnly": false,
-							"isOrdered": false,
-							"isUnique": false,
-							"isDerived": false,
-							"aggregation": "none",
-							"isID": false
-						}
-					],
-					"isAbstract": false,
-					"isFinalSpecialization": false,
-					"isLeaf": false,
-					"isActive": false
-				},
-				{
-					"_type": "UMLClass",
-					"_id": "AAAAAAFYcR52nEQjmMo=",
-					"_parent": {
-						"$ref": "AAAAAAFF+qBWK6M3Z8Y="
-					},
-					"name": "Texture",
-					"ownedElements": [
-						{
-							"_type": "UMLGeneralization",
-							"_id": "AAAAAAFYcSHLMkScH5I=",
-							"_parent": {
-								"$ref": "AAAAAAFYcR52nEQjmMo="
-							},
-							"source": {
-								"$ref": "AAAAAAFYcR52nEQjmMo="
-							},
-							"target": {
-								"$ref": "AAAAAAFYcRbbrUN2YfA="
-							},
-							"visibility": "public"
-						}
-					],
-					"visibility": "public",
-					"attributes": [
-						{
-							"_type": "UMLAttribute",
-							"_id": "AAAAAAFYcR6zE0RNqXc=",
-							"_parent": {
-								"$ref": "AAAAAAFYcR52nEQjmMo="
-							},
-							"name": "_d3dTexture",
-							"visibility": "private",
-							"isStatic": false,
-							"isLeaf": false,
-							"type": "LPDIRECT3DTEXTURE9",
-							"isReadOnly": false,
-							"isOrdered": false,
-							"isUnique": false,
-							"isDerived": false,
-							"aggregation": "none",
-							"isID": false
-						}
-					],
-					"isAbstract": false,
-					"isFinalSpecialization": false,
-					"isLeaf": false,
-					"isActive": false
-				},
-				{
-					"_type": "UMLClass",
-					"_id": "AAAAAAFYcR8IU0RWh4c=",
-					"_parent": {
-						"$ref": "AAAAAAFF+qBWK6M3Z8Y="
-					},
-					"name": "Material",
-					"ownedElements": [
-						{
-							"_type": "UMLGeneralization",
-							"_id": "AAAAAAFYcSHUskStV9w=",
-							"_parent": {
-								"$ref": "AAAAAAFYcR8IU0RWh4c="
-							},
-							"source": {
-								"$ref": "AAAAAAFYcR8IU0RWh4c="
-							},
-							"target": {
-								"$ref": "AAAAAAFYcRbbrUN2YfA="
-							},
-							"visibility": "public"
-						}
-					],
-					"visibility": "public",
-					"attributes": [
-						{
-							"_type": "UMLAttribute",
-							"_id": "AAAAAAFYcR+Aw0SATrU=",
-							"_parent": {
-								"$ref": "AAAAAAFYcR8IU0RWh4c="
-							},
-							"name": "_d3dMaterial9",
-							"visibility": "private",
-							"isStatic": false,
-							"isLeaf": false,
-							"type": "D3DMATERIAL9",
-							"isReadOnly": false,
-							"isOrdered": false,
-							"isUnique": false,
-							"isDerived": false,
-							"aggregation": "none",
-							"isID": false
-						}
-					],
-					"isAbstract": false,
-					"isFinalSpecialization": false,
-					"isLeaf": false,
-					"isActive": false
-				},
-				{
-					"_type": "UMLClass",
-					"_id": "AAAAAAFYcSIFZETDwQQ=",
-					"_parent": {
-						"$ref": "AAAAAAFF+qBWK6M3Z8Y="
-					},
-					"name": "Skinned Mesh",
-					"ownedElements": [
-						{
-							"_type": "UMLGeneralization",
-							"_id": "AAAAAAFYcSI0wkTuQCs=",
-							"_parent": {
-								"$ref": "AAAAAAFYcSIFZETDwQQ="
-							},
-							"source": {
-								"$ref": "AAAAAAFYcSIFZETDwQQ="
-							},
-							"target": {
-								"$ref": "AAAAAAFYcRstskPer5k="
-							},
-							"visibility": "public"
-						}
-					],
-					"visibility": "public",
-					"isAbstract": false,
-					"isFinalSpecialization": false,
-					"isLeaf": false,
-					"isActive": false
+					"name": "Component",
+					"visibility": "public"
 				}
 			],
 			"visibility": "public"

@@ -20,12 +20,12 @@ void Init()
 
 	ZeroMemory(&light, sizeof(light));
 	light.Type = D3DLIGHT_DIRECTIONAL;
-	light.Diffuse.r = 0.5f;
-	light.Diffuse.g = 0.5f;
-	light.Diffuse.b = 0.5f;
+	light.Diffuse.r = 1.0f;
+	light.Diffuse.g = 1.0f;
+	light.Diffuse.b = 1.0f;
 	light.Diffuse.a = 1.0f;
 
-	D3DVECTOR vecDirection = { -1.0f, -0.3f, -1.0f };
+	D3DVECTOR vecDirection = { 0.0f, 0.0f, 0.0f };
 	light.Direction = vecDirection;
 	D3DDevice->SetLight(0, &light);
 	D3DDevice->LightEnable(0, TRUE);

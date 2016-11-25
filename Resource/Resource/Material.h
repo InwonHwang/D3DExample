@@ -15,10 +15,10 @@ public:
 	virtual void Load(TCHAR *) override {}
 	void set()
 	{
-		_d3dMaterial.Ambient = D3DXCOLOR(255, 255, 0, 255);
-		_d3dMaterial.Diffuse = D3DXCOLOR(255, 255, 0, 255);
-		_d3dMaterial.Specular = D3DXCOLOR(255, 255, 0, 255);
-		_d3dMaterial.Emissive = D3DXCOLOR(0, 0, 0, 255);
+		_d3dMaterial.Ambient = D3DXCOLOR(255, 255, 255, 255);
+		_d3dMaterial.Diffuse = D3DXCOLOR(255, 255, 255, 255);
+		_d3dMaterial.Specular = D3DXCOLOR(255, 255, 255, 255);
+		_d3dMaterial.Emissive = D3DXCOLOR(255, 255, 255, 255);
 		_d3dMaterial.Power = 2.0f;
 	}
 
