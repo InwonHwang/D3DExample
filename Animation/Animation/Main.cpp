@@ -204,7 +204,7 @@ class MeshAllocation : public ID3DXAllocateHierarchy
 			d3ddev,
 			&pMeshContainer->pFinalMesh);
 
-		// Load the textures for each material (if any)
+		// load the textures for each material (if any)
 		pMeshContainer->pTextures = new LPDIRECT3DTEXTURE9[pMeshContainer->NumMaterials];
 		for (DWORD i = 0; i < NumMaterials; i++)
 		{
@@ -457,6 +457,7 @@ void cleanD3D(void)
 	}
 
 	Transforms.clear();
+	SAFE_DELETE(anim);
 	SAFE_DELETE_ARRAY(FinalMatrices);    // free the FinalMatrices array
 	SAFE_RELEASE(d3ddev);    // close and release the 3D device
 	SAFE_RELEASE(d3d);    // close and release Direct3D

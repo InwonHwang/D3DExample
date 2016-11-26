@@ -72,7 +72,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <ExecutablePath>$(DXSDK_DIR)Utilities\bin\x86;$(ExecutablePath)</ExecutablePath>
-    <IncludePath>$(DXSDK_DIR)Include;$(IncludePath)</IncludePath>
+    <IncludePath>D:\boost_1_62_0;$(DXSDK_DIR)Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
     <ReferencePath>$(VC_ReferencesPath_x86);</ReferencePath>
   </PropertyGroup>
@@ -147,7 +147,31 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="Component.cpp" />
+    <ClCompile Include="Device.cpp" />
+    <ClCompile Include="Frame.cpp" />
+    <ClCompile Include="Main.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Main2.cpp" />
+    <ClCompile Include="Pool.cpp" />
+    <ClCompile Include="ResourceManager.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="XFile.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Animation.h" />
+    <ClInclude Include="Component.h" />
+    <ClInclude Include="Device.h" />
+    <ClInclude Include="Frame.h" />
+    <ClInclude Include="IResourceItem.h" />
+    <ClInclude Include="iwrmxftmpl.h" />
+    <ClInclude Include="Pool.h" />
+    <ClInclude Include="ResourceManager.h" />
+    <ClInclude Include="Singleton.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="XFile.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
