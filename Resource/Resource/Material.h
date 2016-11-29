@@ -18,8 +18,13 @@ public:
 		_d3dMaterial.Ambient = D3DXCOLOR(255, 255, 255, 255);
 		_d3dMaterial.Diffuse = D3DXCOLOR(255, 255, 255, 255);
 		_d3dMaterial.Specular = D3DXCOLOR(255, 255, 255, 255);
-		_d3dMaterial.Emissive = D3DXCOLOR(255, 255, 255, 255);
+		_d3dMaterial.Emissive = D3DXCOLOR(0, 255, 0, 255);
 		_d3dMaterial.Power = 2.0f;
+	}
+
+	D3DMATERIAL9 get()
+	{
+		return _d3dMaterial;
 	}
 
 public:

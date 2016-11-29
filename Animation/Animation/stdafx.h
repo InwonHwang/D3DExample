@@ -14,13 +14,14 @@
 #include <boost/pool/pool_alloc.hpp>
 #include <boost/pool/singleton_pool.hpp>
 
-#define SAFE_RELEASE(p) if(p) { p->Release(); }
-#define SAFE_DELETE(p) if(p) { delete p; }
-#define SAFE_DELETE_ARRAY(p) if(p) { delete[] p; }
-
 namespace std { typedef basic_string<TCHAR> tstring; }
 
 void DebugError(HRESULT hr);
 void DebugBox(HRESULT hr, LPCTSTR str);
 std::tstring IntegerToString(DWORD i);
 std::tstring floatToString(float f);
+
+#define SAFE_RELEASE(p) if(p) { p->Release(); }
+#define SAFE_DELETE(p) if(p) { delete p; }
+#define SAFE_DELETE_ARRAY(p) if(p) { delete[] p; }
+#define STRING std::tstring

@@ -164,7 +164,7 @@ void InitMesh(void)
 	ID3DXBuffer* mtrlBuffer = 0;
 	DWORD        numMtrls = 0;
 
-	hr = D3DXLoadMeshFromX(_T("bigship1.x"), D3DXMESH_MANAGED, D3DDevice,
+	hr = D3DXLoadMeshFromX(_T("airplane 2.x"), D3DXMESH_MANAGED, D3DDevice,
 		&adjBuffer, &mtrlBuffer, 0, &numMtrls, &SourceMesh);
 
 

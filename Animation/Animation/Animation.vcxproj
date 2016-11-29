@@ -148,28 +148,43 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="AnimationController.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="Frame.cpp" />
     <ClCompile Include="Main.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Main2.cpp" />
+    <ClCompile Include="Main2.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="MeshRenderer.cpp" />
     <ClCompile Include="Pool.cpp" />
+    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
+    <ClCompile Include="SkinnedMesh.cpp" />
+    <ClCompile Include="SkinnedMeshRenderer.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="XFile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />
+    <ClInclude Include="AnimationController.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="Device.h" />
     <ClInclude Include="Frame.h" />
     <ClInclude Include="IResourceItem.h" />
     <ClInclude Include="iwrmxftmpl.h" />
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="MeshRenderer.h" />
     <ClInclude Include="Pool.h" />
+    <ClInclude Include="Renderer.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Singleton.h" />
+    <ClInclude Include="SkinnedMesh.h" />
+    <ClInclude Include="SkinnedMeshRenderer.h" />
+    <ClInclude Include="Structure.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="XFile.h" />
   </ItemGroup>

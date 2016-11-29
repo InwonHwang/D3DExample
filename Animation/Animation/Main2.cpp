@@ -1,15 +1,10 @@
 
 #include "stdafx.h"
 #include "Device.h"
-#include "Pool.h"
 #include "XFile.h"
-#include "Frame.h"
-#include "Animation.h"
-#include <rmxfguid.h>
+#include "ResourceManager.h"
 
-Animation *anim;
-ID3DXAnimationController *pAnimationController;
-D3DXMATRIX matrix;
+ResourceManager* rm;
 
 void Init()
 {
@@ -30,41 +25,37 @@ void Init()
 
 void Render()
 {
-	D3DXMATRIX matView;
+	D3DXMATRIX matView;    // the view transform matrix
 	D3DXMatrixLookAtLH(&matView,
-		&D3DXVECTOR3(0.0f, 10.0f, 40.0f),
-		&D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-		&D3DXVECTOR3(0.0f, 1.0f, 0.0f));
-	D3DDevice->SetTransform(D3DTS_VIEW, &matView);
+		&D3DXVECTOR3(1000.0f, 100.0f, 0.0f),    // the camera position
+		&D3DXVECTOR3(0.0f, 0.0f, 0.0f),    // the look-at position
+		&D3DXVECTOR3(0.0f, 1.0f, 0.0f));    // the up direction
+	D3DDevice->SetTransform(D3DTS_VIEW, &matView);    // set the view transform to matView 
 
-	D3DXMATRIX matProjection;
+	D3DXMATRIX matProjection;    // the projection transform matrix
 	D3DXMatrixPerspectiveFovLH(&matProjection,
-		D3DXToRadian(45),
-		800 / 600,
-		1.0f,
-		100.0f);
-	D3DDevice->SetTransform(D3DTS_PROJECTION, &matProjection);
+		D3DXToRadian(45),    // the horizontal field of view
+		(FLOAT)800 / (FLOAT)600,    // aspect ratio
+		1.0f,    // the near view-plane
+		2000.0f);    // the far view-plane
+	D3DDevice->SetTransform(D3DTS_PROJECTION, &matProjection);    // set the projection
 
-	float index = 1.5f;
-	D3DXMATRIX matRotateY;
-	D3DXMatrixRotationY(&matRotateY, index);
-	D3DDevice->SetTransform(D3DTS_WORLD, &(matRotateY));
+	static float index = 0.0f; index += 0.03f;    // an ever-increasing float value
+	D3DXMATRIX matRotateY;    // a matrix to store the rotation for each triangle
+	D3DXMatrixRotationY(&matRotateY, index);    // the rotation matrix
+	D3DDevice->SetTransform(D3DTS_WORLD, &matRotateY);    // set the world transform
 
 	D3DDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0, 32, 64, 128), 1.0f, 0);
 	D3DDevice->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_ARGB(0, 32, 64, 128), 1.0f, 0);
 
-	// Begin the scene
 	if (SUCCEEDED(D3DDevice->BeginScene()))
-	{
+	{		
+		rm->tempUpdate();
 		D3DDevice->EndScene();
 	}
 
-	// Present the backbuffer contents to the display
 	D3DDevice->Present(NULL, NULL, NULL, NULL);
 }
-
-
-
 
 //-----------------------------------------------------------------------------
 // Name: MsgProc()
@@ -75,31 +66,24 @@ LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	switch (msg)
 	{
 	case WM_DESTROY:
-		SAFE_DELETE(anim);
-		SAFE_RELEASE(pAnimationController);
+		SAFE_DELETE(rm);
 		D3D->Release();
 		XFILE->Release();
 		PostQuitMessage(0);
 		return 0;
 
 	case WM_PAINT:
-		Render();
 		ValidateRect(hWnd, NULL);
 		return 0;
 	}
 
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
-void parseXFileData(LPD3DXFILEDATA pXFileData);
-//-----------------------------------------------------------------------------
-// Name: wWinMain()
-// Desc: The application's entry point
-//-----------------------------------------------------------------------------
+
 INT WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, INT)
 {
 	UNREFERENCED_PARAMETER(hInst);
 
-	// Register the window class
 	WNDCLASSEX wc =
 	{
 		sizeof(WNDCLASSEX), CS_CLASSDC, MsgProc, 0L, 0L,
@@ -108,60 +92,35 @@ INT WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, INT)
 	};
 	RegisterClassEx(&wc);
 
-	// Create the application's window
 	HWND hWnd = CreateWindow(_T("D3D Tutorial"), _T("D3D Tutorial 01: CreateDevice"),
 		WS_OVERLAPPEDWINDOW, 100, 100, 800, 600,
 		NULL, NULL, wc.hInstance, NULL);
 
 	SetActiveWindow(hWnd);
 
-	if (XFILE->Init())
+	if (D3D->Init() && XFILE->Init())
 	{
-		D3DXCreateAnimationController(1, 1, 1, 1, &pAnimationController);
-		LPD3DXFILEENUMOBJECT pEnumObject = NULL;
-		HRESULT hr = 0;
+		rm = new ResourceManager();
+		rm->parse("tiny.x");		
 
-		if (FAILED(hr = D3DXFILE->CreateEnumObject("tiny.x", DXFILELOAD_FROMFILE, &pEnumObject)))
-		{
-			DebugError(hr);
-		}
-
-		SIZE_T childCount = 0;
-		pEnumObject->GetChildren(&childCount);
-
-		for (SIZE_T i = 0; i < childCount; i++)
-		{
-			LPD3DXFILEDATA data = NULL;
-
-			if (FAILED(hr = pEnumObject->GetChild(i, &data)))
-			{
-				DebugError(hr);
-				break;
-			}
-					
-			
-			parseXFileData(data);
-			
-
-			SAFE_RELEASE(data);
-		}
-	}
-
-	if (D3D->Init())
-	{
 		ShowWindow(hWnd, SW_SHOWDEFAULT);
 		UpdateWindow(hWnd);
 
 		MSG msg;
 
-		while (GetMessage(&msg, NULL, 0, 0))
+		while (TRUE)
 		{
-			
+			DWORD starting_point = GetTickCount();
+
 			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 			{
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
+			
+			Render();
+
+			while ((GetTickCount() - starting_point) < 25);
 		}
 	}
 
@@ -171,63 +130,5 @@ INT WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, INT)
 	return 0;
 }
 
-void parseXFileData(LPD3DXFILEDATA pXFileData)
-{
-	HRESULT hr = 0;
-	GUID type;
-
-	hr = pXFileData->GetType(&type);
-
-	//Frame* frame = new Frame;
-	
-	if (type == TID_D3DRMFrameTransformMatrix)
-	{		
-	}
-	else if (type == TID_D3DRMAnimationSet)
-	{	
-		Animation *anim = new Animation();
-		
-		anim->load(pXFileData);
-		anim->load("Test", 1, true);
-
-		pAnimationController->RegisterAnimationSet(anim->GetAnimationSet());
-		pAnimationController->RegisterAnimationOutput("Bip01", &matrix, 0, 0, 0);
-		pAnimationController->SetTrackAnimationSet(0, anim->GetAnimationSet());
-
-		DebugBox(0, floatToString(matrix._11).c_str());
-
-		D3DXTRACK_DESC Desc;
-		Desc.Enable = true;
-		Desc.Speed = 1;
-		Desc.Weight = 1;
-		Desc.Position = 0;
-		Desc.Priority = D3DXPRIORITY_HIGH;
-
-
-		pAnimationController->SetTrackDesc(0, &Desc);
-		pAnimationController->ResetTime();		
-		pAnimationController->AdvanceTime(160, 0);
-
-		DebugBox(0, floatToString(matrix._11).c_str());
-
-	}
-	
-	
-	
-	//SAFE_DELETE(frame);
-
-	SIZE_T childCount;	
-	pXFileData->GetChildren(&childCount);
-
-	for (SIZE_T i = 0; i < childCount; i++)
-	{
-		LPD3DXFILEDATA pSubData;
-		if (FAILED(hr = pXFileData->GetChild(i, &pSubData)))
-			continue;
-
-		parseXFileData(pSubData);
-		SAFE_RELEASE(pSubData);
-	}
-}
 
 

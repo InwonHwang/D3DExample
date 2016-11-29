@@ -4,6 +4,7 @@
 class IResourceItem abstract
 {
 //protected:
+
 public:
 	virtual ~IResourceItem() {}
 	virtual void Save() = 0;

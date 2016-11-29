@@ -325,7 +325,6 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	return msg.wParam;
 }
 
-
 // this is the main message handler for the program
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -457,7 +456,6 @@ void cleanD3D(void)
 	}
 
 	Transforms.clear();
-	SAFE_DELETE(anim);
 	SAFE_DELETE_ARRAY(FinalMatrices);    // free the FinalMatrices array
 	SAFE_RELEASE(d3ddev);    // close and release the 3D device
 	SAFE_RELEASE(d3d);    // close and release Direct3D
@@ -545,7 +543,7 @@ void link_frames(CUSTOM_FRAME* pFrame)
 }
 
 
-void update_frames(CUSTOM_FRAME* pFrame, D3DXMATRIX* pParentMatrix)
+void update_frames(CUSTOM_FRAME* pFrame, D3DXMATRIX* pParentMatrix) // frame Ã£±â
 {
 	// combine the frame's matrix with the parent's matrix, if any
 	if (pParentMatrix)
@@ -576,8 +574,8 @@ void update_mesh_containers(CUSTOM_FRAME* pFrame)
 	
 	if (pMeshContainer && pMeshContainer->pSkinInfo)
 	{
-		if(pMeshContainer->Name)
-			MessageBoxA(GetActiveWindow(), pMeshContainer->Name, NULL, MB_OK);
+		//if(pMeshContainer->Name)
+			//MessageBoxA(GetActiveWindow(), pMeshContainer->Name, NULL, MB_OK);
 		UINT NumFrames = pMeshContainer->pSkinInfo->GetNumBones();    // find how many frames
 																	  // for each frame in the mesh container...
 		for (UINT i = 0; i < NumFrames; i++)

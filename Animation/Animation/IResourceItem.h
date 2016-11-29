@@ -4,7 +4,6 @@
 
 class IResourceItem abstract
 {
-//protected:
 public:
 	virtual ~IResourceItem() {}
 

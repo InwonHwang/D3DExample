@@ -24,6 +24,7 @@ void MeshRenderer::SetSubMesh(Material* material)
 
 void MeshRenderer::Update()
 {
+	D3DDevice->SetMaterial(&_material->get());
 	_mesh->_d3dxMeshContainer->MeshData.pMesh->DrawSubset(0);
 
 }
