@@ -4,10 +4,12 @@
 #include "Structure.h"
 
 class AnimationController;
+class ResourceManager;
 
 class Frame : public IResourceItem
 {	
 	friend class AnimationController;
+	friend class ResourceManager;
 private:
 	MATRIXCONTAINER* _matrixContainer;	
 

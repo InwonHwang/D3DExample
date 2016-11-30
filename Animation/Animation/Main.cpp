@@ -35,34 +35,34 @@ struct CUSTOM_MESHCONTAINER : public D3DXMESHCONTAINER
 	LPDIRECT3DTEXTURE9* pTextures;    // an array of applicable textures
 };
 
-class Transform
-{
-private:
-	std::list<Transform *> _children;
-	Transform * _parent;
-	
-
-public:
-	D3DXFRAME* _frame;
-
-	void SetChild(Transform * child)
-	{
-		_children.push_back(child);
-	}
-
-	void SetParent(Transform * parent)
-	{
-		_parent = parent;
-	}
-
-	void CreateFrame()
-	{
-		_frame = new CUSTOM_FRAME();
-	}
-
-	Transform() {}
-	~Transform() { _children.clear(); _parent = NULL;}
-};
+//class Transform
+//{
+//private:
+//	std::list<Transform *> _children;
+//	Transform * _parent;
+//	
+//
+//public:
+//	D3DXFRAME* _frame;
+//
+//	void SetChild(Transform * child)
+//	{
+//		_children.push_back(child);
+//	}
+//
+//	void SetParent(Transform * parent)
+//	{
+//		_parent = parent;
+//	}
+//
+//	void CreateFrame()
+//	{
+//		_frame = new CUSTOM_FRAME();
+//	}
+//
+//	Transform() {}
+//	~Transform() { _children.clear(); _parent = NULL;}
+//};
 
 std::list<Transform *> Transforms;
 Transform* TopTransform;

@@ -64,7 +64,7 @@ void Render()
 LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
-	{
+	{	
 	case WM_DESTROY:
 		SAFE_DELETE(rm);
 		D3D->Release();
@@ -107,8 +107,9 @@ INT WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, INT)
 		UpdateWindow(hWnd);
 
 		MSG msg;
+		ZeroMemory(&msg, sizeof(msg));
 
-		while (TRUE)
+		while (msg.message != WM_QUIT)
 		{
 			DWORD starting_point = GetTickCount();
 

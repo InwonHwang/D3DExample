@@ -9,10 +9,10 @@
 
 #include "MeshRenderer.h"
 #include "SkinnedMeshRenderer.h"
+#include "Transform.h"
 
 ResourceManager::ResourceManager()
 {
-	i = 0;
 }
 
 
@@ -31,6 +31,7 @@ ResourceManager::~ResourceManager()
 	_textures.clear();
 
 	SAFE_DELETE(_meshRenderer);
+	tempClearTransform(_topTransform);	
 }
 
 void ResourceManager::parse(char* fileName)
@@ -56,20 +57,59 @@ void ResourceManager::parse(char* fileName)
 			break;
 		}
 
-		parseChild(data);
+		parseChild(data, NULL);
 		
 		SAFE_RELEASE(data);
 	}
+	
+	tempResgisterFrame(_topTransform);
 }
 
-void ResourceManager::parseChild(LPD3DXFILEDATA xfileData)
+void ResourceManager::parseChild(LPD3DXFILEDATA xfileData, void* data)
 {
 	HRESULT hr = 0;
 	GUID type;
 
 	hr = xfileData->GetType(&type);	
+	
+	void* param = data;
 
-	if (type == TID_D3DRMMesh && i == 0) //!skinInfo)
+	if (type == TID_D3DRMFrame) //!skinInfo
+	{
+		if (!data)
+		{
+			_topTransform = new Transform();
+			_topTransform->_parent = NULL;
+			param = _topTransform;
+		}
+		else
+		{
+			Transform* parent = static_cast<Transform*>(data);			
+			Transform* newTransform = new Transform();
+			parent->_children.push_back(newTransform);
+			newTransform->_parent = parent;
+			param = newTransform;
+		}
+
+		DWORD size = 0;
+
+		Transform* tempTransform = static_cast<Transform *>(param);
+
+		if (SUCCEEDED(hr = xfileData->GetName(NULL, &size)))
+		{
+			if (size > 0) {
+				tempTransform->_name = new char[size];
+				xfileData->GetName(tempTransform->_name, &size);				
+			}
+		}
+	}
+	else if (type == TID_D3DRMFrameTransformMatrix)
+	{
+		Transform* tempTransform = static_cast<Transform*>(data);		
+		tempTransform->_frame->load(xfileData);
+		return;
+	}
+	else if (type == TID_D3DRMMesh) //!skinInfo
 	{		
 		ID3DXBuffer*	adjBuffer = 0;
 		ID3DXBuffer*	mtrlBuffer = 0;
@@ -80,23 +120,20 @@ void ResourceManager::parseChild(LPD3DXFILEDATA xfileData)
 		hr = D3DXLoadSkinMeshFromXof(xfileData, D3DXMESH_MANAGED, D3DDevice,
 			&adjBuffer, &mtrlBuffer, 0, &numMtrls,&skinInfo, &mesh);
 
-		Mesh* tempMesh = NULL;
 		if (skinInfo)
 		{
-			tempMesh = new SkinnedMesh();
 			_meshRenderer = new SkinnedMeshRenderer();
+			_meshRenderer->_mesh = new SkinnedMesh();
 		}
 		else
 		{
-			tempMesh = new Mesh();
 			_meshRenderer = new MeshRenderer();
+			_meshRenderer->_mesh = new Mesh();			
 		}
-			
 
-		tempMesh->_meshContainer->Mesh = mesh;
-		tempMesh->_meshContainer->Adjacency = (DWORD*)adjBuffer->GetBufferPointer();
-		tempMesh->_meshContainer->SkinInfo = skinInfo;
-		_meshRenderer->_mesh = tempMesh;
+		_meshRenderer->_mesh->_meshContainer->Mesh = mesh;
+		_meshRenderer->_mesh->_meshContainer->Adjacency = adjBuffer;
+		_meshRenderer->_mesh->_meshContainer->SkinInfo = skinInfo;
 
 		if (mtrlBuffer != 0 && numMtrls != 0)
 		{
@@ -120,7 +157,6 @@ void ResourceManager::parseChild(LPD3DXFILEDATA xfileData)
 					_textures.push_back(0);
 					_meshRenderer->_textures.push_back(0);
 				}
-
 			}
 		}
 
@@ -129,17 +165,21 @@ void ResourceManager::parseChild(LPD3DXFILEDATA xfileData)
 
 		if (skinInfo)
 		{
-			mesh->CloneMesh(D3DXMESH_MANAGED, NULL,	D3DDevice, &tempMesh->_meshContainer->FinalMesh);
+			mesh->CloneMesh(D3DXMESH_MANAGED, NULL,	D3DDevice, &_meshRenderer->_mesh->_meshContainer->FinalMesh);		
+			_meshRenderer->_mesh->_meshContainer->FrameMatrices = new LPD3DXMATRIX[skinInfo->GetNumBones()];
+			_meshRenderer->_mesh->_meshContainer->FinalMatrices = new D3DXMATRIX[skinInfo->GetNumBones()];
 		}
-		i++;
+
+		return;
 	}
-	if (type == TID_D3DRMAnimationSet)
+	else if (type == TID_D3DRMAnimationSet)
 	{
 		/*Animation* animation = new Animation();
 		animation->load(xfileData);
-		_animations.push_back(animation);*/
+		_animations.push_back(animation);
+		return;*/
+		return;
 	}
-
 
 	SIZE_T childCount;
 	xfileData->GetChildren(&childCount);
@@ -150,9 +190,71 @@ void ResourceManager::parseChild(LPD3DXFILEDATA xfileData)
 		if (FAILED(hr = xfileData->GetChild(i, &pSubData)))
 			continue;
 
-		parseChild(pSubData);
+		parseChild(pSubData, param);
 		SAFE_RELEASE(pSubData);
 	}
 }
 
-void ResourceManager::tempUpdate() { _meshRenderer->update(); }
+
+void ResourceManager::tempUpdateFrame(Transform *transform)
+{
+	if (!transform) return;
+		
+	if (transform->_parent)
+	{		
+		transform->_frame->_matrixContainer->CombTransformationMatrix = transform->_frame->_matrixContainer->Matrix * transform->_parent->_frame->_matrixContainer->CombTransformationMatrix;
+	}
+	else
+		transform->_frame->_matrixContainer->CombTransformationMatrix = transform->_frame->_matrixContainer->Matrix;
+
+	if (transform->_children.size() == 0) return;
+
+	std::list<Transform *>::iterator it;
+	for (it = transform->_children.begin(); it != transform->_children.end(); ++it)
+	{
+		tempUpdateFrame(*it);
+	}
+		
+}
+
+void ResourceManager::tempUpdate()
+{ 
+	tempUpdateFrame(_topTransform);
+	_meshRenderer->update();
+}
+void ResourceManager::tempClearTransform(Transform* transform)
+{
+	if (transform->_children.size() == 0) return;	
+
+	std::list<Transform *>::iterator it;	
+	for (it = transform->_children.begin(); it != transform->_children.end(); ++it)
+	{
+		tempClearTransform(*it);
+	}
+
+	SAFE_DELETE(transform);
+}
+void ResourceManager::tempResgisterFrame(Transform *transform)
+{		
+	if (transform->_children.size() == 0) return;
+
+	std::list<Transform *>::iterator it;
+	for (it = transform->_children.begin(); it != transform->_children.end(); ++it)
+	{
+		tempResgisterFrame(*it);
+	}
+	
+	ID3DXSkinInfo* skinInfo = _meshRenderer->_mesh->_meshContainer->SkinInfo;
+	DWORD numBones = skinInfo->GetNumBones();
+	
+	for (DWORD i = 0; i < numBones; i++)
+	{
+		LPCSTR name = skinInfo->GetBoneName(i);
+
+		if (strcmp(transform->_name, name) == 0)
+		{
+			_meshRenderer->_mesh->_meshContainer->FrameMatrices[i] = &(transform->_frame->_matrixContainer->CombTransformationMatrix);
+		}
+		
+	}
+}

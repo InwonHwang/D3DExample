@@ -7,5 +7,6 @@ public:
 	~SkinnedMeshRenderer();
 
 	virtual void update() override;
+	void updateMeshContainer();
 };
 

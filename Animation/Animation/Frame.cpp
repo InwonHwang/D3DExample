@@ -6,6 +6,7 @@ Frame::Frame()
 	: IResourceItem(),
 	_matrixContainer(NULL)
 {
+	_matrixContainer = new MATRIXCONTAINER();
 }
 
 

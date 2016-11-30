@@ -11,20 +11,31 @@
 class Animation;
 class Frame;
 
-class AnimationController
+class AnimationController : private ID3DXAnimationController
 {
-private:	
-	ID3DXAnimationController* _animationController;	
-	std::list<Animation *>* _animations;
-	std::list<Frame *>* _frames;
+private:
 
-public:
-	AnimationController();
-	~AnimationController();
 
-	void registerAnimation(Animation*);
-	void registerFrame(Frame*);
-	void create();
-	void tempUpdate(); //임시 Test용;
+	
+
+
 };
+
+
+//class AnimationController
+//{
+//private:	
+//	ID3DXAnimationController* _animationController;	
+//	std::list<Animation *>* _animations;
+//	std::list<Frame *>* _frames;
+//
+//public:
+//	AnimationController();
+//	~AnimationController();
+//
+//	void registerAnimation(Animation*);
+//	void registerFrame(Frame*);
+//	void create();
+//	void tempUpdate(); //임시 Test용;
+//};
 

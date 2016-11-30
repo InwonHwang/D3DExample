@@ -15,10 +15,12 @@
 // 
 
 class AnimationController;
+class ResourceManager;
 
 class Animation final : public IResourceItem
 {
 	friend class AnimationController;
+	friend class ResourceManager;
 
 	typedef struct tagD3DXKeyMatrix
 	{
@@ -36,7 +38,7 @@ class Animation final : public IResourceItem
 		D3DXKEY_VECTOR3*	PositionKeys;	// PositionKey 정보
 		D3DXKEY_MATRIX*		MatrixKeys;		// MatrixKey 정보
 
-		tagAnimationData() : Name(nullptr), ScaleKeys(nullptr), RotationKeys(nullptr), PositionKeys(nullptr), MatrixKeys(nullptr) {}
+		tagAnimationData() : Name(NULL), ScaleKeys(NULL), RotationKeys(NULL), PositionKeys(NULL), MatrixKeys(NULL) {}
 		~tagAnimationData()
 		{
 			SAFE_DELETE_ARRAY(Name);

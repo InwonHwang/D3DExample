@@ -166,6 +166,7 @@
     <ClCompile Include="SkinnedMesh.cpp" />
     <ClCompile Include="SkinnedMeshRenderer.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="Transform.cpp" />
     <ClCompile Include="XFile.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -186,6 +187,7 @@
     <ClInclude Include="SkinnedMeshRenderer.h" />
     <ClInclude Include="Structure.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Transform.h" />
     <ClInclude Include="XFile.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
