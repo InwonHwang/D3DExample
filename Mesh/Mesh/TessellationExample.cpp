@@ -56,7 +56,7 @@ void InitMesh(void)
 	ID3DXBuffer* mtrlBuffer = 0;
 	DWORD        numMtrls = 0;
 
-	hr = D3DXLoadMeshFromX(_T("bigship1.x"), D3DXMESH_SYSTEMMEM, D3DDevice,
+	hr = D3DXLoadMeshFromX(_T("Hanzo.x"), D3DXMESH_SYSTEMMEM, D3DDevice,
 		&adjBuffer, &mtrlBuffer, 0, &numMtrls, &SourceMesh);
 
 	if (FAILED(hr)) DebugError(hr);

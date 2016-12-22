@@ -1,21 +1,21 @@
 #pragma once
 #include "Renderer.h"
+#include "stdafx.h"
 
 class Mesh;
-class Material;
+class ResourceManager;
 
 class MeshRenderer : public Renderer
 {
-private:
+	friend class ResourceManager;
+protected:
 	Mesh* _mesh;
-	Material* _material;
-
+	std::list<D3DMATERIAL9 *> _materials;
+	std::list<IDirect3DTexture9 *> _textures;
 public:
 	MeshRenderer();
-	~MeshRenderer();
+	virtual ~MeshRenderer();
 
-	virtual void Update() override;
-	virtual void SetMesh(Mesh* mesh);
-	virtual void SetSubMesh(Material* material);
+	virtual void update() override;
 };
 

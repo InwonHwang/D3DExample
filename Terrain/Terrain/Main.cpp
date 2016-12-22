@@ -20,7 +20,7 @@ DWORD g_dwMouseY = 0;
 void InitMatrix()
 {
 	D3DXMATRIX matView;
-	D3DXVECTOR3 vEyePt(0.0f, 100.0f, 1.0f);
+	D3DXVECTOR3 vEyePt(0.0f, 500.0f, 1.0f);
 	D3DXVECTOR3 vLookAtPt(0.0f, 0.0f, 0.0f);
 	D3DXVECTOR3 vUpVec(0.0f, 1.0f, 0.0f);
 	D3DXMatrixLookAtLH(&matView, &vEyePt, &vLookAtPt, &vUpVec);
@@ -31,7 +31,7 @@ void InitMatrix()
 		D3DXToRadian(45),
 		800 / 600,
 		1.0f,
-		100.0f);
+		10000.0f);
 	D3DDevice->SetTransform(D3DTS_PROJECTION, &matProjection);
 
 	float index = 1.5f;
@@ -107,7 +107,6 @@ void Render(void)
 		D3DXMatrixIdentity(&I);
 
 		if (Terrain) Terrain->draw(&I, false);
-			
 
 		D3DDevice->EndScene();
 	}
@@ -157,7 +156,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	Camera = new ZCamera;	
 	InitMatrix();
 	InitLight();
-	Terrain = new MyTerrain("coastMountain64.raw", 64, 64, 1, 0.1f);
+	Terrain = new MyTerrain("coastMountain64.raw", 64, 64, 10, 1);
 	D3DXVECTOR3 lightDirection(0.0f, 1.0f, 0.0f);
 	Terrain->genTexture(&lightDirection);
 	//Terrain->loadTexture(_T("grass.bmp"));

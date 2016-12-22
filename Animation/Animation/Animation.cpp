@@ -5,7 +5,7 @@ Animation::Animation()
 	: IResourceItem(),
 	_animationSet(NULL),
 	_animationData(NULL)
-{
+{	
 }
 
 Animation::~Animation()
@@ -96,6 +96,11 @@ void Animation::loadAnimationKey(LPD3DXFILEDATA xfileData, void* pData)
 					&animData->RotationKeys[i].Value,
 					&animData->PositionKeys[i].Value,
 					&animData->MatrixKeys[i].Value);
+
+				animData->RotationKeys[i].Value.x = -animData->RotationKeys[i].Value.x;
+				animData->RotationKeys[i].Value.y = -animData->RotationKeys[i].Value.y;
+				animData->RotationKeys[i].Value.z = -animData->RotationKeys[i].Value.z;
+				animData->RotationKeys[i].Value.w = animData->RotationKeys[i].Value.w;
 
 				tempBuffer += sizeof(D3DXMATRIX) + sizeof(DWORD) * 2;
 			}
@@ -203,11 +208,10 @@ void Animation::create(char *animName, float speed, bool loop)
 	HRESULT hr = 0;
 
 	if (!_animationData)
-		hr = D3DXCreateKeyframedAnimationSet(animName, speed, playbackType, 1, 0, NULL, &_animationSet);
+		hr = D3DXCreateKeyframedAnimationSet(animName, speed, playbackType, 160, 0, NULL, &_animationSet);
 	else
 	{
 		hr = D3DXCreateKeyframedAnimationSet(animName, speed, playbackType, _numAnimation, 0, NULL, &_animationSet);
-
 
 		for (DWORD i = 0; i < _numAnimation; i++)
 		{

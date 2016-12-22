@@ -35,34 +35,34 @@ struct CUSTOM_MESHCONTAINER : public D3DXMESHCONTAINER
 	LPDIRECT3DTEXTURE9* pTextures;    // an array of applicable textures
 };
 
-//class Transform
-//{
-//private:
-//	std::list<Transform *> _children;
-//	Transform * _parent;
-//	
-//
-//public:
-//	D3DXFRAME* _frame;
-//
-//	void SetChild(Transform * child)
-//	{
-//		_children.push_back(child);
-//	}
-//
-//	void SetParent(Transform * parent)
-//	{
-//		_parent = parent;
-//	}
-//
-//	void CreateFrame()
-//	{
-//		_frame = new CUSTOM_FRAME();
-//	}
-//
-//	Transform() {}
-//	~Transform() { _children.clear(); _parent = NULL;}
-//};
+class Transform
+{
+private:
+	std::list<Transform *> _children;
+	Transform * _parent;
+	
+
+public:
+	D3DXFRAME* _frame;
+
+	void SetChild(Transform * child)
+	{
+		_children.push_back(child);
+	}
+
+	void SetParent(Transform * parent)
+	{
+		_parent = parent;
+	}
+
+	void CreateFrame()
+	{
+		_frame = new CUSTOM_FRAME();
+	}
+
+	Transform() {}
+	~Transform() { _children.clear(); _parent = NULL;}
+};
 
 std::list<Transform *> Transforms;
 Transform* TopTransform;
@@ -394,7 +394,7 @@ void render_frame(void)
 
 	D3DXMATRIX matView;    // the view transform matrix
 	D3DXMatrixLookAtLH(&matView,
-		&D3DXVECTOR3(1000.0f, 100.0f, 0.0f),    // the camera position
+		&D3DXVECTOR3(500.0f, 100.0f, 0.0f),    // the camera position
 		&D3DXVECTOR3(0.0f, 0.0f, 0.0f),    // the look-at position
 		&D3DXVECTOR3(0.0f, 1.0f, 0.0f));    // the up direction
 	d3ddev->SetTransform(D3DTS_VIEW, &matView);    // set the view transform to matView 
@@ -469,7 +469,7 @@ void init_graphics(void)
 
 
 
-	D3DXLoadMeshHierarchyFromX(L"tiny.x",
+	D3DXLoadMeshHierarchyFromX(L"Hanzo.x",
 		D3DXMESH_MANAGED,
 		d3ddev,
 		&MemAllocator,

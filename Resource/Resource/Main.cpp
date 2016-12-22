@@ -1,18 +1,10 @@
 
 #include "stdafx.h"
 #include "Device.h"
-#include "Font.h"
-#include "Timer.h"
-#include "Mesh.h"
-#include "Material.h"
-#include "MeshRenderer.h"
-#include "Pool.h"
+#include "XFile.h"
+#include "ResourceManager.h"
 
-Font *font;
-Mesh *mesh;
-Material *material;
-MeshRenderer *meshRenderer;
-Timer timer;
+ResourceManager* rm;
 
 void Init()
 {
@@ -33,43 +25,38 @@ void Init()
 
 void Render()
 {
-	D3DXMATRIX matView;
+	D3DXMATRIX matView;    // the view transform matrix
 	D3DXMatrixLookAtLH(&matView,
-		&D3DXVECTOR3(0.0f, 10.0f, 40.0f),
-		&D3DXVECTOR3(0.0f, 0.0f, 0.0f),
-		&D3DXVECTOR3(0.0f, 1.0f, 0.0f));
-	D3DDevice->SetTransform(D3DTS_VIEW, &matView);
+		&D3DXVECTOR3(1000.0f, 100.0f, 0.0f),    // the camera position
+		&D3DXVECTOR3(0.0f, 0.0f, 0.0f),    // the look-at position
+		&D3DXVECTOR3(0.0f, 1.0f, 0.0f));    // the up direction
+	D3DDevice->SetTransform(D3DTS_VIEW, &matView);    // set the view transform to matView 
 
-	D3DXMATRIX matProjection;
+	D3DXMATRIX matProjection;    // the projection transform matrix
 	D3DXMatrixPerspectiveFovLH(&matProjection,
-		D3DXToRadian(45),
-		800 / 600,
-		1.0f,
-		100.0f);
-	D3DDevice->SetTransform(D3DTS_PROJECTION, &matProjection);
+		D3DXToRadian(45),    // the horizontal field of view
+		(FLOAT)800 / (FLOAT)600,    // aspect ratio
+		1.0f,    // the near view-plane
+		2000.0f);    // the far view-plane
+	D3DDevice->SetTransform(D3DTS_PROJECTION, &matProjection);    // set the projection
 
-	float index = 1.5f;
-	D3DXMATRIX matRotateY;
-	D3DXMatrixRotationY(&matRotateY, index);
-	D3DDevice->SetTransform(D3DTS_WORLD, &(matRotateY));
+	//static float index = 0.0f; index += 0.03f;    // an ever-increasing float value
+	D3DXMATRIX matRotateY;    // a matrix to store the rotation for each triangle
+	//D3DXMatrixRotationY(&matRotateY, index);    // the rotation matrix
+	D3DXMatrixRotationY(&matRotateY, 0);    // the rotation matrix
+	D3DDevice->SetTransform(D3DTS_WORLD, &matRotateY);    // set the world transform
 
 	D3DDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0, 32, 64, 128), 1.0f, 0);
 	D3DDevice->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_ARGB(0, 32, 64, 128), 1.0f, 0);
 
-	// Begin the scene
 	if (SUCCEEDED(D3DDevice->BeginScene()))
-	{
-		font->draw();
-		meshRenderer->Update();
+	{		
+		rm->tempUpdate();
 		D3DDevice->EndScene();
 	}
 
-	// Present the backbuffer contents to the display
 	D3DDevice->Present(NULL, NULL, NULL, NULL);
 }
-
-
-
 
 //-----------------------------------------------------------------------------
 // Name: MsgProc()
@@ -78,18 +65,15 @@ void Render()
 LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
-	{
+	{	
 	case WM_DESTROY:
-		font->release();
-		SAFE_DELETE(font);
-		SAFE_DELETE(mesh);
-		SAFE_DELETE(meshRenderer);
+		SAFE_DELETE(rm);
 		D3D->Release();
+		XFILE->Release();
 		PostQuitMessage(0);
 		return 0;
 
 	case WM_PAINT:
-		Render();
 		ValidateRect(hWnd, NULL);
 		return 0;
 	}
@@ -97,18 +81,10 @@ LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
-
-
-
-//-----------------------------------------------------------------------------
-// Name: wWinMain()
-// Desc: The application's entry point
-//-----------------------------------------------------------------------------
 INT WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, INT)
 {
 	UNREFERENCED_PARAMETER(hInst);
 
-	// Register the window class
 	WNDCLASSEX wc =
 	{
 		sizeof(WNDCLASSEX), CS_CLASSDC, MsgProc, 0L, 0L,
@@ -117,60 +93,40 @@ INT WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, INT)
 	};
 	RegisterClassEx(&wc);
 
-	// Create the application's window
 	HWND hWnd = CreateWindow(_T("D3D Tutorial"), _T("D3D Tutorial 01: CreateDevice"),
 		WS_OVERLAPPEDWINDOW, 100, 100, 800, 600,
 		NULL, NULL, wc.hInstance, NULL);
 
 	SetActiveWindow(hWnd);
-	timer.SetUp();
-	timer.start();
 
-	if (D3D->Init())
+	if (D3D->Init() && XFILE->Init())
 	{
-		font = new Font();
-		mesh = new Mesh();
-		material = new Material();
-		meshRenderer = new MeshRenderer();		
-
-		mesh->Load(_T("bigship1.x"));
-		material->set();
-		meshRenderer->SetMesh(mesh);
-		meshRenderer->SetSubMesh(material);
+		rm = new ResourceManager();
+		rm->parse("tiny.x");		
 
 		ShowWindow(hWnd, SW_SHOWDEFAULT);
 		UpdateWindow(hWnd);
 
 		MSG msg;
-		
-		static UINT32 lastTime = timer.getCurrentTime();
+		ZeroMemory(&msg, sizeof(msg));
 
-		while (GetMessage(&msg, NULL, 0, 0))
+		while (msg.message != WM_QUIT)
 		{
-			UINT32 curTime = timer.getCurrentTime();
-			float timeDelta = (curTime - lastTime) * 0.001f;
+			DWORD starting_point = GetTickCount();
 
 			if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 			{
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
-			else
-			{
-				std::tstring temp = IntegerToString(DWORD(1/timeDelta));
-				font->setString(temp.c_str());
-				Render();
+			
+			Render();
 
-				lastTime = curTime;
-			}
-
-
-			while ((timer.getCurrentTime() - curTime) < 30);
+			while ((GetTickCount() - starting_point) < 25);
 		}
 	}
 
-	SAFE_DELETE(mesh);
-	SAFE_DELETE(font);
+	
 
 	UnregisterClass(_T("D3D Tutorial"), wc.hInstance);
 	return 0;

@@ -6,6 +6,7 @@
 #include "Mesh.h"
 #include "SkinnedMesh.h"
 #include "Animation.h"
+#include "AnimationController.h"
 
 #include "MeshRenderer.h"
 #include "SkinnedMeshRenderer.h"
@@ -31,6 +32,7 @@ ResourceManager::~ResourceManager()
 	_textures.clear();
 
 	SAFE_DELETE(_meshRenderer);
+	SAFE_DELETE(_animationController);
 	tempClearTransform(_topTransform);	
 }
 
@@ -62,7 +64,16 @@ void ResourceManager::parse(char* fileName)
 		SAFE_RELEASE(data);
 	}
 	
-	tempResgisterFrame(_topTransform);
+	tempLinkFrame(_topTransform);
+	DWORD temp = _animations.front()->getNumBone();
+	_animationController = new AnimationController(temp, 1, 1, 1);
+	tempRegisterFrame(_animationController, _topTransform);
+	DWORD i = 0;
+	for (std::list<Animation *>::iterator it = _animations.begin(); it != _animations.end(); ++it)
+	{
+		_animationController->registerAnimation(i, *it);
+	}
+	
 }
 
 void ResourceManager::parseChild(LPD3DXFILEDATA xfileData, void* data)
@@ -110,7 +121,7 @@ void ResourceManager::parseChild(LPD3DXFILEDATA xfileData, void* data)
 		return;
 	}
 	else if (type == TID_D3DRMMesh) //!skinInfo
-	{		
+	{				
 		ID3DXBuffer*	adjBuffer = 0;
 		ID3DXBuffer*	mtrlBuffer = 0;
 		ID3DXSkinInfo*	skinInfo = 0;
@@ -174,10 +185,11 @@ void ResourceManager::parseChild(LPD3DXFILEDATA xfileData, void* data)
 	}
 	else if (type == TID_D3DRMAnimationSet)
 	{
-		/*Animation* animation = new Animation();
+		DebugBox(0, _T("hello"));
+		Animation* animation = new Animation();
 		animation->load(xfileData);
+		animation->create("temp", 5000, true);
 		_animations.push_back(animation);
-		return;*/
 		return;
 	}
 
@@ -200,53 +212,43 @@ void ResourceManager::tempUpdateFrame(Transform *transform)
 {
 	if (!transform) return;
 		
-	if (transform->_parent)
-	{		
-		transform->_frame->_matrixContainer->CombTransformationMatrix = transform->_frame->_matrixContainer->Matrix * transform->_parent->_frame->_matrixContainer->CombTransformationMatrix;
-	}
+	if (transform->_parent)	
+		transform->_frame->_matrixContainer->CombTransformationMatrix = transform->_frame->_matrixContainer->Matrix * transform->_parent->_frame->_matrixContainer->CombTransformationMatrix;	
 	else
 		transform->_frame->_matrixContainer->CombTransformationMatrix = transform->_frame->_matrixContainer->Matrix;
 
-	if (transform->_children.size() == 0) return;
-
 	std::list<Transform *>::iterator it;
-	for (it = transform->_children.begin(); it != transform->_children.end(); ++it)
-	{
-		tempUpdateFrame(*it);
-	}
-		
+	for (it = transform->_children.begin(); it != transform->_children.end(); ++it)	
+		tempUpdateFrame(*it);	
 }
 
 void ResourceManager::tempUpdate()
 { 
-	tempUpdateFrame(_topTransform);
+	_animationController->tempUpdate();	
+	tempUpdateFrame(_topTransform);		
 	_meshRenderer->update();
 }
+
 void ResourceManager::tempClearTransform(Transform* transform)
 {
-	if (transform->_children.size() == 0) return;	
+	if (!transform) return;	
+
+	SAFE_DELETE(transform);
 
 	std::list<Transform *>::iterator it;	
 	for (it = transform->_children.begin(); it != transform->_children.end(); ++it)
 	{
 		tempClearTransform(*it);
 	}
-
-	SAFE_DELETE(transform);
 }
-void ResourceManager::tempResgisterFrame(Transform *transform)
-{		
-	if (transform->_children.size() == 0) return;
 
-	std::list<Transform *>::iterator it;
-	for (it = transform->_children.begin(); it != transform->_children.end(); ++it)
-	{
-		tempResgisterFrame(*it);
-	}
-	
+void ResourceManager::tempLinkFrame(Transform *transform)
+{		
+	if (!transform) return;
+
 	ID3DXSkinInfo* skinInfo = _meshRenderer->_mesh->_meshContainer->SkinInfo;
 	DWORD numBones = skinInfo->GetNumBones();
-	
+
 	for (DWORD i = 0; i < numBones; i++)
 	{
 		LPCSTR name = skinInfo->GetBoneName(i);
@@ -255,6 +257,38 @@ void ResourceManager::tempResgisterFrame(Transform *transform)
 		{
 			_meshRenderer->_mesh->_meshContainer->FrameMatrices[i] = &(transform->_frame->_matrixContainer->CombTransformationMatrix);
 		}
-		
+
+	}
+
+	std::list<Transform *>::iterator it;
+	for (it = transform->_children.begin(); it != transform->_children.end(); ++it)
+	{
+		tempLinkFrame(*it);
+	}
+}
+
+void ResourceManager::tempRegisterFrame(AnimationController* animationController, Transform *transform)
+{
+	if (!animationController || !transform) return;
+
+	ID3DXSkinInfo* skinInfo = _meshRenderer->_mesh->_meshContainer->SkinInfo;
+	DWORD numBones = skinInfo->GetNumBones();
+
+	animationController->registerTransform(transform);
+
+	/*for (DWORD i = 0; i < numBones; i++)
+	{
+		LPCSTR name = skinInfo->GetBoneName(i);
+
+		if (strcmp(transform->_name, name) == 0)
+		{
+			MessageBoxA(GetActiveWindow(), name, name, MB_OK);
+		}
+	}	*/
+
+	std::list<Transform *>::iterator it;
+	for (it = transform->_children.begin(); it != transform->_children.end(); ++it)
+	{
+		tempRegisterFrame(animationController, *it);
 	}
 }

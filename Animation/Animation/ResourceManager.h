@@ -1,8 +1,7 @@
 #pragma once
 #include "stdafx.h"
 
-//class Animation;
-
+class AnimationController;
 class Animation;
 class MeshRenderer;
 class Transform;
@@ -24,11 +23,14 @@ public:
 
 	MeshRenderer*	_meshRenderer;
 	Transform*		_topTransform;
+	AnimationController* _animationController;
+	D3DXMATRIX _tempMatrix;
 
-	void tempUpdateFrame(Transform *Top);
 	void tempUpdate(); //test용
-	void tempClearTransform(Transform *Top); // test용
-	void tempResgisterFrame(Transform *Top); // test용
+	void tempUpdateFrame(Transform *); //test용	
+	void tempClearTransform(Transform *); // test용
+	void tempLinkFrame(Transform *); // test용
+	void tempRegisterFrame(AnimationController*, Transform *); // test용
 
 };
 

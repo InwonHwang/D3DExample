@@ -3,10 +3,11 @@
 #include "Frame.h"
 
 class ResourceManager;
-
+class AnimationController;
 class Transform : public Component
 {
 	friend class ResourceManager;
+	friend class AnimationController;
 private:
 	Frame* _frame;
 	Transform *_parent;

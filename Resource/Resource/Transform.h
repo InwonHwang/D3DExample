@@ -1,16 +1,23 @@
 #pragma once
-#include "Component.h"
-#include "stdafx.h"
+#include "IComponent.h"
+#include "Frame.h"
 
-class Transform : public Component
+class ResourceManager;
+class AnimationController;
+class Transform : public IComponent
 {
+	friend class ResourceManager;
+	friend class AnimationController;
 private:
-	std::list<Component *> _children;
-	Component * _parent;
-	LPD3DXFRAME _frame;
-	
+	Frame* _frame;
+	Transform *_parent;
+	std::list<Transform *> _children;
+	char*	_name;
+
 public:
 	Transform();
 	~Transform();
+
+	virtual void update() {}
 };
 

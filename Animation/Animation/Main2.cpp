@@ -40,9 +40,10 @@ void Render()
 		2000.0f);    // the far view-plane
 	D3DDevice->SetTransform(D3DTS_PROJECTION, &matProjection);    // set the projection
 
-	static float index = 0.0f; index += 0.03f;    // an ever-increasing float value
+	//static float index = 0.0f; index += 0.03f;    // an ever-increasing float value
 	D3DXMATRIX matRotateY;    // a matrix to store the rotation for each triangle
-	D3DXMatrixRotationY(&matRotateY, index);    // the rotation matrix
+	//D3DXMatrixRotationY(&matRotateY, index);    // the rotation matrix
+	D3DXMatrixRotationY(&matRotateY, 0);    // the rotation matrix
 	D3DDevice->SetTransform(D3DTS_WORLD, &matRotateY);    // set the world transform
 
 	D3DDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0, 32, 64, 128), 1.0f, 0);
@@ -101,7 +102,7 @@ INT WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, INT)
 	if (D3D->Init() && XFILE->Init())
 	{
 		rm = new ResourceManager();
-		rm->parse("tiny.x");		
+		rm->parse("Hanzo.X");		
 
 		ShowWindow(hWnd, SW_SHOWDEFAULT);
 		UpdateWindow(hWnd);

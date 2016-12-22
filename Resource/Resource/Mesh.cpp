@@ -3,47 +3,22 @@
 
 Mesh::Mesh()
 {
-	_d3dxMeshContainer = new D3DXMESHCONTAINER();
+	_meshContainer = new MESHCONTAINER();
 }
 
 
 Mesh::~Mesh()
-{	
-	SAFE_RELEASE(_d3dxMeshContainer->MeshData.pMesh);
-	SAFE_DELETE(_d3dxMeshContainer);
+{
+	SAFE_DELETE(_meshContainer);
 }
 
-void Mesh::Save() 
+void Mesh::save()
 {
 }
-
-void Mesh::Load(LPD3DXFILEDATA xfileData)
-{
-}
-
-void Mesh::Load(TCHAR * fileName)
-{	
-	D3DXLoadMeshFromX(fileName, D3DXMESH_MANAGED, D3DDevice, NULL, NULL, NULL, NULL, &(_d3dxMeshContainer->MeshData.pMesh));
-}
-
-SkinnedMesh::SkinnedMesh()
-{
-	_d3dxMeshContainer = new ANIMMESHCONTAINER();
-}
-SkinnedMesh::~SkinnedMesh()
+void Mesh::loadChildren(LPD3DXFILEDATA, void*)
 {
 
 }
-
-void SkinnedMesh::Save()
+void Mesh::load(LPD3DXFILEDATA xfileData)
 {
-
-}
-void SkinnedMesh::Load(LPD3DXFILEDATA xfileData)
-{
-
-}
-void SkinnedMesh::Load(TCHAR *fileName)
-{
-
 }

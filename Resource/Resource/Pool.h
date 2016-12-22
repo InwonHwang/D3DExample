@@ -4,7 +4,7 @@
 class Mesh;
 class Material;
 class Texture;
-class Component;
+class IComponent;
 
 //namespace Pool
 //{
@@ -14,9 +14,7 @@ class Component;
 class ResourcePool abstract
 {
 public:
-	static boost::object_pool<Mesh> Mesh;
-	static boost::object_pool<Material> Material;
-	static boost::object_pool<Texture> Texture;
+	
 };
 
 class ComponentPool abstract

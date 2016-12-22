@@ -96,7 +96,7 @@ void SetMatrix()
 {
 	D3DXMATRIX matView;
 	D3DXMatrixLookAtLH(&matView,
-		&D3DXVECTOR3(0.0f, 20.0f, 50.0f),
+		&D3DXVECTOR3(100.0f, 00.0f, 0.0f),
 		&D3DXVECTOR3(0.0f, 0.0f, 0.0f),
 		&D3DXVECTOR3(0.0f, 1.0f, 0.0f));
 	D3DDevice->SetTransform(D3DTS_VIEW, &matView);
@@ -109,9 +109,9 @@ void SetMatrix()
 		100.0f);
 	D3DDevice->SetTransform(D3DTS_PROJECTION, &matProjection);
 
-	float index = 1.5f;
+
 	D3DXMATRIX matRotateY;
-	D3DXMatrixRotationY(&matRotateY, index);
+	D3DXMatrixRotationY(&matRotateY, 0);
 	D3DDevice->SetTransform(D3DTS_WORLD, &(matRotateY));
 }
 
@@ -164,7 +164,7 @@ void InitMesh(void)
 	ID3DXBuffer* mtrlBuffer = 0;
 	DWORD        numMtrls = 0;
 
-	hr = D3DXLoadMeshFromX(_T("airplane 2.x"), D3DXMESH_MANAGED, D3DDevice,
+	hr = D3DXLoadMeshFromX(_T("Hanzo.X"), D3DXMESH_MANAGED, D3DDevice,
 		&adjBuffer, &mtrlBuffer, 0, &numMtrls, &SourceMesh);
 
 

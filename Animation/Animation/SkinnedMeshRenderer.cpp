@@ -21,7 +21,7 @@ void SkinnedMeshRenderer::update()
 	for (DWORD i = 0; i < _materials.size(); i++)
 	{
 		D3DDevice->SetMaterial((*it));
-		_mesh->_meshContainer->Mesh->DrawSubset(i);
+		_mesh->_meshContainer->FinalMesh->DrawSubset(i);
 		++it;
 	}
 }
@@ -34,9 +34,10 @@ void SkinnedMeshRenderer::updateMeshContainer()
 																	  // for each frame in the mesh container...
 		for (UINT i = 0; i < NumFrames; i++)
 		{
-			_mesh->_meshContainer->FinalMatrices[i] = *_mesh->_meshContainer->SkinInfo->GetBoneOffsetMatrix(i);			
+			_mesh->_meshContainer->FinalMatrices[i] = *_mesh->_meshContainer->SkinInfo->GetBoneOffsetMatrix(i);				
 			_mesh->_meshContainer->FinalMatrices[i] *= *_mesh->_meshContainer->FrameMatrices[i];			
 		}
+		
 
 		void* pSrc = NULL;   
 		void* pDst = NULL;    

@@ -1,14 +1,10 @@
 #pragma once
-#include "Component.h"
+#include "IComponent.h"
 
-class Renderer : public Component
-{
-
-
+class Renderer : public IComponent
+{	
 public:
 	Renderer();
 	~Renderer();
-
-	virtual void Update() override;
 };
 
