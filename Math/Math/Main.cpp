@@ -39,41 +39,56 @@ int main()
 	cout << "외적: " << result.x << " " << result.y << " " << result.z << endl << endl;
 
 	// -------------------------- 행렬 --------------------------
-	Matrix m1;
-	Matrix m2(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);
+	Matrix positionMatrix;
 
 	//이동행렬 구하기	
-	D3DXMatrixTranslation(&m1, 1, 2, 3);
-	cout << m1._11 << " " << m1._12 << " " << m1._13 << " " << m1._14 << endl;
-	cout << m1._21 << " " << m1._22 << " " << m1._23 << " " << m1._24 << endl;
-	cout << m1._31 << " " << m1._32 << " " << m1._33 << " " << m1._34 << endl;
-	cout << m1._41 << " " << m1._42 << " " << m1._43 << " " << m1._44 << endl << endl;
+	D3DXMatrixTranslation(&positionMatrix, 1, 2, 3);
+
+	D3DXVECTOR3 s, t;
+	D3DXQUATERNION r;
+		
+	D3DXMatrixDecompose(&s, &r, &t, &positionMatrix);
+	cout << "position---------------------" << endl;
+	cout << s.x << " " << s.y << " " << s.z << endl ;
+	cout << r.x << " " << r.y << " " << r.z << endl ;
+	cout << t.x << " " << t.y << " " << t.z << endl << endl ;
 
 	//회전행렬 구하기	
-	D3DXMatrixRotationX(&m1, 45);
-	cout << m1._11 << " " << m1._12 << " " << m1._13 << " " << m1._14 << endl;
-	cout << m1._21 << " " << m1._22 << " " << m1._23 << " " << m1._24 << endl;
-	cout << m1._31 << " " << m1._32 << " " << m1._33 << " " << m1._34 << endl;
-	cout << m1._41 << " " << m1._42 << " " << m1._43 << " " << m1._44 << endl << endl;
+	Matrix rotationMatrix;
 
-	D3DXMatrixRotationY(&m1, 45);
-	cout << m1._11 << " " << m1._12 << " " << m1._13 << " " << m1._14 << endl;
-	cout << m1._21 << " " << m1._22 << " " << m1._23 << " " << m1._24 << endl;
-	cout << m1._31 << " " << m1._32 << " " << m1._33 << " " << m1._34 << endl;
-	cout << m1._41 << " " << m1._42 << " " << m1._43 << " " << m1._44 << endl << endl;
+	D3DXMatrixRotationYawPitchRoll(&rotationMatrix, 45, 45, 45);
 
-	D3DXMatrixRotationZ(&m1, 45);
-	cout << m1._11 << " " << m1._12 << " " << m1._13 << " " << m1._14 << endl;
-	cout << m1._21 << " " << m1._22 << " " << m1._23 << " " << m1._24 << endl;
-	cout << m1._31 << " " << m1._32 << " " << m1._33 << " " << m1._34 << endl;
-	cout << m1._41 << " " << m1._42 << " " << m1._43 << " " << m1._44 << endl << endl;
+	//D3DXMatrixRotationX(&rotationMatrix, 45);
+	////D3DXQuaternion(&m1, 45);
+
+	//D3DXMatrixDecompose(&s, &r, &t, &rotationMatrix);
+	//cout << "rotation---------------------" << endl;
+	//cout << s.x << " " << s.y << " " << s.z << endl;
+	//cout << r.x << " " << r.y << " " << r.z << endl;
+	//cout << t.x << " " << t.y << " " << t.z << endl << endl;
+
+	//D3DXMatrixRotationY(&rotationMatrix, 45);
+	//D3DXMatrixRotationZ(&rotationMatrix, 45);
+
+	cout << "rotation---------------------" << endl;
+	cout << s.x << " " << s.y << " " << s.z << endl;
+	cout << r.x << " " << r.y << " " << r.z << endl;
+	cout << t.x << " " << t.y << " " << t.z << endl << endl;
 
 	//크기 변환 구하기	
-	D3DXMatrixScaling(&m1, 2, 2, 2);
-	cout << m1._11 << " " << m1._12 << " " << m1._13 << " " << m1._14 << endl;
-	cout << m1._21 << " " << m1._22 << " " << m1._23 << " " << m1._24 << endl;
-	cout << m1._31 << " " << m1._32 << " " << m1._33 << " " << m1._34 << endl;
-	cout << m1._41 << " " << m1._42 << " " << m1._43 << " " << m1._44 << endl << endl;
+	Matrix scaleMatrix;
+	D3DXMatrixScaling(&scaleMatrix, 2, 2, 2);
+
+	scaleMatrix *= rotationMatrix;
+	scaleMatrix *= positionMatrix;
+
+	
+
+	D3DXMatrixDecompose(&s, &r, &t, &scaleMatrix);
+	cout << "scale---------------------" << endl;
+	cout << s.x << " " << s.y << " " << s.z << endl;
+	cout << r.x << " " << r.y << " " << r.z << endl;
+	cout << t.x << " " << t.y << " " << t.z << endl << endl;
 
 	//Matrix 연산은 크기, 회전, 이동 순으로 곱해주기
 	
