@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "D3D\Method\Transform.h"
+#include "D3D\Method\Camera.h"
 
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
@@ -17,63 +18,25 @@ std::vector<D3DMATERIAL9>       Mtrls(0);
 std::vector<IDirect3DTexture9*> Textures(0);
 D3DMATERIAL9					mtrl;
 
-namespace std { typedef basic_string<TCHAR> tstring; }
-
-void DebugBox(HRESULT hr, LPCTSTR str)
-{
-	TCHAR szBuffer[50];
-	_stprintf_s(szBuffer, _T("%i"), hr);
-
-	MessageBox(GetActiveWindow(), szBuffer, str, MB_OK);
-}
-
-std::tstring floatToString(float f)
-{
-	TCHAR szBuffer[50];
-	_stprintf_s(szBuffer, _T("%f"), f);
-
-	return std::tstring(szBuffer);
-}
+Transform t;
+Camera c;
 
 
 void InitMatrix()
 {
-	/*Transform t;
 	
-	t.setLocalPosition(Vector3(-300, 0, 0));
-	t.setLocalRotation(Vector3(0, 45, 0));
-	
-	t.getLocalPosition();
-	t.getPosition();*/
+	t.init();
 
-	D3DXMATRIX m1;
-	D3DXMatrixIdentity(&m1);
-	
-	D3DXMatrixRotationYawPitchRoll(&m1, 0, 45, 0);
+	t.setPosition(Vector3(0, 0, 300));
+	t.setRotation(0, 20, 0);
+	t.update();
 
-	Vector3 s, t;
-	Quaternion r;
-	D3DXMatrixDecompose(&s, &r, &t, &m1);
-
-	Vector3 axis;
-	float angle;
-	D3DXQuaternionToAxisAngle(&r, &axis, &angle);
-	DebugBox(0, floatToString(axis.x).c_str());
-	DebugBox(0, floatToString(axis.y).c_str());
-	DebugBox(0, floatToString(axis.z).c_str());
-
-	DebugBox(0, floatToString(angle).c_str());
-	//DebugBox(0, floatToString(r.y).c_str());
-	
+	Quaternion s = t.getRotation();
+	Vector3 e = Quaternion::ToEulerAngle(s);	
 
 	
 
-	D3DXMATRIX matView;
-	D3DXVECTOR3 vEyePt(-300, 0.0f, 0.0f);		// 위치
-	D3DXVECTOR3 vLookAtPt(0.0f, 0.0f, 0.0f);	// z축
-	D3DXVECTOR3 vUpVec(0.0f, 1.0f, 0.0f);		// y축
-	D3DXMatrixLookAtLH(&matView, &vEyePt, &vLookAtPt, &vUpVec);
-	D3DDevice->SetTransform(D3DTS_VIEW, &matView);
+	D3DDevice->SetTransform(D3DTS_VIEW, &t.matrix());
 
 	D3DXMATRIX matProjection;
 	D3DXMatrixPerspectiveFovLH(&matProjection,
@@ -83,10 +46,10 @@ void InitMatrix()
 		10000.0f);
 	D3DDevice->SetTransform(D3DTS_PROJECTION, &matProjection);
 
-	float index = 1.5f;
+	float index = 0;
 	D3DXMATRIX matRotateY;
 	D3DXMatrixRotationY(&matRotateY, index);
-	D3DDevice->SetTransform(D3DTS_WORLD, &(matRotateY));
+	D3DDevice->SetTransform(D3DTS_WORLD, &t.matrix());
 }
 
 void InitMesh(void)
@@ -96,7 +59,7 @@ void InitMesh(void)
 	ID3DXBuffer* mtrlBuffer = 0;
 	DWORD        numMtrls = 0;
 
-	hr = D3DXLoadMeshFromX(_T("Hanzo.x"), D3DXMESH_SYSTEMMEM, D3DDevice,
+	hr = D3DXLoadMeshFromX(_T("Media\\Hanzo.x"), D3DXMESH_SYSTEMMEM, D3DDevice,
 		&adjBuffer, &mtrlBuffer, 0, &numMtrls, &SourceMesh);
 
 

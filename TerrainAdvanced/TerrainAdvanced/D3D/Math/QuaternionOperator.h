@@ -1,7 +1,7 @@
 #pragma once
 #include "Quaternion.h"
 
-inline Quaternion operator * (FLOAT f, const Quaternion &q)
+inline Quaternion operator * (float f, const Quaternion &q)
 {
 	return Quaternion(f * q.x, f * q.y, f * q.z, f * q.w);
 }

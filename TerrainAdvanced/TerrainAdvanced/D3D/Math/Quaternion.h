@@ -2,6 +2,8 @@
 
 #include "d3dx9math.h"
 
+class Vector3;
+
 class Quaternion : public D3DXQUATERNION
 {
 public:
@@ -26,4 +28,9 @@ public:
 
 	bool operator == (const Quaternion&) const;
 	bool operator != (const Quaternion&) const;
+
+public:
+	static Quaternion Euler(float x, float y, float z);
+	static Vector3 ToEulerAngle(const Quaternion& q);
+	static Vector3 Rotate(const Vector3&, float x, float y, float z);
 };

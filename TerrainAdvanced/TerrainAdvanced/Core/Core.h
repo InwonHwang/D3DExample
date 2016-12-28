@@ -2,6 +2,8 @@
 
 #include <assert.h>
 #include <tchar.h>
+#include <string>
+#include <Windows.h>
 
 #include "BitFlags.h"
 #include "ResourceItem.h"
@@ -16,3 +18,9 @@ enum TYPE {
 	RAMBACKUP,	// 힙 메모리에 저장.
 	VOLITILE
 };
+
+namespace std { typedef basic_string<TCHAR> tstring; }
+
+void DebugBox(HRESULT hr, LPCTSTR str);
+
+std::tstring floatToString(float f);

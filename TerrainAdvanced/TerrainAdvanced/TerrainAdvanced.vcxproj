@@ -165,8 +165,11 @@
     <ClInclude Include="Core\ResourceItem.h" />
     <ClInclude Include="D3D\Method\Terrain.h" />
     <ClInclude Include="D3D\Method\Transform.h" />
+    <ClInclude Include="D3D\Math\Mathf.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Core\Core.cpp" />
+    <ClCompile Include="D3D\Math\QuaternionFunction.cpp" />
     <ClCompile Include="D3D\Method\Camera.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="D3D\Device.cpp" />
