@@ -7,18 +7,21 @@
 
 Quaternion Quaternion::Euler(float x, float y, float z)
 {
-	float t0 = Mathf::Sin(z * 0.5f);
-	float t1 = Mathf::Cos(z * 0.5f);
-	float t2 = Mathf::Sin(x * 0.5f);
-	float t3 = Mathf::Cos(x * 0.5f);
-	float t4 = Mathf::Sin(y * 0.5f);
-	float t5 = Mathf::Cos(y * 0.5f);
-	Quaternion result;
-	result.x = t5 * t2 * t1 + t4 * t3 * t0;
-	result.y = t4 * t3 * t1 - t5 * t2 * t0;
-	result.z = t5 * t3 * t0 - t4 * t2 * t1;
-	result.w = t5 * t3 * t1 + t4 * t2 * t0;
-	return result;
+	float x0 = x * Mathf::DegToRad();
+	float y0 = y * Mathf::DegToRad();
+	float z0 = z * Mathf::DegToRad();
+	float t0 = Mathf::Sin(z0 * 0.5f);
+	float t1 = Mathf::Cos(z0 * 0.5f);
+	float t2 = Mathf::Sin(x0 * 0.5f);
+	float t3 = Mathf::Cos(x0 * 0.5f);
+	float t4 = Mathf::Sin(y0 * 0.5f);
+	float t5 = Mathf::Cos(y0 * 0.5f);
+	Quaternion q;
+	q.x = t5 * t2 * t1 + t4 * t3 * t0;
+	q.y = t4 * t3 * t1 - t5 * t2 * t0;
+	q.z = t5 * t3 * t0 - t4 * t2 * t1;
+	q.w = t5 * t3 * t1 + t4 * t2 * t0;
+	return q;
 }
 
 Vector3 Quaternion::ToEulerAngle(const Quaternion& q)

@@ -13,19 +13,20 @@ public:
 	void *lock(UINT offset, UINT size);
 	void unlock();
 
-	void create() override;
+	/*void create() override;
 	void destroy() override;
 	void disable() override;
-	void restore() override;
+	void restore() override;*/
 
 	bool isDynamic() const;
 	bool isVolitile() const;
 private:
 	IDirect3DIndexBuffer9* _d3dIB;
+	void*   _backupBuffer;
 	flags8  _typeFlags;
 	DWORD	_usageFlags;
 	UINT	_size;
-	void*   _backupBuffer;
+	
 };
 
 inline bool IndexBuffer::isDynamic() const

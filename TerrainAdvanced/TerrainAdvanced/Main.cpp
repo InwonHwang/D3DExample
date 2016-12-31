@@ -5,12 +5,17 @@
 
 #include "D3D\Method\Transform.h"
 #include "D3D\Method\Camera.h"
+#include "D3D\Frustum.h"
 
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
 #define KEY_DOWN(vk_code) ((GetAsyncKeyState(vk_code) & 0x8000) ? 1 : 0)
 #define KEY_UP(vk_code) ((GetAsyncKeyState(vk_code) & 0x8000) ? 0 : 1)
 
+DWORD					g_cxHeight = 0;
+DWORD					g_czHeight = 0;
+DWORD					g_dwMouseX = 0;
+DWORD					g_dwMouseY = 0;
 ID3DXMesh*                      SourceMesh = 0;
 ID3DXBuffer*					adjBuffer = 0;
 
@@ -19,37 +24,49 @@ std::vector<IDirect3DTexture9*> Textures(0);
 D3DMATERIAL9					mtrl;
 
 Transform t;
+Transform t2;
 Camera c;
+Frustum f;
 
+D3DXMATRIX			matProj;
 
 void InitMatrix()
-{
+{	
+	t.create();	
 	
-	t.init();
-
-	t.setPosition(Vector3(0, 0, 300));
-	t.setRotation(0, 20, 0);
+	/*t.setLocalPosition(Vector3(0, 0, 0));
+	t.setLocalRotation(Vector3(0, 0, 0));*/
+	
 	t.update();
 
-	Quaternion s = t.getRotation();
-	Vector3 e = Quaternion::ToEulerAngle(s);	
+	/*DebugBox(0, floatToString(t.getEulerAngle().x).c_str());
+	DebugBox(0, floatToString(t.getEulerAngle().y).c_str());
+	DebugBox(0, floatToString(t.getEulerAngle().z).c_str());
 
+	DebugBox(0, floatToString(t.getPosition().x).c_str());
+	DebugBox(0, floatToString(t.getPosition().y).c_str());
+	DebugBox(0, floatToString(t.getPosition().z).c_str());*/
+
+	t2.create();
+	t2.setLocalPosition(Vector3(0, 0, 80));
+	t2.update();
+
+	c.setTransform(t);
+	c.update();
+
+	f.create();
+	f.setTransform(t);
+
+	D3DXMATRIX matWorld;
+	D3DXMatrixTranslation(&matWorld, 0, 0, 0);
+	D3DDevice->SetTransform(D3DTS_WORLD, &matWorld);
+
+	D3DXMATRIX matProj;
+	D3DXMatrixPerspectiveFovLH(&matProj, 45 * Mathf::DegToRad(), 1.0f, 1.0f, 1000.0f);
+	D3DDevice->SetTransform(D3DTS_PROJECTION, &matProj);
+
+	D3DXMatrixPerspectiveFovLH(&matProj, 45 * Mathf::DegToRad(), 1.0f, 1.0f, 200.0f);
 	
-
-	D3DDevice->SetTransform(D3DTS_VIEW, &t.matrix());
-
-	D3DXMATRIX matProjection;
-	D3DXMatrixPerspectiveFovLH(&matProjection,
-		D3DXToRadian(45),
-		800 / 600,
-		1.0f,
-		10000.0f);
-	D3DDevice->SetTransform(D3DTS_PROJECTION, &matProjection);
-
-	float index = 0;
-	D3DXMATRIX matRotateY;
-	D3DXMatrixRotationY(&matRotateY, index);
-	D3DDevice->SetTransform(D3DTS_WORLD, &t.matrix());
 }
 
 void InitMesh(void)
@@ -59,7 +76,7 @@ void InitMesh(void)
 	ID3DXBuffer* mtrlBuffer = 0;
 	DWORD        numMtrls = 0;
 
-	hr = D3DXLoadMeshFromX(_T("Media\\Hanzo.x"), D3DXMESH_SYSTEMMEM, D3DDevice,
+	hr = D3DXLoadMeshFromX(_T("Media\\airplane 2.x"), D3DXMESH_MANAGED, D3DDevice,
 		&adjBuffer, &mtrlBuffer, 0, &numMtrls, &SourceMesh);
 
 
@@ -90,9 +107,9 @@ void InitMesh(void)
 
 	SAFE_RELEASE(adjBuffer);
 
-	D3DDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-	D3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-	D3DDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
+	//D3DDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+	//D3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+	//D3DDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
 
 	mtrl.Ambient = D3DXCOLOR(255, 255, 0, 255);
 	mtrl.Diffuse = D3DXCOLOR(255, 255, 0, 255);
@@ -130,18 +147,12 @@ void Render(void)
 	{
 		for (UINT i = 0; i < Mtrls.size(); i++)
 		{
-			////// draw wireframe outline
-			//D3DDevice->SetMaterial(&mtrl);
-			//D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
-			////PatchMesh->DrawSubset(i);
-			//SourceMesh->DrawSubset(i);
-			//D3DDevice->SetNPatchMode(0);
-			//D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+			f.draw();
 
 			// draw pmesh
 			D3DDevice->SetMaterial(&Mtrls[i]);
 			D3DDevice->SetTexture(0, Textures[i]);
-			SourceMesh->DrawSubset(i);
+			SourceMesh->DrawSubset(i);			
 		}
 
 		D3DDevice->EndScene();
@@ -150,6 +161,54 @@ void Render(void)
 	D3DDevice->Present(NULL, NULL, NULL, NULL);
 
 	return;
+}
+
+
+/**-----------------------------------------------------------------------------
+* 키보드 입력 처리
+*------------------------------------------------------------------------------
+*/
+void ProcessKey(void)
+{
+	static float posZ = 0;	
+	if (GetAsyncKeyState('Q')) t.setLocalPosition(Vector3(0, 0, --posZ));	// 카메라 전진!
+	if (GetAsyncKeyState('E')) t.setLocalPosition(Vector3(0, 0, ++posZ));	// 카메라 후진!
+
+	static float rotX = 0;
+	static float rotY = 0;
+	static float rotZ = 0;
+	if (GetAsyncKeyState('W')) t.setLocalRotation(Vector3(++rotX, rotY, rotZ));
+	if (GetAsyncKeyState('S')) t.setLocalRotation(Vector3(--rotX, rotY, rotZ));
+	if (GetAsyncKeyState('A')) t.setLocalRotation(Vector3(rotX, ++rotY, rotZ));
+	if (GetAsyncKeyState('D')) t.setLocalRotation(Vector3(rotX, --rotY, rotZ));
+	if (GetAsyncKeyState('Z')) t.setLocalRotation(Vector3(rotX, rotY, --rotZ));
+	if (GetAsyncKeyState('X')) t.setLocalRotation(Vector3(rotX, rotY, ++rotZ));
+
+	
+	if (GetAsyncKeyState(VK_ESCAPE)) PostMessage(GetActiveWindow(), WM_DESTROY, 0, 0L);
+	if (GetAsyncKeyState(VK_LBUTTON))
+	{
+		c.setTransform(t2);
+	}
+	if (GetAsyncKeyState(VK_RBUTTON))
+	{
+		c.setTransform(t);
+	}
+	D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+	/*if (GetAsyncKeyState(VK_LBUTTON)) D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+	if (GetAsyncKeyState(VK_RBUTTON)) D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);*/
+	t.update();
+	c.update();
+	f.make(matProj);
+}
+
+/**-----------------------------------------------------------------------------
+* 입력 처리
+*------------------------------------------------------------------------------
+*/
+void ProcessInputs(void)
+{
+	ProcessKey();
 }
 
 void cleanD3D(void)
@@ -210,8 +269,10 @@ int WINAPI WinMain(HINSTANCE hInstance,
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-
-		Render();
+		
+		ProcessInputs();
+		Render();		
+		
 
 		if (KEY_DOWN(VK_ESCAPE))
 			PostMessage(hWnd, WM_DESTROY, 0, 0);
@@ -220,6 +281,9 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	}
 
 	cleanD3D();
+	t.destroy();
+	t2.destroy();
+	f.destroy();
 
 	return msg.wParam;
 }

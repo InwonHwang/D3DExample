@@ -1,26 +1,42 @@
 #pragma once
 
 #include "../Math/Math.h"
+#include "../../Core/Core.h"
 
+class Frustum;
+
+// 임시용
 class Transform;
 
 class Camera
 {
-
+public:
+	enum CameraOption {
+		PERSPECTIVE, // perspective or orthographic;
+		FRUSTUM
+	};
 
 public:
 	Camera();
 	~Camera();
 
-	virtual void init();
+	virtual void create(flags32 option);
+	virtual void destroy();
+
 	virtual void update();
 
 	void flush();
 
-	D3DXMATRIX getMatrixView() { return _matView; }
-
+	//임시용
+	void setTransform(Transform& t)
+	{
+		_t = &t;
+	}
 private:
-	Transform* t;
-	D3DXMATRIX _matView;	
+	Frustum* _frustum;
+	flags32 _option;
+
+	//임시용
+	Transform* _t;
 };
 

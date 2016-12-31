@@ -1,7 +1,10 @@
 #include "IndexBuffer.h"
 #include "../Device.h"
 
+
 IndexBuffer::IndexBuffer()
+	: _d3dIB(nullptr),
+	_backupBuffer(nullptr)
 {
 }
 
@@ -11,8 +14,8 @@ IndexBuffer::~IndexBuffer()
 
 bool IndexBuffer::create(UINT count, UINT indexSize, DWORD FVF, flags8 type, DWORD usage, void* pData)
 {
-	assert(_d3dIB);
-	assert(_backupBuffer);
+	assert(_d3dIB == nullptr);
+	assert(_backupBuffer == nullptr);
 
 	_typeFlags = type;
 	_usageFlags = usage;
@@ -43,7 +46,7 @@ bool IndexBuffer::create(UINT count, UINT indexSize, DWORD FVF, flags8 type, DWO
 		// _size 만큼 할당
 	}
 
-	create();
+	//create();
 	return true;
 }
 
@@ -74,36 +77,36 @@ void IndexBuffer::unlock()
 	}
 }
 
-void IndexBuffer::create()
-{
-	notifyCreated();
-}
-
-void IndexBuffer::destroy()
-{
-	notifyDestroyed();
-
-	SAFE_RELEASE(_d3dIB);
-	SAFE_DELETE_ARRAY(_backupBuffer);
-	_typeFlags.clear();
-	_usageFlags = 0;
-	_size = 0;
-}
-
-void IndexBuffer::disable()
-{
-	notifyDisabled();
-	if (_typeFlags.check(TYPE::VOLITILE))
-	{
-		// release
-	}
-}
-
-void IndexBuffer::restore()
-{
-	notifyRestored();
-	if (_typeFlags.check(TYPE::RAMBACKUP))
-	{
-		// _backupBuffer에 있는 내용 _d3dVB에 저장
-	}
-}
+//void IndexBuffer::create()
+//{
+//	notifyCreated();
+//}
+//
+//void IndexBuffer::destroy()
+//{
+//	notifyDestroyed();
+//
+//	SAFE_RELEASE(_d3dIB);
+//	SAFE_DELETE_ARRAY(_backupBuffer);
+//	_typeFlags.clear();
+//	_usageFlags = 0;
+//	_size = 0;
+//}
+//
+//void IndexBuffer::disable()
+//{
+//	notifyDisabled();
+//	if (_typeFlags.check(TYPE::VOLITILE))
+//	{
+//		// release
+//	}
+//}
+//
+//void IndexBuffer::restore()
+//{
+//	notifyRestored();
+//	if (_typeFlags.check(TYPE::RAMBACKUP))
+//	{
+//		// _backupBuffer에 있는 내용 _d3dVB에 저장
+//	}
+//}
