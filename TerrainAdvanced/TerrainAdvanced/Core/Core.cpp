@@ -15,3 +15,8 @@ std::tstring floatToString(float f)
 
 	return std::tstring(szBuffer);
 }
+
+float Lerp(float a, float b, float t)
+{
+	return a - (a*t) + (b*t);
+}

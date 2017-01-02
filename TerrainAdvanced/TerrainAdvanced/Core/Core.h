@@ -8,6 +8,7 @@
 #include "BitFlags.h"
 #include "ResourceItem.h"
 #include "Singleton.h"
+#include "STL.h"
 
 #define SAFE_DELETE(x) { if(x) { delete x; x = nullptr; } }
 #define SAFE_DELETE_ARRAY(x){ if(x) { delete[] x; x = nullptr; } }
@@ -24,3 +25,5 @@ namespace std { typedef basic_string<TCHAR> tstring; }
 void DebugBox(HRESULT hr, LPCTSTR str);
 
 std::tstring floatToString(float f);
+
+float Lerp(float a, float b, float t);

@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "D3D\Method\Transform.h"
+#include "D3D\Method\Terrain.h"
 #include "D3D\Method\Camera.h"
 #include "D3D\Frustum.h"
 
@@ -12,157 +13,112 @@
 #define KEY_DOWN(vk_code) ((GetAsyncKeyState(vk_code) & 0x8000) ? 1 : 0)
 #define KEY_UP(vk_code) ((GetAsyncKeyState(vk_code) & 0x8000) ? 0 : 1)
 
-DWORD					g_cxHeight = 0;
-DWORD					g_czHeight = 0;
-DWORD					g_dwMouseX = 0;
-DWORD					g_dwMouseY = 0;
-ID3DXMesh*                      SourceMesh = 0;
-ID3DXBuffer*					adjBuffer = 0;
+//////////////////////////////////////////////////////////////////////////////////////////////
+LPDIRECT3DTEXTURE9		g_pTexHeight = NULL; // Texture 높이맵
+LPDIRECT3DTEXTURE9		g_pTexDiffuse = NULL; // Texture 색깔맵
 
-std::vector<D3DMATERIAL9>       Mtrls(0);
-std::vector<IDirect3DTexture9*> Textures(0);
-D3DMATERIAL9					mtrl;
+struct MYINDEX
+{
+	WORD	_0, _1, _2;		/// WORD, 16비트 인덱스
+};
+//////////////////////////////////////////////////////////////////////////////////////////////////
 
 Transform t;
 Transform t2;
+
+Terrain* terrain;
 Camera c;
+
 Frustum f;
 
 D3DXMATRIX			matProj;
 
+/**-----------------------------------------------------------------------------
+* 텍스처 초기화
+*------------------------------------------------------------------------------
+*/
+HRESULT InitTexture()
+{	
+	if (FAILED(D3DXCreateTextureFromFileEx(D3DDevice, "Media/map128.bmp",
+		D3DX_DEFAULT, D3DX_DEFAULT,
+		D3DX_DEFAULT, 0,
+		D3DFMT_X8R8G8B8, D3DPOOL_MANAGED,
+		D3DX_DEFAULT, D3DX_DEFAULT, 0,
+		NULL, NULL, &g_pTexHeight)))
+		return E_FAIL;
+
+	// 색깔맵
+	if (FAILED(D3DXCreateTextureFromFile(D3DDevice, "Media/tile2.tga", &g_pTexDiffuse)))
+		return E_FAIL;
+
+	return S_OK;
+}
+
 void InitMatrix()
 {	
-	t.create();	
-	
-	/*t.setLocalPosition(Vector3(0, 0, 0));
-	t.setLocalRotation(Vector3(0, 0, 0));*/
-	
+	if (FAILED(InitTexture())) return;
+	terrain = new Terrain(2, 0.1f);
+	terrain->initVertice(g_pTexHeight);
+	terrain->initIndice();
+
+
+	t.create();		
+	t.setLocalRotation(Quaternion::Euler(0, 0, 0));
+	t.setLocalPosition(Vector3(0, 0, 50));
 	t.update();
 
-	/*DebugBox(0, floatToString(t.getEulerAngle().x).c_str());
-	DebugBox(0, floatToString(t.getEulerAngle().y).c_str());
-	DebugBox(0, floatToString(t.getEulerAngle().z).c_str());
-
-	DebugBox(0, floatToString(t.getPosition().x).c_str());
-	DebugBox(0, floatToString(t.getPosition().y).c_str());
-	DebugBox(0, floatToString(t.getPosition().z).c_str());*/
-
 	t2.create();
-	t2.setLocalPosition(Vector3(0, 0, 80));
+	t2.setLocalPosition(Vector3(0, 20, 100));
+	t2.setLocalRotation(Quaternion::Euler(-20, 0, 0));
 	t2.update();
 
 	c.setTransform(t);
 	c.update();
 
+	D3DXMATRIX matWorld;
+	D3DXMatrixIdentity(&matWorld);
+	D3DDevice->SetTransform(D3DTS_WORLD, &matWorld);
+
 	f.create();
 	f.setTransform(t);
 
-	D3DXMATRIX matWorld;
-	D3DXMatrixTranslation(&matWorld, 0, 0, 0);
-	D3DDevice->SetTransform(D3DTS_WORLD, &matWorld);
-
 	D3DXMATRIX matProj;
-	D3DXMatrixPerspectiveFovLH(&matProj, 45 * Mathf::DegToRad(), 1.0f, 1.0f, 1000.0f);
+	D3DXMatrixPerspectiveFovLH(&matProj, 45 * Mathf::DegToRad(), 1.0f, 1.0f, 10000.0f);
 	D3DDevice->SetTransform(D3DTS_PROJECTION, &matProj);
-
-	D3DXMatrixPerspectiveFovLH(&matProj, 45 * Mathf::DegToRad(), 1.0f, 1.0f, 200.0f);
-	
-}
-
-void InitMesh(void)
-{
-	HRESULT hr = 0;
-
-	ID3DXBuffer* mtrlBuffer = 0;
-	DWORD        numMtrls = 0;
-
-	hr = D3DXLoadMeshFromX(_T("Media\\airplane 2.x"), D3DXMESH_MANAGED, D3DDevice,
-		&adjBuffer, &mtrlBuffer, 0, &numMtrls, &SourceMesh);
-
-
-	if (mtrlBuffer != 0 && numMtrls != 0)
-	{
-		D3DXMATERIAL* mtrls = (D3DXMATERIAL*)mtrlBuffer->GetBufferPointer();
-
-		for (UINT i = 0; i < numMtrls; i++)
-		{
-			mtrls[i].MatD3D.Ambient = mtrls[i].MatD3D.Diffuse;
-
-			Mtrls.push_back(mtrls[i].MatD3D);
-			if (mtrls[i].pTextureFilename != 0)
-			{
-				IDirect3DTexture9* tex = 0;
-				D3DXCreateTextureFromFile(D3DDevice, (TCHAR *)mtrls[i].pTextureFilename, &tex);
-				Textures.push_back(tex);
-			}
-			else
-				Textures.push_back(0);
-
-		}
-	}
-	SAFE_RELEASE(mtrlBuffer);
-
-	hr = SourceMesh->OptimizeInplace(D3DXMESHOPT_ATTRSORT | D3DXMESHOPT_COMPACT | D3DXMESHOPT_VERTEXCACHE,
-		(DWORD*)adjBuffer->GetBufferPointer(), (DWORD*)adjBuffer->GetBufferPointer(), 0, 0);
-
-	SAFE_RELEASE(adjBuffer);
-
-	//D3DDevice->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-	//D3DDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-	//D3DDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
-
-	mtrl.Ambient = D3DXCOLOR(255, 255, 0, 255);
-	mtrl.Diffuse = D3DXCOLOR(255, 255, 0, 255);
-	mtrl.Specular = D3DXCOLOR(255, 255, 0, 255);
-	mtrl.Emissive = D3DXCOLOR(0, 0, 0, 255);
-	mtrl.Power = 2.0f;
 }
 
 void InitLight(void)
 {
-	D3DLIGHT9 light;
+	/// 재질(material)설정
+	/// 재질은 디바이스에 단 하나만 설정될 수 있다.
+	D3DMATERIAL9 mtrl;
+	ZeroMemory(&mtrl, sizeof(D3DMATERIAL9));
+	mtrl.Diffuse.r = mtrl.Ambient.r = 1.0f;
+	mtrl.Diffuse.g = mtrl.Ambient.g = 1.0f;
+	mtrl.Diffuse.b = mtrl.Ambient.b = 1.0f;
+	mtrl.Diffuse.a = mtrl.Ambient.a = 1.0f;
+	D3DDevice->SetMaterial(&mtrl);
 
-	ZeroMemory(&light, sizeof(light));
-	light.Type = D3DLIGHT_DIRECTIONAL;
-	light.Diffuse.r = 1.0f;
+	/// 광원 설정
+	D3DXVECTOR3 vecDir;									/// 방향성 광원(directional light)이 향할 빛의 방향
+	D3DLIGHT9 light;									/// 광원 구조체
+	ZeroMemory(&light, sizeof(D3DLIGHT9));			/// 구조체를 0으로 지운다.
+	light.Type = D3DLIGHT_DIRECTIONAL;			/// 광원의 종류(점 광원,방향성 광원,스포트라이트)
+	light.Diffuse.r = 1.0f;							/// 광원의 색깔과 밝기
 	light.Diffuse.g = 1.0f;
-	light.Diffuse.b = 1.0f;
-	light.Diffuse.a = 1.0f;
+	light.Diffuse.b = 0.0f;
+	vecDir = D3DXVECTOR3(1, 1, 1);					/// 광원 고정
+	vecDir = D3DXVECTOR3(cosf(GetTickCount() / 350.0f),	/// 광원 회전
+		1.0f,
+		sinf(GetTickCount() / 350.0f));
+	D3DXVec3Normalize((D3DXVECTOR3*)&light.Direction, &vecDir);	/// 광원의 방향을 단위벡터로 만든다.
+	light.Range = 1000.0f;									/// 광원이 다다를수 있는 최대거리
+	D3DDevice->SetLight(0, &light);							/// 디바이스에 0번 광원 설치
+	D3DDevice->LightEnable(0, TRUE);							/// 0번 광원을 켠다
+	D3DDevice->SetRenderState(D3DRS_LIGHTING, TRUE);			/// 광원설정을 켠다
 
-	D3DVECTOR vecDirection = { 0.0f, 0.0f, -1.0f };
-	light.Direction = vecDirection;
-	D3DDevice->SetLight(0, &light);
-	D3DDevice->LightEnable(0, TRUE);
-
-	return;
+	D3DDevice->SetRenderState(D3DRS_AMBIENT, 0x00909090);		/// 환경광원(ambient light)의 값 설정
 }
-
-
-void Render(void)
-{
-	D3DDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0, 32, 64, 128), 1.0f, 0);
-	D3DDevice->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_ARGB(0, 32, 64, 128), 1.0f, 0);
-
-	if (D3DDevice->BeginScene())
-	{
-		for (UINT i = 0; i < Mtrls.size(); i++)
-		{
-			f.draw();
-
-			// draw pmesh
-			D3DDevice->SetMaterial(&Mtrls[i]);
-			D3DDevice->SetTexture(0, Textures[i]);
-			SourceMesh->DrawSubset(i);			
-		}
-
-		D3DDevice->EndScene();
-	}
-
-	D3DDevice->Present(NULL, NULL, NULL, NULL);
-
-	return;
-}
-
 
 /**-----------------------------------------------------------------------------
 * 키보드 입력 처리
@@ -170,21 +126,43 @@ void Render(void)
 */
 void ProcessKey(void)
 {
-	static float posZ = 0;	
-	if (GetAsyncKeyState('Q')) t.setLocalPosition(Vector3(0, 0, --posZ));	// 카메라 전진!
-	if (GetAsyncKeyState('E')) t.setLocalPosition(Vector3(0, 0, ++posZ));	// 카메라 후진!
+	//static float posX = 0;
+	//static float posY = 0;
+	//static float posZ = 50;
+
+	//if (GetAsyncKeyState('S')) t.MoveTo(Vector3(posX, posY, ++posZ));	// 카메라 후진!
+	//if (GetAsyncKeyState('W')) t.MoveTo(Vector3(posX, posY, --posZ));	// 카메라 전진!
+	//if (GetAsyncKeyState('D')) t.MoveTo(Vector3(--posX, posY, posZ));	// 카메라 후진!
+	//if (GetAsyncKeyState('A')) t.MoveTo(Vector3(++posX, posY, posZ));	// 카메라 전진!
+	//if (GetAsyncKeyState('R')) t.MoveTo(Vector3(posX, ++posY, posZ));	// 카메라 후진!
+	//if (GetAsyncKeyState('F')) t.MoveTo(Vector3(posX, --posY, posZ));	// 카메라 전진!
+
+	//if (GetAsyncKeyState('I')) t.RotateLocalX(0.05f);	// 카메라 후진!
+	//if (GetAsyncKeyState('K')) t.RotateLocalX(-0.05f);	// 카메라 후진!
+	//if (GetAsyncKeyState('J')) t.RotateLocalY(0.05f);	// 카메라 후진!
+	//if (GetAsyncKeyState('L')) t.RotateLocalY(-0.05f);	// 카메라 후진!
+
+
+	static float posX = 0;
+	static float posY = 0;
+	static float posZ = 50;
+
+	if (GetAsyncKeyState('W')) t.setLocalPosition(Vector3(posX, posY, --posZ));	// 카메라 후진!
+	if (GetAsyncKeyState('S')) t.setLocalPosition(Vector3(posX, posY, ++posZ));	// 카메라 전진!
+	if (GetAsyncKeyState('D')) t.setLocalPosition(Vector3(--posX, posY, posZ));	// 카메라 후진!
+	if (GetAsyncKeyState('A')) t.setLocalPosition(Vector3(++posX, posY, posZ));	// 카메라 전진!
+	if (GetAsyncKeyState('R')) t.setLocalPosition(Vector3(posX, ++posY, posZ));	// 카메라 후진!
+	if (GetAsyncKeyState('F')) t.setLocalPosition(Vector3(posX, --posY, posZ));	// 카메라 전진!
 
 	static float rotX = 0;
 	static float rotY = 0;
 	static float rotZ = 0;
-	if (GetAsyncKeyState('W')) t.setLocalRotation(Vector3(++rotX, rotY, rotZ));
-	if (GetAsyncKeyState('S')) t.setLocalRotation(Vector3(--rotX, rotY, rotZ));
-	if (GetAsyncKeyState('A')) t.setLocalRotation(Vector3(rotX, ++rotY, rotZ));
-	if (GetAsyncKeyState('D')) t.setLocalRotation(Vector3(rotX, --rotY, rotZ));
-	if (GetAsyncKeyState('Z')) t.setLocalRotation(Vector3(rotX, rotY, --rotZ));
-	if (GetAsyncKeyState('X')) t.setLocalRotation(Vector3(rotX, rotY, ++rotZ));
+	if (GetAsyncKeyState('K')) t.setLocalRotation(Quaternion::Euler(--rotX, rotY, rotZ));
+	if (GetAsyncKeyState('I')) t.setLocalRotation(Quaternion::Euler(++rotX, rotY, rotZ));
+	if (GetAsyncKeyState('L')) t.setLocalRotation(Quaternion::Euler(rotX, ++rotY, rotZ));
+	if (GetAsyncKeyState('J')) t.setLocalRotation(Quaternion::Euler(rotX, --rotY, rotZ));
 
-	
+
 	if (GetAsyncKeyState(VK_ESCAPE)) PostMessage(GetActiveWindow(), WM_DESTROY, 0, 0L);
 	if (GetAsyncKeyState(VK_LBUTTON))
 	{
@@ -199,24 +177,55 @@ void ProcessKey(void)
 	if (GetAsyncKeyState(VK_RBUTTON)) D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);*/
 	t.update();
 	c.update();
-	f.make(matProj);
+		
+	
+	D3DXMATRIX matProj;
+	D3DXMatrixPerspectiveFovLH(&matProj, 45 * Mathf::DegToRad(), 1.0f, 1.0f, 250);	
+
+	D3DXMATRIX m;
+	D3DXMatrixMultiply(&m, &t.getMatrix(), &matProj);
+
+	f.make(m);
+
+	terrain->processFrustumCulling(f);
 }
 
-/**-----------------------------------------------------------------------------
-* 입력 처리
-*------------------------------------------------------------------------------
-*/
+
 void ProcessInputs(void)
 {
 	ProcessKey();
 }
 
+
+void Render(void)
+{
+	D3DDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0, 32, 64, 128), 1.0f, 0);
+	D3DDevice->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_ARGB(0, 32, 64, 128), 1.0f, 0);
+
+	if (D3DDevice->BeginScene())
+	{
+		f.draw();
+		
+
+		if (terrain) terrain->draw(D3DDevice);
+
+		D3DDevice->EndScene();
+	}
+
+	D3DDevice->Present(NULL, NULL, NULL, NULL);
+
+	return;
+}
+
 void cleanD3D(void)
 {
-	SAFE_RELEASE(SourceMesh);
+	SAFE_DELETE(terrain);
 
-	for (UINT i = 0; i < Textures.size(); i++)
-		SAFE_RELEASE(Textures[i]);
+	if (g_pTexHeight != NULL)
+		g_pTexHeight->Release();
+
+	if (g_pTexDiffuse != NULL)
+		g_pTexDiffuse->Release();
 
 	D3D->Release();
 
@@ -252,7 +261,6 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	SetActiveWindow(hWnd);
 	D3D->Init();
 	InitMatrix();
-	InitMesh();
 	InitLight();
 
 	MSG msg;

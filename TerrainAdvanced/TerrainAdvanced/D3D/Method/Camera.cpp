@@ -37,6 +37,5 @@ void Camera::update()
 
 void Camera::flush()
 {
-	D3DDevice->SetTransform(D3DTS_VIEW, &_t->getMatrix());
-	
+	D3DDevice->SetTransform(D3DTS_VIEW, &_t->getMatrix());	
 }
