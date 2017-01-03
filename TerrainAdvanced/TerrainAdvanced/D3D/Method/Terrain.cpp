@@ -41,67 +41,14 @@ void Terrain::draw(IDirect3DDevice9* device, Frustum& f)
 	
 	if (SUCCEEDED(_ib->Lock(0, (_numVertsCol - 1)*(_numVertsRow - 1) * 2 * sizeof(INDEX), (void**)&pI, 0)))
 	{
-		_numTriangles = _quadTree->generateIndex(pI, _heightMap, f);
+		_numTriangles = _quadTree->generateIndex(pI, _heightMap, f, 0.025f);
 		_ib->Unlock();
 	}
-
-	//processFrustumCulling(f);
 
 	device->SetStreamSource(0, _vb, 0, sizeof(TERRAINVERTEX));
 	device->SetFVF(TERRAINVERTEX::FVF);
 	device->SetIndices(_ib);
 	device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, _numVertsCol*_numVertsRow, 0, _numTriangles);
-}
-
-bool Terrain::processFrustumCulling(const Frustum& f)
-{
-	WORD		i[4];	// 임시로 저장할 인덱스 정보
-	BOOL		b[4];	// 임시로 저장할 frustum culling결과값
-	INDEX		idx;
-	INDEX*		pI;
-
-	if (FAILED(_ib->Lock(0, (_numVertsCol - 1)*(_numVertsRow - 1) * 2 * sizeof(INDEX), (void**)&pI, 0)))
-		return false;
-
-	_numTriangles = 0;
-
-	for (WORD z = 0; z < _numVertsRow - 1; z++)
-	{
-		for (WORD x = 0; x < _numVertsCol - 1; x++)
-		{
-			i[0] = (z*_numVertsCol + x);			// 좌측 상단
-			i[1] = (z*_numVertsCol + x + 1);		// 우측 상단
-			i[2] = ((z + 1)*_numVertsCol + x);		// 좌측 하단
-			i[3] = ((z + 1)*_numVertsCol + x + 1);	// 우측 하단
-
-			b[0] = f.isIn(_heightMap[i[0]]);	// 좌측상단 정점이 Frustum안에 있는가?
-			b[1] = f.isIn(_heightMap[i[1]]);	// 우측상단 정점이 Frustum안에 있는가?
-			b[2] = f.isIn(_heightMap[i[2]]);	// 좌측하단 정점이 Frustum안에 있는가?
-			if (b[0] | b[1] | b[2])				// 셋중에 하나라도 frustum안에 있으면 렌더링한다.
-			{
-				idx._0 = i[0];
-				idx._1 = i[1];
-				idx._2 = i[2];
-				*pI++ = idx;
-				_numTriangles++;				// 렌더링할 삼각형 개수 증가
-			}
-
-			b[2] = f.isIn(_heightMap[i[2]]);	// 좌측하단 정점이 Frustum안에 있는가?
-			b[1] = f.isIn(_heightMap[i[1]]);	// 우측상단 정점이 Frustum안에 있는가?
-			b[3] = f.isIn(_heightMap[i[3]]);	// 우측하단 정점이 Frustum안에 있는가?
-			if (b[2] | b[1] | b[3])				// 셋중에 하나라도 frustum안에 있으면 렌더링한다.
-			{
-				idx._0 = i[2];
-				idx._1 = i[1];
-				idx._2 = i[3];
-				*pI++ = idx;
-				_numTriangles++;
-			}
-		}
-	}
-	_ib->Unlock();
-
-	return true;
 }
 
 bool Terrain::initVertice(IDirect3DDevice9* device, IDirect3DTexture9* texHeightMap)

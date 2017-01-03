@@ -22,7 +22,6 @@ public:
 	virtual void destroy();
 
 	void draw(IDirect3DDevice9* device, Frustum& f);
-	bool processFrustumCulling(const Frustum& f);
 	bool initVertice(IDirect3DDevice9* device, IDirect3DTexture9* texHeightMap);
 	bool initIndice(IDirect3DDevice9* device);
 

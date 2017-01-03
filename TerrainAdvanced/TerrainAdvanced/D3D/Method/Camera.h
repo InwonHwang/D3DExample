@@ -27,7 +27,7 @@ public:
 
 	void flush();
 
-	Frustum* getFrustum() { return _frustum; }
+	Frustum* getFrustum() const { return _frustum; }
 
 	//юс╫ц©К
 	void setTransform(Transform& t)
