@@ -33,6 +33,8 @@ Frustum f;
 
 D3DXMATRIX			matProj;
 
+bool render;
+
 /**-----------------------------------------------------------------------------
 * 텍스처 초기화
 *------------------------------------------------------------------------------
@@ -57,9 +59,8 @@ HRESULT InitTexture()
 void InitMatrix()
 {	
 	if (FAILED(InitTexture())) return;
-	terrain = new Terrain(2, 0.1f);
-	terrain->initVertice(g_pTexHeight);
-	terrain->initIndice();
+	terrain = new Terrain(1, 0.1f);
+	terrain->create(D3DDevice, g_pTexHeight);
 
 
 	t.create();		
@@ -68,8 +69,8 @@ void InitMatrix()
 	t.update();
 
 	t2.create();
-	t2.setLocalPosition(Vector3(0, 20, 100));
-	t2.setLocalRotation(Quaternion::Euler(-20, 0, 0));
+	t2.setLocalPosition(Vector3(0, 140, 200));
+	t2.setLocalRotation(Quaternion::Euler(-45, 0, 0));
 	t2.update();
 
 	c.setTransform(t);
@@ -126,23 +127,6 @@ void InitLight(void)
 */
 void ProcessKey(void)
 {
-	//static float posX = 0;
-	//static float posY = 0;
-	//static float posZ = 50;
-
-	//if (GetAsyncKeyState('S')) t.MoveTo(Vector3(posX, posY, ++posZ));	// 카메라 후진!
-	//if (GetAsyncKeyState('W')) t.MoveTo(Vector3(posX, posY, --posZ));	// 카메라 전진!
-	//if (GetAsyncKeyState('D')) t.MoveTo(Vector3(--posX, posY, posZ));	// 카메라 후진!
-	//if (GetAsyncKeyState('A')) t.MoveTo(Vector3(++posX, posY, posZ));	// 카메라 전진!
-	//if (GetAsyncKeyState('R')) t.MoveTo(Vector3(posX, ++posY, posZ));	// 카메라 후진!
-	//if (GetAsyncKeyState('F')) t.MoveTo(Vector3(posX, --posY, posZ));	// 카메라 전진!
-
-	//if (GetAsyncKeyState('I')) t.RotateLocalX(0.05f);	// 카메라 후진!
-	//if (GetAsyncKeyState('K')) t.RotateLocalX(-0.05f);	// 카메라 후진!
-	//if (GetAsyncKeyState('J')) t.RotateLocalY(0.05f);	// 카메라 후진!
-	//if (GetAsyncKeyState('L')) t.RotateLocalY(-0.05f);	// 카메라 후진!
-
-
 	static float posX = 0;
 	static float posY = 0;
 	static float posZ = 50;
@@ -172,7 +156,7 @@ void ProcessKey(void)
 	{
 		c.setTransform(t);
 	}
-	D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+	D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);	
 	/*if (GetAsyncKeyState(VK_LBUTTON)) D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
 	if (GetAsyncKeyState(VK_RBUTTON)) D3DDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);*/
 	t.update();
@@ -186,8 +170,6 @@ void ProcessKey(void)
 	D3DXMatrixMultiply(&m, &t.getMatrix(), &matProj);
 
 	f.make(m);
-
-	terrain->processFrustumCulling(f);
 }
 
 
@@ -204,10 +186,10 @@ void Render(void)
 
 	if (D3DDevice->BeginScene())
 	{
-		f.draw();
 		
+		f.draw();
 
-		if (terrain) terrain->draw(D3DDevice);
+		if (terrain) terrain->draw(D3DDevice, f);		
 
 		D3DDevice->EndScene();
 	}
@@ -219,6 +201,7 @@ void Render(void)
 
 void cleanD3D(void)
 {
+
 	SAFE_DELETE(terrain);
 
 	if (g_pTexHeight != NULL)
@@ -278,8 +261,9 @@ int WINAPI WinMain(HINSTANCE hInstance,
 			DispatchMessage(&msg);
 		}
 		
-		ProcessInputs();
-		Render();		
+		ProcessInputs();		
+		Render();
+
 		
 
 		if (KEY_DOWN(VK_ESCAPE))

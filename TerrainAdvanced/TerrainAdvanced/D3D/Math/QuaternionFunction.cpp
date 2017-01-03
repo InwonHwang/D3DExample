@@ -24,37 +24,37 @@ Quaternion Quaternion::Euler(float x, float y, float z)
 	return q;
 }
 
-//Vector3 Quaternion::ToEulerAngle(const Quaternion& q)
-//{
-//	Vector3 v;	
-//
-//	v.x = Mathf::Atan2(2 * q.x*q.w - 2 * q.y*q.z, 1 - 2 * q.x*q.x - 2 * q.z*q.z) * Mathf::RadToDeg();
-//	v.y = Mathf::Atan2(2 * q.y*q.w - 2 * q.x*q.z, 1 - 2 * q.y*q.y - 2 * q.z*q.z) * Mathf::RadToDeg();
-//	v.z = Mathf::Asin(2 * q.x*q.y + 2 * q.z*q.w) * Mathf::RadToDeg();
-//
-//	return v;
-//}
 Vector3 Quaternion::ToEulerAngle(const Quaternion& q)
 {
-	Vector3 v;
+	Vector3 v;	
 
-	double ysqr = q.y * q.y;
-
-	double t0 = +2.0f * (q.w * q.x + q.y * q.z);
-	double t1 = +1.0f - 2.0f * (q.x * q.x + ysqr);
-	v.x = std::atan2(t0, t1) * Mathf::RadToDeg();
-	
-	double t2 = +2.0f * (q.w * q.y - q.z * q.x);
-	t2 = t2 > 1.0f ? 1.0f : t2;
-	t2 = t2 < -1.0f ? -1.0f : t2;
-	v.y = std::asin(t2) * Mathf::RadToDeg();
-	
-	double t3 = +2.0f * (q.w * q.z + q.x *q.y);
-	double t4 = +1.0f - 2.0f * (ysqr + q.z * q.z);
-	v.z = std::atan2(t3, t4) * Mathf::RadToDeg();
+	v.x = Mathf::Atan2(2 * q.x*q.w - 2 * q.y*q.z, 1 - 2 * q.x*q.x - 2 * q.z*q.z) * Mathf::RadToDeg();
+	v.y = Mathf::Atan2(2 * q.y*q.w - 2 * q.x*q.z, 1 - 2 * q.y*q.y - 2 * q.z*q.z) * Mathf::RadToDeg();
+	v.z = Mathf::Asin(2 * q.x*q.y + 2 * q.z*q.w) * Mathf::RadToDeg();
 
 	return v;
 }
+//Vector3 Quaternion::ToEulerAngle(const Quaternion& q)
+//{
+//	Vector3 v;
+//
+//	float ysqr = q.y * q.y;
+//
+//	float t0 = +2.0f * (q.w * q.x + q.y * q.z);
+//	float t1 = +1.0f - 2.0f * (q.x * q.x + ysqr);
+//	v.x = std::atan2(t0, t1) * Mathf::RadToDeg();
+//	
+//	float t2 = +2.0f * (q.w * q.y - q.z * q.x);
+//	t2 = t2 > 1.0f ? 1.0f : t2;
+//	t2 = t2 < -1.0f ? -1.0f : t2;
+//	v.y = std::asin(t2) * Mathf::RadToDeg();
+//	
+//	float t3 = +2.0f * (q.w * q.z + q.x *q.y);
+//	float t4 = +1.0f - 2.0f * (ysqr + q.z * q.z);
+//	v.z = std::atan2(t3, t4) * Mathf::RadToDeg();
+//
+//	return v;
+//}
 
 
 // http://stackoverflow.com/questions/14607640/rotating-a-vector-in-3d-space ÂüÁ¶
