@@ -27,3 +27,5 @@ void DebugBox(HRESULT hr, LPCTSTR str);
 std::tstring floatToString(float f);
 
 float Lerp(float a, float b, float t);
+
+bool IsInRect(RECT* rc, POINT pt);

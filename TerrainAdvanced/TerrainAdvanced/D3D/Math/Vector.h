@@ -48,6 +48,9 @@ public:
 
 	bool operator == (const Vector3&) const;
 	bool operator != (const Vector3&) const;
+
+public:
+	static float GetDistance(const Vector3& v1, const Vector3& v2);
 };
 
 class Vector4 : public D3DXVECTOR4

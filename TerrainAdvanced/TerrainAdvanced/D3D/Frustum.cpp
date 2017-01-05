@@ -147,7 +147,7 @@ void Frustum::draw()
 	D3DDevice->SetIndices(0);
 
 	// 파란색으로 상,하 평면을 그린다.
-	//D3DDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
+	//D3DDevice->SetRenderState(D3DRS_LIGHTING, true);
 	//ZeroMemory(&mtrl, sizeof(D3DMATERIAL9));
 	//mtrl.Diffuse.b = mtrl.Ambient.b = 1.0f;
 	//D3DDevice->SetMaterial(&mtrl);

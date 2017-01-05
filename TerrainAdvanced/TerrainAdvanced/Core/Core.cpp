@@ -20,3 +20,12 @@ float Lerp(float a, float b, float t)
 {
 	return a - (a*t) + (b*t);
 }
+
+bool IsInRect(RECT* rc, POINT pt)
+{
+	if ((rc->left <= pt.x) && (pt.x <= rc->right) &&
+		(rc->bottom <= pt.y) && (pt.y <= rc->top))
+		return true;
+
+	return false;
+}

@@ -19,7 +19,7 @@ LPDIRECT3DTEXTURE9		g_pTexDiffuse = NULL; // Texture »ö±ò¸Ê
 
 struct MYINDEX
 {
-	WORD	_0, _1, _2;		/// WORD, 16ºñÆ® ÀÎµ¦½º
+	WORD	topLeft, topRight, bottomLeft;		/// WORD, 16ºñÆ® ÀÎµ¦½º
 };
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -115,8 +115,8 @@ void InitLight(void)
 	D3DXVec3Normalize((D3DXVECTOR3*)&light.Direction, &vecDir);	/// ±¤¿øÀÇ ¹æÇâÀ» ´ÜÀ§º¤ÅÍ·Î ¸¸µç´Ù.
 	light.Range = 1000.0f;									/// ±¤¿øÀÌ ´Ù´Ù¸¦¼ö ÀÖ´Â ÃÖ´ë°Å¸®
 	D3DDevice->SetLight(0, &light);							/// µð¹ÙÀÌ½º¿¡ 0¹ø ±¤¿ø ¼³Ä¡
-	D3DDevice->LightEnable(0, TRUE);							/// 0¹ø ±¤¿øÀ» ÄÒ´Ù
-	D3DDevice->SetRenderState(D3DRS_LIGHTING, TRUE);			/// ±¤¿ø¼³Á¤À» ÄÒ´Ù
+	D3DDevice->LightEnable(0, true);							/// 0¹ø ±¤¿øÀ» ÄÒ´Ù
+	D3DDevice->SetRenderState(D3DRS_LIGHTING, true);			/// ±¤¿ø¼³Á¤À» ÄÒ´Ù
 
 	D3DDevice->SetRenderState(D3DRS_AMBIENT, 0x00909090);		/// È¯°æ±¤¿ø(ambient light)ÀÇ °ª ¼³Á¤
 }
@@ -248,7 +248,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 	MSG msg;
 
-	while (TRUE)
+	while (true)
 	{
 		DWORD starting_point = GetTickCount();
 

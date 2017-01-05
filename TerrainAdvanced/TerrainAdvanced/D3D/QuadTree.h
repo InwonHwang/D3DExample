@@ -17,6 +17,13 @@ class QuadTree
 		
 	};
 
+	enum {
+		EDGE_UP,
+		EDGE_DN,
+		EDGE_LT,
+		EDGE_RT
+	};
+
 	enum State
 	{
 		FRUSTUM_OUT,
@@ -24,55 +31,79 @@ class QuadTree
 		FRUSTUM_IN
 	};
 public:
-	QuadTree(int topLeft, int topRight, int bottomLeft, int bottomRight);
+	QuadTree(QuadTree* parent, int topLeft, int topRight, int bottomLeft, int bottomRight);
 	QuadTree(int cx, int cy);	
 	~QuadTree();
 
-	void destroy();
+	
 	bool build(Vector3* heightMap);
 
 	int generateIndex(void* indices, Vector3* heightMap, Frustum& f, float LODRatio);
+private:
+	// constructor
+	void		setConers(int topLeft, int topRight, int bottomLeft, int bottomRight);	
 
-private:	
-	bool subDivide();
-	void setConers(int topLeft, int topRight, int bottomLeft, int bottomRight);
+	// destructor
+	void		destroy();																
 
-	void processFrustumCulling(Vector3* heightMap, Frustum& f);
-	int isInFrustum(Vector3* heightMap, Frustum& f)  const;
-	int genrateTriangleIndex(int numTriangles, void* indices, Vector3* heightMap, const Frustum& f, float LODRatio);
+	// build
+	bool		buildQuadTree(Vector3* pHeightMap);										
+	void		buildNeighbourNode(QuadTree* pRoot, Vector3* pHeightMap, int cx);
+	
+	// generateIndex
+	void		processFrustumCulling(Vector3* heightMap, Frustum& f);
+	int			genrateTriangleIndex(int numTriangles, void* indices, Vector3* heightMap, const Frustum& f, float LODRatio);
 
-	// inline
-	QuadTree* createChild(int topLeft, int topRight, int bottomLeft, int bottomRight) const;
-	float getDistance(const Vector3& v1, const Vector3& v2) const;
-	int getLODLevel(Vector3* heightMap, const Vector3& cameraPos, float LODRatio) const;
-	bool isVisible(Vector3* heightMap, const Vector3& cameraPos, float LODRatio) const;
+	// buildQuadTree
+	bool		subDivide();
+
+	// buildNeighbourNode
+	QuadTree*	findNode(Vector3* pHeightMap, int topLeft, int topRight, int bottomLeft, int bottomRight);
+	int			getNodeIndex(int ed, int cx, int& topLeft, int& topRight, int& bottomLeft, int& bottomRight);
+
+	// processFrustumCulling
+	int			isInFrustum(Vector3* heightMap, Frustum& f)  const;
+	void		setInFrustumAll();
+
+	// inline	
+	QuadTree*	createChild(QuadTree* parent, int topLeft, int topRight, int bottomLeft, int bottomRight) const;
+	int			getLODLevel(Vector3* heightMap, const Vector3& cameraPos, float LODRatio) const;	
+	void		getConer(int& topLeft, int& topRight, int& bottomLeft, int& bottomRight) const;
+	bool		isVisible(Vector3* heightMap, const Vector3& cameraPos, float LODRatio) const;
+
+	
 
 private:
 	QuadTree*	_child[4];
+	QuadTree*	_parent;
+	QuadTree*	_neighbour[4];
+
 	int			_coner[4];
 	int			_center;
-
 	bool		_culled;
 	float		_radius;
 };
 
-inline QuadTree* QuadTree::createChild(int topLeft, int topRight, int bottomLeft, int bottomRight) const
+inline QuadTree* QuadTree::createChild(QuadTree* parent, int topLeft, int topRight, int bottomLeft, int bottomRight) const
 {
-	return new QuadTree(topLeft, topRight, bottomLeft, bottomRight);
-}
-
-inline float QuadTree::getDistance(const Vector3& v1, const Vector3& v2) const
-{
-	return D3DXVec3Length(&(v1 - v2));
+	return new QuadTree(parent, topLeft, topRight, bottomLeft, bottomRight);
 }
 
 inline int QuadTree::getLODLevel(Vector3* heightMap, const Vector3& cameraPos, float LODRatio) const
 {
-	float d = getDistance(*(heightMap + _center), cameraPos);
+	float d = Vector3::GetDistance(*(heightMap + _center), cameraPos);
 	return max((int)(d * LODRatio), 1);
 }
 
 inline bool QuadTree::isVisible(Vector3* heightMap, const Vector3& cameraPos, float LODRatio) const
 {
 	return (_coner[TOP_RIGHT] - _coner[TOP_LEFT] <=  getLODLevel(heightMap, cameraPos, LODRatio));
+}
+
+inline void QuadTree::getConer(int& topLeft, int& topRight, int& bottomLeft, int& bottomRight) const
+{
+	topLeft = _coner[0];
+	topRight = _coner[1];
+	bottomLeft = _coner[2];
+	bottomRight = _coner[3];
 }

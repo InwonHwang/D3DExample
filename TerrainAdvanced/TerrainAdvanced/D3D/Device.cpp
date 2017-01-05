@@ -15,13 +15,13 @@ Device::~Device()
 bool Device::Init()
 {
 	if (NULL == (_d3d = Direct3DCreate9(D3D_SDK_VERSION)))
-		return FALSE;
+		return false;
 
 	D3DDISPLAYMODE d3ddm;
 	if (FAILED(_d3d->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &d3ddm)))
 	{
 		SAFE_RELEASE(_d3d);
-		return FALSE;
+		return false;
 	}
 
 	HRESULT hr;
