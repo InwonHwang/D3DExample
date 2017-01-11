@@ -8,18 +8,13 @@ public:
 	StaticMesh(IDirect3DDevice9& device);
 	virtual ~StaticMesh();
 
+	// inherited from IMemento
+	virtual void Load(FbxNode& fbxNode, void* pData) override;		// IDirect3DDevice9 필요
+	virtual void Save(FbxNode& fbxNode) override;
+
 	// inherited from Mesh
 	virtual void Draw() override;									// IDirect3DDevice9 필요
 
-	// inherited from IMemento
-	virtual void Load(FbxNode& fbxNode) override;					// IDirect3DDevice9 필요
-	virtual void Save(FbxNode& fbxNode) override;					
-	virtual void* GetData() override;
-
-private:
-	void InternalLoadVertice(FbxNode& fbxNode);	
-	void InternalLoadIndice(FbxNode& fbxNode);
-	void InternalSetUpVertexBuffer();
-	void InternalSetUpIndexBuffer();
+protected:
+	virtual void LoadVerticeAndIndice(FbxNode& fbxNode, void* pData) override;
 };
-

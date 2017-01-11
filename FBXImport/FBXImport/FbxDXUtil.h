@@ -1,0 +1,21 @@
+#pragma once
+#include "Core.h"
+
+class FbxDxUtil abstract
+{
+public:
+
+	static D3DXVECTOR4 ToDX(const FbxDouble4 &m, bool neg_w);
+
+	static D3DXVECTOR4 ToDX(const FbxDouble4 &m);
+
+	static D3DXVECTOR3 ToDX(const FbxDouble3 &m);
+
+	static D3DXMATRIX ToDX(const FbxAMatrix &mtx);
+
+	
+
+	//private:
+	//	FbxDxUtil();	// 컴파일러가 디폴트 생성자를 못만들게 함.
+	//	~FbxDxUtil();
+};

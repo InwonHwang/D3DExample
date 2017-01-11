@@ -26,6 +26,11 @@ public:
 
 	virtual void Draw() abstract;						// Device 필요
 
+	bool IsSkinned() const;
+
+protected:
+	virtual void LoadVerticeAndIndice(FbxNode& fbxNode, void* pData) abstract;
+
 protected:
 	IDirect3DDevice9*	_device;
 	VertexBuffer*		_vb;
@@ -36,7 +41,9 @@ protected:
 	int		_vertexCount;			// vertex개수
 	int		_primitiveCount;		// triangle(index) 개수
 
-	std::vector<MESHVERTEX> _bufferVertice;
-	std::vector<unsigned long> _bufferIndice;
 };
 
+inline bool Mesh::IsSkinned() const
+{
+	return _isSkinned;
+}

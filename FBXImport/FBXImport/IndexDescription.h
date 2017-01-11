@@ -1,6 +1,6 @@
 #pragma once
 
-typedef struct Index
+typedef struct tagIndex
 {
 #ifdef _USE_INDEX16
 	unsigned short	_0, _1, _2;		/// WORD, 16∫Ò∆Æ ¿Œµ¶Ω∫

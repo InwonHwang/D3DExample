@@ -7,10 +7,12 @@
 #include <d3dx9.h>
 #include <vector>
 #include <string>
+#include <set>
 #include <algorithm>
 #include <cassert>
 
 #include "BitFlags.h"
+#include "FbxDXUtil.h"
 
 #define SAFE_DELETE(p) if(p) { delete p; p = nullptr; }
 #define SAFE_DELETE_ARRAY(p) if(p) { delete[] p; p = nullptr; }
