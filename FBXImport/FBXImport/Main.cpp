@@ -1,25 +1,24 @@
 #include "Core.h"
-#include "StaticMesh.h"
-#include "SkinnedMesh.h"
-#include "Frame.h"
-#include "AnimationCurve.h"
+#include "FbxTest.h"
 
 #define KEY_DOWN(vk_code) ((GetAsyncKeyState(vk_code) & 0x8000) ? 1 : 0)
 
 LPDIRECT3D9             g_pD3D = NULL;
 LPDIRECT3DDEVICE9       g_pd3dDevice = NULL;
-SkinnedMesh*			mesh[6];
-Frame*					frame[6];
 
-std::vector<Frame *>* bone;
+bool Init()
+{
+	if (!FbxTest::Init()) return false;
+	if (!FbxTest::ImportScene()) return false;
+	FbxTest::Load();
+		
+	return true;
+}
 
-
-bool fbxSdk();
 HRESULT InitD3D(HWND hWnd)
 {
 	if (NULL == (g_pD3D = Direct3DCreate9(D3D_SDK_VERSION)))
 		return E_FAIL;
-
 
 	D3DPRESENT_PARAMETERS d3dpp;
 	ZeroMemory(&d3dpp, sizeof(d3dpp));
@@ -49,7 +48,7 @@ void InitMatrix()
 	light.Diffuse.b = 1.0f;
 	light.Diffuse.a = 1.0f;
 
-	D3DVECTOR vecDirection = { 83,20,16 };
+	D3DVECTOR vecDirection = { 0,0,0 };
 	light.Direction = vecDirection;
 	g_pd3dDevice->SetLight(0, &light);
 	g_pd3dDevice->LightEnable(0, TRUE);
@@ -59,12 +58,8 @@ void InitMatrix()
 	D3DXMATRIX matWorld;
 	D3DXMatrixIdentity(&matWorld);
 	g_pd3dDevice->SetTransform(D3DTS_WORLD, &matWorld);
-
-	/*D3DXVECTOR3 eye(-83, 20, -5000);
-	D3DXVECTOR3 up(0, 1, 0);
-	D3DXVECTOR3 lookAt(-83,20,16);*/
 	
-	D3DXVECTOR3 eye(0, 50, -500);
+	D3DXVECTOR3 eye(0, 50, -1500);
 	D3DXVECTOR3 up(0, 1, 0);
 	D3DXVECTOR3 lookAt(0, 50, 0);
 
@@ -78,129 +73,6 @@ void InitMatrix()
 	g_pd3dDevice->SetTransform(D3DTS_PROJECTION, &matProj);
 }
 
-void LoadBoneHierarachy(FbxNode *pNode, std::vector<Frame *>& boneHierarchy)
-{	
-	FbxNodeAttribute::EType AttributeType = pNode->GetNodeAttribute()->GetAttributeType();
-
-	if (AttributeType == FbxNodeAttribute::eSkeleton)
-	{
-		Frame* tempBone = new Frame();
-
-		tempBone->Load(*pNode, nullptr);
-		boneHierarchy.push_back(tempBone);
-	}
-
-	for (int i = 0; i < pNode->GetChildCount(); i++)
-	{
-		LoadBoneHierarachy(pNode->GetChild(i), boneHierarchy);
-	}
-}
-
-bool fbxSdk()
-{
-	// fbx 싱글톤
-	FbxManager* fbxManager = FbxManager::Create();
-
-	// IO 세팅
-	FbxIOSettings* ios = FbxIOSettings::Create(fbxManager, IOSROOT);
-	ios->SetBoolProp(IMP_FBX_MATERIAL, true);
-	ios->SetBoolProp(IMP_FBX_TEXTURE, true);
-	ios->SetBoolProp(IMP_FBX_LINK, true);
-	ios->SetBoolProp(IMP_FBX_SHAPE, true);
-	ios->SetBoolProp(IMP_FBX_GOBO, true);
-	ios->SetBoolProp(IMP_FBX_ANIMATION, true);
-	ios->SetBoolProp(IMP_FBX_GLOBAL_SETTINGS, true);
-
-	ios->SetBoolProp(EXP_FBX_MATERIAL, true);
-	ios->SetBoolProp(EXP_FBX_TEXTURE, true);
-	ios->SetBoolProp(EXP_FBX_EMBEDDED, true);
-	ios->SetBoolProp(EXP_FBX_SHAPE, true);
-	ios->SetBoolProp(EXP_FBX_GOBO, true);
-	ios->SetBoolProp(EXP_FBX_ANIMATION, true);
-	ios->SetBoolProp(EXP_FBX_GLOBAL_SETTINGS, true);
-
-	fbxManager->SetIOSettings(ios);
-
-	// Scene 임포트
-	FbxImporter* importer = FbxImporter::Create(fbxManager, "");
-
-	//const char* fileName = "Media\\lowpolytree.fbx";
-	//const char* fileName = "Media\\Medieva_fantasy_house.fbx";
-	//const char* fileName = "Media\\baum hd med fbx.fbx";
-	const char* fileName = "Media\\Hero_General.fbx";
-
-	bool importStatus = importer->Initialize(fileName, -1, fbxManager->GetIOSettings());
-
-	if (!importStatus) {
-		MessageBoxA(GetActiveWindow(), NULL, importer->GetStatus().GetErrorString(), MB_OK);
-		importer->Destroy();
-		fbxManager->Destroy();
-		return false;
-	}
-
-	FbxScene* scene = FbxScene::Create(fbxManager, "Scene");
-
-	importer->Import(scene);
-	importer->Destroy();
-
-
-	FbxNode* pFbxRootNode = scene->GetRootNode();
-
-	int j = 0;
-	if (pFbxRootNode)
-	{
-		/*int numStacks = scene->GetSrcObjectCount(FbxCriteria::ObjectType(FbxAnimStack::ClassId));
-
-		FbxAnimStack* pAnimStack = FbxCast<FbxAnimStack>(scene->GetSrcObject(FbxCriteria::ObjectType(FbxAnimStack::ClassId), 0));
-				
-
-		int numAnimLayers = pAnimStack->GetMemberCount(FbxCriteria::ObjectType(FbxAnimLayer::ClassId));
-
-		for (int i = 0; i < numAnimLayers; i++)
-		{
-			FbxAnimLayer* animLayer = FbxCast<FbxAnimLayer>(pAnimStack->GetMember(FbxCriteria::ObjectType(FbxAnimLayer::ClassId), i));
-		}*/
-		bone = new std::vector<Frame *>();
-
-		for (int i = 0; i < pFbxRootNode->GetChildCount(); i++)
-		{
-			FbxNode* pFbxChildNode = pFbxRootNode->GetChild(i);
-
-			if (pFbxChildNode->GetNodeAttribute() == NULL) continue;
-
-			FbxNodeAttribute::EType AttributeType = pFbxChildNode->GetNodeAttribute()->GetAttributeType();
-
-			if (AttributeType == FbxNodeAttribute::eSkeleton)	// Transform 만들기
-			{
-				LoadBoneHierarachy(pFbxChildNode, *bone);
-				// Animation 생성
-				// Frame 생성
-				// Animation curve 생성
-				// Animation에 animation curve, frame 추가
-			}
-			else if (AttributeType == FbxNodeAttribute::eMesh)
-			{
-				int deformerCount = pFbxChildNode->GetMesh()->GetDeformerCount();
-				
-				// deformerCount == 0이면 Static Mesh라는 것.
-				frame[j] = new Frame();
-				frame[j]->Load(*pFbxChildNode, nullptr);
-
-				mesh[j] = new SkinnedMesh(*g_pd3dDevice);
-				mesh[j]->Load(*pFbxChildNode, bone);
-				
-				// defomerCount > 0 면 Skinned Mesh를 생성
-				j++;
-			}			
-		}
-	}
-
-	pFbxRootNode->Destroy();
-	scene->Destroy();
-	fbxManager->Destroy();	
-
-	return true;
-}
 
 
 
@@ -211,22 +83,27 @@ VOID Render()
 
 	if (SUCCEEDED(g_pd3dDevice->BeginScene()))
 	{
-		g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
-		//g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+		//g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+		g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 		
-		for (auto it = bone->begin(); it != bone->end(); ++it)
+		for (auto it = FbxTest::g_bones.begin(); it != FbxTest::g_bones.end(); ++it)
 		{
-			(*it)->Draw(*g_pd3dDevice);
+			//(*it)->Draw(*g_pd3dDevice);			
 		}
 
-		for (int i = 0; i < 1; i++)
+		//auto itMeshs = FbxTest::g_staticMeshs.begin();
+		auto itMeshs = FbxTest::g_skinnedMeshs.begin();
+		auto itFrames = FbxTest::g_frames.begin();		
+
+		for (int i = 0; i < FbxTest::g_skinnedMeshs.size(); i++)
 		{
-			mesh[i]->ApplyMatrix(&frame[i]->GetWorldMatrixParent(), &frame[i]->GetLocalMatrix());
-			//g_pd3dDevice->SetTransform(D3DTS_WORLD, &frame[i]->GetWorldMatrix());
-			mesh[i]->Draw();
+			//g_pd3dDevice->SetTransform(D3DTS_WORLD, &(*itFrames)->GetWorldMatrix());
+			(*itMeshs)->ApplyMatrix((*itFrames)->GetLocalMatrix(), (*itFrames)->GetWorldMatrix());
+			(*itMeshs)->Draw();	
+
+			itMeshs++;
+			itFrames++;
 		}
-			
-		
 
 		g_pd3dDevice->EndScene();
 	}
@@ -239,19 +116,7 @@ VOID Render()
 
 VOID Cleanup()
 {
-	for(auto it = bone->begin(); it != bone->end(); ++it)
-	{
-		SAFE_DELETE(*it);		
-	}
-	bone->clear();
-	SAFE_DELETE(bone);
-
-
-	for (int i = 0; i < 6; i++)
-	{
-		SAFE_DELETE(mesh[i]);
-		SAFE_DELETE(frame[i]);
-	}
+	FbxTest::Clear();
 
 	if (g_pd3dDevice != NULL)
 		g_pd3dDevice->Release();
@@ -294,10 +159,9 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	
 
 	if (SUCCEEDED(InitD3D(hWnd)))
-	{
-		// Create the vertex buffer
-		if (SUCCEEDED(fbxSdk()))
-		{
+	{	
+		if(Init())
+		{ 
 			InitMatrix();
 			while (msg.message != WM_QUIT)
 			{
@@ -310,12 +174,12 @@ int WINAPI WinMain(HINSTANCE hInstance,
 					Render();
 
 				if (KEY_DOWN(VK_ESCAPE))
-					PostMessage(hWnd, WM_QUIT, 0, 0);
+					PostMessage(hWnd, WM_DESTROY, 0, 0);
 			}
 		}
+		
 	}
 	Cleanup();
-
 
 	return msg.wParam;
 }
@@ -326,7 +190,7 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 	{
 	case WM_DESTROY:
 	{
-		Cleanup();
+		//Cleanup();
 		PostQuitMessage(0);
 		return 0;
 	} break;

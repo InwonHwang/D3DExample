@@ -5,13 +5,13 @@ class FbxDxUtil abstract
 {
 public:
 
-	static D3DXVECTOR4 ToDX(const FbxDouble4 &m, bool neg_w);
+	static D3DXQUATERNION ToDXQuaternion(const FbxDouble4 &m, bool neg_w);
 
-	static D3DXVECTOR4 ToDX(const FbxDouble4 &m);
+	static D3DXVECTOR4 ToDXVector4(const FbxDouble4 &m);
 
-	static D3DXVECTOR3 ToDX(const FbxDouble3 &m);
+	static D3DXVECTOR3 ToDXVector3(const FbxDouble3 &m);
 
-	static D3DXMATRIX ToDX(const FbxAMatrix &mtx);
+	static D3DXMATRIX ToDXMatrix(const FbxAMatrix &mtx);
 
 	
 

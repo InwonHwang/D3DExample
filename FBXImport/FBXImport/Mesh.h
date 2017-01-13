@@ -29,7 +29,11 @@ public:
 	bool IsSkinned() const;
 
 protected:
-	virtual void LoadVerticeAndIndice(FbxNode& fbxNode, void* pData) abstract;
+	virtual void LoadPosition(FbxMesh& mesh, int ctrlPointIndex, D3DXVECTOR3& position) abstract;
+	virtual void LoadColor(FbxMesh&, int ctrlPointIndex, int vertexCount, D3DXVECTOR4& color) abstract;
+	virtual void LoadUV(FbxMesh&, int ctrlPointIndex, int uvIndex, D3DXVECTOR2& uv) abstract;
+	virtual void LoadNormal(FbxMesh&, int ctrlPointIndex, int vertexCount, D3DXVECTOR3& normal) abstract;
+	virtual void LoadTangent(FbxMesh&, int ctrlPointIndex, int vertexCount, D3DXVECTOR3& tangent) abstract;
 
 protected:
 	IDirect3DDevice9*	_device;
