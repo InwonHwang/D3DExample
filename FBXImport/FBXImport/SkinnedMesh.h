@@ -1,6 +1,7 @@
 #pragma once
 #include "Mesh.h"
 #include "IMemento.h"
+#include "Utilities.h"
 
 class Frame;
 
@@ -20,6 +21,15 @@ public:
 	virtual void Save(FbxNode& fbxNode) override;	
 
 protected:
+	void ProcessControlPoints(FbxNode* inNode);
+	void ProcessJointsAndAnimations(FbxNode* inNode);
+	unsigned int FindJointIndexUsingName(const std::string& inJointName);
+
+	void Optimize();
+	int FindVertex(const PNTIWVertex& inTargetVertex, const std::vector<PNTIWVertex>& uniqueVertices);
+
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	void LoadSkinInfo(FbxNode& fbxNode, std::vector<SKINNEDMESHVERTEX>& bufferVertex);
 
 	// inherited from Mesh
@@ -31,6 +41,13 @@ protected:
 	
 
 private:
+
+	std::unordered_map<unsigned int, CtrlPoint*> mControlPoints;
+	unsigned int mTriangleCount;											
+	std::vector<Triangle> mTriangles;										// index 역할을 하는..
+	std::vector<PNTIWVertex> mVertices;
+	//Skeleton mSkeleton;
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	std::vector<int>					_indexBones;
 	std::vector<D3DXMATRIX>				_boneOffset;	// 오프셋 매트릭스
 	std::vector<Frame *>*				_bones;

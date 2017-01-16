@@ -5,7 +5,7 @@ class FbxDxUtil abstract
 {
 public:
 
-	static D3DXQUATERNION ToDXQuaternion(const FbxDouble4 &m, bool neg_w);
+	static D3DXQUATERNION ToDXQuaternion(const FbxQuaternion &m);
 
 	static D3DXVECTOR4 ToDXVector4(const FbxDouble4 &m);
 

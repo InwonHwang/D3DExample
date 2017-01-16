@@ -17,6 +17,7 @@ public:
 
 	D3DXMATRIX GetLocalMatrix() const;
 	D3DXMATRIX GetWorldMatrix() const;
+	D3DXMATRIX GetWorldMatrixParent() const;
 
 	const char* GetName() const;
 
@@ -39,6 +40,12 @@ inline D3DXMATRIX Frame::GetWorldMatrix() const
 {
 	return _matLocal * _matWorldParent;
 }
+
+inline D3DXMATRIX Frame::GetWorldMatrixParent() const
+{
+	return _matWorldParent;
+}
+
 
 inline const char* Frame::GetName() const
 {

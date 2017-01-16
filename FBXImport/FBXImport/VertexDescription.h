@@ -1,13 +1,6 @@
 #pragma once
 #include <d3dx9.h>
 
-//typedef struct Vertex
-//{
-//	Vector3 Positon;
-//	Vector3 Normal;
-//	Vector3 UV;
-//}VERTEX, *LPVERTEX;
-
 typedef struct tagStaticMeshVertex
 {
 	D3DXVECTOR3 Position;
@@ -24,10 +17,22 @@ typedef struct tagSkinnedMeshVertex
 	D3DXVECTOR3 Normal;
 	D3DXVECTOR2 TexCoord;
 	D3DXVECTOR3 Tangent;
-	float		Weight[3] = { 0.0f, };		// °¡ÁßÄ¡ °ª 4°³
-	int			Index[4] = { 0, };			// »À´ë ÀÎµ¦½º
+	D3DXVECTOR3	Weight{ 0.0f, 0.0f, 0.0f };	// °¡ÁßÄ¡ °ª 4°³
+	int			Index[4] = { 0, 0, 0, 0};			// »À´ë ÀÎµ¦½º
+	
 	
 }SKINNEDMESHVERTEX, *LPSKINNEDMESHVERTEX;
+
+typedef struct tagSkinnedMeshVertex2
+{
+	D3DXVECTOR3 Position;
+	D3DXVECTOR3 Normal;
+	D3DXVECTOR2 TexCoord;
+	D3DXVECTOR3	Weight{ 0.0f, 0.0f, 0.0f };	// °¡ÁßÄ¡ °ª 4°³
+	int			Index[4] = { 0, 0, 0, 0 };			// »À´ë ÀÎµ¦½º
+
+
+}SKINNEDMESHVERTEX2, *LPSKINNEDMESHVERTEX2;
 
 struct BOXVERTEX
 {
@@ -39,39 +44,7 @@ struct BOXVERTEX
 	BOXVERTEX(float f1, float f2, float f3, DWORD c) { x = f1; y = f2; z = f3; color = c; }
 };
 
-typedef struct tagBlendInfo
-{
-	DWORD	Index;
-	double  Weight;
 
-	tagBlendInfo() :
-		Index(0),
-		Weight(0)
-	{}
-
-	bool operator < (const tagBlendInfo& tDest) { return !(Weight <= tDest.Weight); }
-}BLENDINFO, *LPBLENDINFO;
-
-typedef struct tagCtrlPoint {
-	STATICMESHVERTEX Vertex;
-	std::vector<BLENDINFO> BlendInfo;
-
-	tagCtrlPoint()
-	{
-		BlendInfo.reserve(4);
-	}
-
-	~tagCtrlPoint()
-	{
-		BlendInfo.erase(BlendInfo.begin(), BlendInfo.end());
-		BlendInfo.clear();
-	}
-
-	void sort()
-	{
-		std::sort(BlendInfo.begin(), BlendInfo.end());
-	}
-}CTRLPOINT, *LPCTRLPOINT;
 
 const D3DVERTEXELEMENT9 StaticMeshDec[6] =
 {
@@ -93,4 +66,72 @@ const D3DVERTEXELEMENT9 SkinnedMeshDec[8] =
 	{ 0, 60, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BLENDWEIGHT,0 },
 	{ 0, 72, D3DDECLTYPE_UBYTE4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BLENDINDICES,0 },
 	D3DDECL_END()
+};
+
+
+const D3DVERTEXELEMENT9 test[6] =
+{
+	{ 0, 0,  D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0 },
+	{ 0, 12, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_NORMAL, 0 },
+	{ 0, 24, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0 },
+	{ 0, 32, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BLENDWEIGHT,0 },
+	{ 0, 44, D3DDECLTYPE_UBYTE4, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_BLENDINDICES,0 },
+	D3DDECL_END()
+};
+
+/////////////////////////////////////////////////
+
+struct VertexBlendingInfo
+{
+	unsigned int mBlendingIndex;
+	float mBlendingWeight;
+
+	VertexBlendingInfo() :
+		mBlendingIndex(0),
+		mBlendingWeight(0.0)
+	{}
+
+	bool operator < (const VertexBlendingInfo& rhs)
+	{
+		return (mBlendingWeight > rhs.mBlendingWeight);
+	}
+};
+
+struct PNTIWVertex
+{
+	D3DXVECTOR3 mPosition;
+	D3DXVECTOR3 mNormal;
+	D3DXVECTOR2 mUV;
+	std::vector<VertexBlendingInfo> mVertexBlendingInfos;
+
+	void SortBlendingInfoByWeight()
+	{
+		std::sort(mVertexBlendingInfos.begin(), mVertexBlendingInfos.end());
+	}
+
+	bool operator==(const PNTIWVertex& rhs) const
+	{
+		bool sameBlendingInfo = true;
+
+		// We only compare the blending info when there is blending info
+		if (!(mVertexBlendingInfos.empty() && rhs.mVertexBlendingInfos.empty()))
+		{
+			// Each vertex should only have 4 index-weight blending info pairs
+			for (unsigned int i = 0; i < 4; ++i)
+			{
+				if (mVertexBlendingInfos[i].mBlendingIndex != rhs.mVertexBlendingInfos[i].mBlendingIndex ||
+					abs(mVertexBlendingInfos[i].mBlendingWeight - rhs.mVertexBlendingInfos[i].mBlendingWeight) > 0.001)
+				{
+					sameBlendingInfo = false;
+					break;
+				}
+			}
+		}
+
+		bool result1 = (mPosition == rhs.mPosition) ? true : false;
+		bool result2 = (mNormal == rhs.mNormal) ? true : false;
+		bool result3 = (mUV == rhs.mUV) ? true : false;
+
+		return result1 && result2 && result3 && sameBlendingInfo;
+	}
 };

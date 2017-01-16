@@ -10,6 +10,7 @@
 #include <set>
 #include <algorithm>
 #include <cassert>
+#include <unordered_map>
 
 #include "BitFlags.h"
 #include "FbxDXUtil.h"

@@ -57,29 +57,30 @@ bool FbxTest::ImportScene()
 	if (!g_pFbxManager) return false;
 	
 	FbxImporter* pFbxImporter = FbxImporter::Create(g_pFbxManager, "");
-	//const char* fileName = "Media\\lowpolytree.fbx";
-	//const char* fileName = "Media\\Medieva_fantasy_house.fbx";
-	//const char* fileName = "Media\\baum hd med fbx.fbx";
+
 	const char* fileName = "Media\\Hero_General.fbx";
 	//const char* fileName = "Media\\robot_red_arm_left.fbx";
-
+	
 	bool importStatus = pFbxImporter->Initialize(fileName, -1, g_pFbxManager->GetIOSettings());
 
 	if (!importStatus) return false;
 	
 	
 	g_pScene->Clear();
-	importStatus = pFbxImporter->Import(g_pScene);
 
+	importStatus = pFbxImporter->Import(g_pScene);
 	pFbxImporter->Destroy();
 
-	/*FbxAxisSystem axisSystem = FbxAxisSystem::eDirectX;
+	FbxGeometryConverter converter(g_pFbxManager);
+	converter.Triangulate(g_pScene, true);
+
+	FbxAxisSystem axisSystem = FbxAxisSystem::DirectX;
 
 	if (g_pScene->GetGlobalSettings().GetAxisSystem() != axisSystem)
 	{
 		axisSystem.ConvertScene(g_pScene);
-	}*/
-
+	}
+	
 	return importStatus;	
 }
 
@@ -99,11 +100,17 @@ void FbxTest::LoadNodeAll(FbxNode& node)
 		{
 		case FbxNodeAttribute::eMesh :
 			{
-				/*StaticMesh* smesh = new StaticMesh(*g_pd3dDevice);
+				/*Frame* frame = new Frame();
+				frame->Load(node, nullptr);
+				g_frames.push_back(frame);
+
+				StaticMesh* smesh = new StaticMesh(*g_pd3dDevice);
 				smesh->Load(node, nullptr);
 				g_staticMeshs.push_back(smesh);*/
 				if (node.GetMesh()->GetDeformerCount() > 0)
 				{
+					
+
 					Frame* frame = new Frame();
 					frame->Load(node, nullptr);
 					g_frames.push_back(frame);
@@ -111,7 +118,7 @@ void FbxTest::LoadNodeAll(FbxNode& node)
 					SkinnedMesh* smesh = new SkinnedMesh(*g_pd3dDevice);
 					smesh->Load(node, (void*)&g_bones);
 					g_skinnedMeshs.push_back(smesh);
-				}				
+				}		
 			}
 			break;
 		case FbxNodeAttribute::eSkeleton :

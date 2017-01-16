@@ -59,7 +59,7 @@ void InitMatrix()
 	D3DXMatrixIdentity(&matWorld);
 	g_pd3dDevice->SetTransform(D3DTS_WORLD, &matWorld);
 	
-	D3DXVECTOR3 eye(0, 50, -1500);
+	D3DXVECTOR3 eye(0, 50, -500);
 	D3DXVECTOR3 up(0, 1, 0);
 	D3DXVECTOR3 lookAt(0, 50, 0);
 
@@ -83,25 +83,20 @@ VOID Render()
 
 	if (SUCCEEDED(g_pd3dDevice->BeginScene()))
 	{
-		//g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
-		g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+		g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+		//g_pd3dDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 		
 		for (auto it = FbxTest::g_bones.begin(); it != FbxTest::g_bones.end(); ++it)
 		{
 			//(*it)->Draw(*g_pd3dDevice);			
 		}
 
-		//auto itMeshs = FbxTest::g_staticMeshs.begin();
-		auto itMeshs = FbxTest::g_skinnedMeshs.begin();
-		auto itFrames = FbxTest::g_frames.begin();		
-
-		for (int i = 0; i < FbxTest::g_skinnedMeshs.size(); i++)
+		auto itFrames = FbxTest::g_frames.begin();
+		for (auto it = FbxTest::g_skinnedMeshs.begin(); it != FbxTest::g_skinnedMeshs.end(); ++it)
 		{
+			(*it)->ApplyMatrix((*itFrames)->GetLocalMatrix(), (*itFrames)->GetWorldMatrixParent());
 			//g_pd3dDevice->SetTransform(D3DTS_WORLD, &(*itFrames)->GetWorldMatrix());
-			(*itMeshs)->ApplyMatrix((*itFrames)->GetLocalMatrix(), (*itFrames)->GetWorldMatrix());
-			(*itMeshs)->Draw();	
-
-			itMeshs++;
+			(*it)->Draw();	
 			itFrames++;
 		}
 

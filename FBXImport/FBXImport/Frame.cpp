@@ -34,14 +34,14 @@ void Frame::Load(FbxNode& fbxNode, void* pData)
 	}
 
 	_name = fbxNode.GetName();
-	_matLocal = FbxDxUtil::ToDXMatrix(fbxNode.EvaluateLocalTransform(0));
+	_matLocal = FbxDxUtil::ToDXMatrix(fbxNode.EvaluateLocalTransform());
 	
 	FbxAMatrix matWorld;
 	matWorld.SetIdentity();
 
 	FbxNode* parent = fbxNode.GetParent();
 	if (parent)	
-		matWorld = parent->EvaluateGlobalTransform(0);
+		matWorld = parent->EvaluateGlobalTransform();
 	
 	_matWorldParent = FbxDxUtil::ToDXMatrix(matWorld);	
 }
