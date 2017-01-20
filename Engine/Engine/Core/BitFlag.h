@@ -1,7 +1,5 @@
 #pragma once
 
-#pragma once
-
 // enum 에서 플래그 값을 정의하지 않고 계산하도록 하기 위해
 #define FLAG(x) (1<<(x)) 
 

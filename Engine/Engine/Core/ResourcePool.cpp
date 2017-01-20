@@ -1,70 +1,44 @@
 #include "ResourcePool.h"
+#include "..\D3D\Resource\Texture.h"
 
-
-
-ResourcePool::ResourcePool()
+template<typename T>
+ResourcePool<T>::ResourcePool(ResourcePoolHandle handle)
+	: ResourcePoolImpl(handle)
 {
 }
 
-
-ResourcePool::~ResourcePool()
+template<typename T>
+ResourcePool<T>::~ResourcePool()
 {
 }
 
-String ResourcePool::GetName(ResourceHandle handle)
+template<typename T>
+sp<T> ResourcePool<T>::Create()
 {
-	return _names[handle];
-}
-
-String ResourcePool::SetName(ResourceHandle handle, const String& name)
-{
-	_names[handle] = name;
-}
-
-ResourceItem* ResourcePool::FindResource(ResourceHandle handle)
-{
-	for (auto it = _items.begin(); it != _items.end(); ++it)
-	{
-		if (it->first == handle)
-			return it->second;
+	// 내부 데이터가 비어있는 리소스를 찾음.
+	sp<T> empty = boost::static_pointer_cast<T>(GetEmptyResource());
+	 
+	// 내부 데이터가 비어있는 리소스가 있으면 해당 리소스 리턴
+	if (empty)
+	{	
+		return empty;
 	}
-
-	return nullptr;
-}
-
-ResourceItem* ResourcePool::GetEmptyResource()
-{
-	for (auto it = _items.begin(); it != _items.end(); ++it)
+	// 없으면 새로 만들어서 리턴
+	else
 	{
-		if (it->second->IsCreated() == 0)
-			return it->second;
+		_resourceCount++;
+		ResourceHandle handle = GenerateResourceHandle();
+		T* resource = _allocator.construct(handle, this);
+		sp<T> newReousrce(resource, [](const void*) {});
+		RegisterResource(handle, newReousrce);
+		SetName(handle, _T(""));
+		return newReousrce;
 	}
-
-	return nullptr;
 }
 
-void ResourcePool::DestroyResource(ResourceHandle handle)
+template<typename T>
+void ResourcePool<T>::Destroy(void* resource)
 {
-	ResourceItem* item = FindResource(handle);	
-	
-	delete item;
-	
-}
-void ResourcePool::RegisterResource(ResourceHandle handle, ResourceItem& resource)
-{
-	_items[handle] = &resource;
-}
-
-ResourceItem* ResourcePool::UnregisterResource(ResourceHandle handle)
-{
-	_items.erase(handle);
-}
-
-ResourceHandle ResourcePool::GenerateResourceHandle() const
-{
-	for (int i = 0; i < _resourceCount; ++i)
-	{
-		if (!_items[i])
-			return i;
-	}
+	T* temp = static_cast<T*>(resource);
+	_allocator.destroy(temp);
 }

@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{5DBE3BF6-34F9-45E2-867C-3FEA3188F268}</ProjectGuid>
+    <ProjectGuid>{750E754E-08B3-4438-A5B3-7E90F08B155D}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Engine</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
@@ -72,8 +72,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <ExecutablePath>$(DXSDK_DIR)Utilities\bin\x86;$(ExecutablePath)</ExecutablePath>
-    <IncludePath>D:\boost_1_62_0;$(DXSDK_DIR)Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)ThirdParty\FBX SDK\Include;D:\boost_1_62_0;$(DXSDK_DIR)Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)ThirdParty\FBX SDK\lib\vs2015\x86\debug;$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -92,11 +92,12 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d9.lib;d3dx10d.lib;d3dx9d.lib;dxerr.lib;dxguid.lib;winmm.lib;comctl32.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;d3dx10d.lib;d3dx9d.lib;dxerr.lib;dxguid.lib;libfbxsdk-mt.lib;winmm.lib;comctl32.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -150,19 +151,44 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Core\Debug.cpp" />
+    <ClCompile Include="Core\Math\QuaternionFunction.cpp" />
+    <ClCompile Include="Core\ResourcePool.cpp" />
+    <ClCompile Include="D3D\Device.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Core\ResourceItem.cpp" />
+    <ClCompile Include="Core\Resource.cpp" />
+    <ClCompile Include="Core\ResourcePoolImpl.cpp" />
+    <ClCompile Include="D3D\Resource\Texture.cpp" />
+    <ClCompile Include="D3D\Component\Image.cpp" />
+    <ClCompile Include="D3D\Resource\Sprite.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Core\BitFlags.h" />
-    <ClInclude Include="Core\core.h" />
-    <ClInclude Include="Core\DataType.h" />
+    <ClInclude Include="Core\BitFlag.h" />
+    <ClInclude Include="Core\Core.h" />
+    <ClInclude Include="Core\DataStructure.h" />
+    <ClInclude Include="Core\Math\Math.h" />
+    <ClInclude Include="Core\Math\Mathf.h" />
+    <ClInclude Include="Core\Math\Quaternion.h" />
+    <ClInclude Include="Core\Math\QuaternionOperator.h" />
+    <ClInclude Include="Core\Math\Vector.h" />
+    <ClInclude Include="Core\Math\VectorFunction.h" />
+    <ClInclude Include="Core\Math\VectorOperator.h" />
+    <ClInclude Include="Core\Memory.h" />
+    <ClInclude Include="Core\ResourceItem.h" />
+    <ClInclude Include="Core\DataTypes.h" />
     <ClInclude Include="Core\ResourcePool.h" />
+    <ClInclude Include="Core\Resource.h" />
+    <ClInclude Include="Core\ResourcePoolImpl.h" />
+    <ClInclude Include="Core\Debug.h" />
     <ClInclude Include="Core\Singleton.h" />
-    <ClInclude Include="Core\string.h" />
-    <ClInclude Include="Math\Vector2.h" />
-    <ClInclude Include="Math\Vector3.h" />
-    <ClInclude Include="Math\Vector4.h" />
-    <ClInclude Include="Resource\VertexBuffer.h" />
+    <ClInclude Include="D3D\Component\Component.h" />
+    <ClInclude Include="D3D\Resource\D3DResource.h" />
+    <ClInclude Include="D3D\Resource\Texture.h" />
+    <ClInclude Include="D3D\Component\Image.h" />
+    <ClInclude Include="D3D\Device.h" />
+    <ClInclude Include="D3D\Resource\Sprite.h" />
+    <ClInclude Include="ThirdParty\ThirdParty.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

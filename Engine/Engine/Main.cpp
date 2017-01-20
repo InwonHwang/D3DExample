@@ -1,82 +1,106 @@
-#include <Windows.h>
 #include "Core\Core.h"
+#include "D3D\Resource\D3DResource.h"
+#include "D3D\Component\Component.h"
+#include "D3D\Device.h"
 
-void DebugBox(HRESULT hr, LPCTSTR str)
+LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+ResourcePool<Texture> g_TexturePool(0);
+ResourcePool<Image> g_SpritePool(0);
+
+sp<Texture> texture;
+sp<Image> sprite;
+
+void Init()
 {
-	TCHAR szBuffer[50];
-	_stprintf_s(szBuffer, _T("%i"), hr);
+	Device::Instance()->Init();
 
-	MessageBox(GetActiveWindow(), szBuffer, str, MB_OK);
+	texture = g_TexturePool.Create();
+	sprite = g_SpritePool.Create();
+
+	texture->LoadTexture(*Device::Instance()->GetD3DDevice(), _T("Media\\Sample.bmp"));	
+	RECT rect;
+	rect.left = 0;
+	rect.right = texture->GetWitdh();
+	rect.top = 0;
+	rect.bottom = texture->GetHandle();
+	sprite->Create(*Device::Instance()->GetD3DDevice(), texture, rect);	
 }
 
-void testBitFlags()
+void Render()
 {
-	flags32 flag2;
+	Device::Instance()->GetD3DDevice()->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0, 32, 64, 128), 1.0f, 0);
+	Device::Instance()->GetD3DDevice()->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_ARGB(0, 32, 64, 128), 1.0f, 0);
 
-	flag2.set(30);
-
-	String str = TEXT("HELLO");
-	DebugBox(0, OUTPUT_TEXT(str));	
-}
-
-
-LRESULT WINAPI MsgProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	switch (msg)
-	{
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		return 0;
-
-	case WM_PAINT:
-		ValidateRect(hWnd, NULL);
-		return 0;
+	if (SUCCEEDED(Device::Instance()->GetD3DDevice()->BeginScene()))
+	{		
+		sprite->Draw(*Device::Instance()->GetD3DDevice());
+		Device::Instance()->GetD3DDevice()->EndScene();
 	}
 
-	return DefWindowProc(hWnd, msg, wParam, lParam);
+	Device::Instance()->GetD3DDevice()->Present(NULL, NULL, NULL, NULL);
 }
 
-INT WINAPI wWinMain(HINSTANCE hInst, HINSTANCE, LPWSTR, INT)
-{
-	UNREFERENCED_PARAMETER(hInst);
 
-	WNDCLASSEX wc =
-	{
-		sizeof(WNDCLASSEX), CS_CLASSDC, MsgProc, 0L, 0L,
-		GetModuleHandle(NULL), NULL, NULL, NULL, NULL,
-		_T("D3D Tutorial"), NULL
-	};
+int WINAPI WinMain(HINSTANCE hInstance,
+	HINSTANCE hPrevInstance,
+	LPSTR lpCmdLine,
+	int nCmdShow)
+{
+	HWND hWnd;
+	WNDCLASSEX wc;
+
+	ZeroMemory(&wc, sizeof(WNDCLASSEX));
+
+	wc.cbSize = sizeof(WNDCLASSEX);
+	wc.style = CS_HREDRAW | CS_VREDRAW;
+	wc.lpfnWndProc = (WNDPROC)WindowProc;
+	wc.hInstance = hInstance;
+	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wc.lpszClassName = _T("WindowClass1");
+
 	RegisterClassEx(&wc);
 
-	HWND hWnd = CreateWindow(_T("D3D Tutorial"), _T("D3D Tutorial 01: CreateDevice"),
-		WS_OVERLAPPEDWINDOW, 100, 100, 800, 600,
-		NULL, NULL, wc.hInstance, NULL);
+	hWnd = CreateWindowEx(NULL, _T("WindowClass1"), _T("Our Direct3D Program"),
+		WS_OVERLAPPEDWINDOW, 0, 0, 800, 600, NULL, NULL, hInstance, NULL);
 
-	SetActiveWindow(hWnd);	
+	ShowWindow(hWnd, nCmdShow);
 
-	ShowWindow(hWnd, SW_SHOWDEFAULT);
-	UpdateWindow(hWnd);
+	SetActiveWindow(hWnd);
 
 	MSG msg;
-	ZeroMemory(&msg, sizeof(msg));
-
-	testBitFlags();
-
+	ZeroMemory(&msg, sizeof(MSG));
+	Init();
 	while (msg.message != WM_QUIT)
-	{			
-
+	{
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
+
+		Render();
 	}
 
+	texture->Destroy();
+	sprite->Destroy();
+	g_TexturePool.Clear();
+	g_SpritePool.Clear();
+	Device::Instance()->Release();
 
-	UnregisterClass(_T("D3D Tutorial"), wc.hInstance);
-	return 0;
+	return msg.wParam;
 }
 
+LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch (message)
+	{
+	case WM_DESTROY:
+	{
+		PostQuitMessage(0);
+		return 0;
+	} break;
+	}
 
-
-
+	return DefWindowProc(hWnd, message, wParam, lParam);
+}

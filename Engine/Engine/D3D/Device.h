@@ -1,14 +1,12 @@
 #pragma once
-
-#include "Singleton.h"
-#include "stdafx.h"
+#include "..\Core\Core.h"
 
 class Device : public Singleton<Device>
 {
 private:
-	LPDIRECT3D9         _d3d;
-	LPDIRECT3DDEVICE9   _d3dDevice;	
-		
+	IDirect3D9*         _d3d;
+	IDirect3DDevice9*   _d3dDevice;
+
 public:
 	Device();
 	~Device();
@@ -16,12 +14,10 @@ public:
 	bool Init() final;
 	void Release() final;
 
-	LPDIRECT3DDEVICE9 D3DDevice()
-	{
-		return _d3dDevice;
-	}
+	IDirect3DDevice9* GetD3DDevice() const;
 };
 
-#define D3D Device::Instance()
-#define D3DDevice D3D->D3DDevice()
-
+inline IDirect3DDevice9* Device::GetD3DDevice() const
+{
+	return _d3dDevice;
+}
