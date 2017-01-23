@@ -1,30 +1,29 @@
 #include "Core\Core.h"
 #include "D3D\Resource\D3DResource.h"
-#include "D3D\Component\Component.h"
+#include "D3D\Component\D3DComponent.h"
 #include "D3D\Device.h"
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 ResourcePool<Texture> g_TexturePool(0);
-ResourcePool<Image> g_SpritePool(0);
 
 sp<Texture> texture;
-sp<Image> sprite;
+wp<Image> image;
+sp<Transform> transform;
 
 void Init()
 {
 	Device::Instance()->Init();
 
 	texture = g_TexturePool.Create();
-	sprite = g_SpritePool.Create();
+	texture->LoadTexture(*Device::Instance()->GetD3DDevice(), _T("Media\\Sample.bmp"));
 
-	texture->LoadTexture(*Device::Instance()->GetD3DDevice(), _T("Media\\Sample.bmp"));	
-	RECT rect;
-	rect.left = 0;
-	rect.right = texture->GetWitdh();
-	rect.top = 0;
-	rect.bottom = texture->GetHandle();
-	sprite->Create(*Device::Instance()->GetD3DDevice(), texture, rect);	
+	Transform* tr = (Transform *)Memory<Transform>::OrderedAlloc(sizeof(Transform));	
+	transform.reset(tr, Memory<Transform>::OrderedFree);
+
+	transform->AddComponent<Image>();
+	image = transform->GetComponent<Image>();
+	image.lock()->Create(*Device::Instance()->GetD3DDevice(), texture);
 }
 
 void Render()
@@ -34,7 +33,8 @@ void Render()
 
 	if (SUCCEEDED(Device::Instance()->GetD3DDevice()->BeginScene()))
 	{		
-		sprite->Draw(*Device::Instance()->GetD3DDevice());
+		//transform->GetComponent<Image>()->Draw(*Device::Instance()->GetD3DDevice());
+		image.lock()->Draw(*Device::Instance()->GetD3DDevice());
 		Device::Instance()->GetD3DDevice()->EndScene();
 	}
 
@@ -81,11 +81,10 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 		Render();
 	}
+		
 
-	texture->Destroy();
-	sprite->Destroy();
-	g_TexturePool.Clear();
-	g_SpritePool.Clear();
+	transform->Clear();
+	g_TexturePool.Clear();	
 	Device::Instance()->Release();
 
 	return msg.wParam;

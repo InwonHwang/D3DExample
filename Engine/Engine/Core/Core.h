@@ -11,6 +11,5 @@
 #include "Resource.h"
 #include "ResourceItem.h"
 #include "ResourcePool.h"
-#include "ResourcePool.cpp"
 #include "ResourcePoolImpl.h"
 #include "Singleton.h"

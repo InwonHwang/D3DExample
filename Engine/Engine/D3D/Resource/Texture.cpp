@@ -12,6 +12,8 @@ Texture::~Texture()
 
 void Texture::LoadTexture(IDirect3DDevice9& device, String fileName)
 {
+	// 이미 로드 되있으면 리턴
+	if (IsLoaded()) return;
 	
 #ifdef UNICODE 
 	if (FAILED(D3DXCreateTextureFromFile(&device, fileName.c_str(), &_texture)))
@@ -33,12 +35,16 @@ void Texture::LoadTexture(IDirect3DDevice9& device, String fileName)
 
 void Texture::LoadRenderTarget(IDirect3DDevice9& device, String fileName, flag32 state, uint width, uint height)
 {	
+	// 이미 로드 되있으면 리턴
+	if (IsLoaded()) return;
+
 	DWORD usage = D3DUSAGE_RENDERTARGET;
 
 	if (state.check(eMipmap))
 	{
 		usage |= D3DUSAGE_AUTOGENMIPMAP;
 	}	
+
 
 	if (FAILED(device.CreateTexture(width, height, 1, usage,
 				D3DFMT_R32F, D3DPOOL_DEFAULT, &_texture, NULL)))

@@ -1,8 +1,13 @@
 #pragma once
 
-#include "Image.h"
-
 class Component
 {
-	
+public:
+	Component() {}
+	~Component() {}
+
+	virtual void Destroy() = 0;
+
+private:	
+	bool _enabled;
 };

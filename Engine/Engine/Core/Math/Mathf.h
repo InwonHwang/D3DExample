@@ -3,12 +3,13 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
+
 class Mathf abstract
 {
 public:
 	static float Infinity() { return INFINITY; }
-	static float RadToDeg() { return (float)(180 / M_PI); }
-	static float DegToRad() { return (float)(M_PI / 180); }
+	static float RadToDeg() { return (float)(180 / 3.14159265358979323846); }
+	static float DegToRad() { return (float)(3.14159265358979323846 / 180); }
 
 	static float Abs(float f) { return abs(f); }
 

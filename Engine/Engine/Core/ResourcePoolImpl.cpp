@@ -45,6 +45,10 @@ sp<ResourceItem> ResourcePoolImpl::GetResource(const String& name)
 
 void ResourcePoolImpl::Clear()
 {	
+	for (auto r : _items)
+	{
+		r.second->Destroy();
+	}
 	_names.clear();
 	_items.clear();
 }

@@ -19,6 +19,8 @@ public:
 	ResourceItem(ResourceHandle handle, ResourcePoolImpl* pool);
 	virtual ~ResourceItem();
 
+	virtual void Destroy() abstract;
+
 	ResourceHandle GetHandle() const;
 	String GetName() const;
 	void SetName(const String& name) const;

@@ -1,8 +1,12 @@
 #pragma once
-class Sprite
+#include "..\..\Core\Core.h"
+
+class Sprite : public ResourceItem
 {
 public:
-	Sprite();
+	Sprite(ResourceHandle handle, ResourcePoolImpl* pool);
 	~Sprite();
+
+	virtual void Destroy() override {}
 };
 

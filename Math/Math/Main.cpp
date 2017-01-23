@@ -1,99 +1,116 @@
 #include <iostream>
 #include "Vector3.h"
 #include "Matrix.h"
+#include <cmath>
 
 using namespace std;
 
 int main()
 {
-	Vector3 v1(1, 1, 1);
-	Vector3 v2(1, 2, 3);
+	//Vector3 v1(1, 1, 1);
+	//Vector3 v2(1, 2, 3);
 
-	// -------------------------- ∫§≈Õ --------------------------
-	//µ°º¿
-	Vector3 result = v1 + v2;
-	cout << "µ°º¿: " << result.x << " " << result.y << " " << result.z << endl;
+	//// -------------------------- ∫§≈Õ --------------------------
+	////µ°º¿
+	//Vector3 result = v1 + v2;
+	//cout << "µ°º¿: " << result.x << " " << result.y << " " << result.z << endl;
 
-	//ª¨º¿
-	result = v2 - v1;
-	cout << "ª¨º¿: " << result.x << " " << result.y << " " << result.z << endl;
+	////ª¨º¿
+	//result = v2 - v1;
+	//cout << "ª¨º¿: " << result.x << " " << result.y << " " << result.z << endl;
 
-	//∫§≈Õ ≈©±‚
-	float length = D3DXVec3Length(&result);
-	cout << "∫§≈Õ≈©±‚: " << length << endl;
+	////∫§≈Õ ≈©±‚
+	//float length = D3DXVec3Length(&result);
+	//cout << "∫§≈Õ≈©±‚: " << length << endl;
 
-	//¡§±‘»≠
-	D3DXVec3Normalize(&result, &v2);
-	cout << "¡§±‘»≠: " << result.x << " " << result.y << " " << result.z << endl;
+	////¡§±‘»≠
+	//D3DXVec3Normalize(&result, &v2);
+	//cout << "¡§±‘»≠: " << result.x << " " << result.y << " " << result.z << endl;
 
-	//∞ˆº¿
-	result = v2 * 5;
-	cout << "∞ˆº¿: " << result.x << " " << result.y << " " << result.z << endl;
+	////∞ˆº¿
+	//result = v2 * 5;
+	//cout << "∞ˆº¿: " << result.x << " " << result.y << " " << result.z << endl;
 
-	//≥ª¿˚	
-	float dot = D3DXVec3Dot(&v1, &v2);
-	cout << "≥ª¿˚: " << dot << endl;
+	////≥ª¿˚	
+	//float dot = D3DXVec3Dot(&v1, &v2);
+	//cout << "≥ª¿˚: " << dot << endl;
 
-	//ø‹¿˚	
-	D3DXVec3Cross(&result, &v1, &v2);
-	cout << "ø‹¿˚: " << result.x << " " << result.y << " " << result.z << endl << endl;
+	////ø‹¿˚	
+	//D3DXVec3Cross(&result, &v1, &v2);
+	//cout << "ø‹¿˚: " << result.x << " " << result.y << " " << result.z << endl << endl;
 
-	// -------------------------- «‡∑ƒ --------------------------
-	Matrix positionMatrix;
+	//// -------------------------- «‡∑ƒ --------------------------
+	//Matrix positionMatrix;
 
-	//¿Ãµø«‡∑ƒ ±∏«œ±‚	
-	D3DXMatrixTranslation(&positionMatrix, 1, 2, 3);
+	////¿Ãµø«‡∑ƒ ±∏«œ±‚	
+	//D3DXMatrixTranslation(&positionMatrix, 1, 2, 3);
 
-	D3DXVECTOR3 s, t;
-	D3DXQUATERNION r;
-		
-	D3DXMatrixDecompose(&s, &r, &t, &positionMatrix);
-	cout << "position---------------------" << endl;
-	cout << s.x << " " << s.y << " " << s.z << endl ;
-	cout << r.x << " " << r.y << " " << r.z << endl ;
-	cout << t.x << " " << t.y << " " << t.z << endl << endl ;
+	//D3DXVECTOR3 s, t;
+	//D3DXQUATERNION r;
+	//	
+	//D3DXMatrixDecompose(&s, &r, &t, &positionMatrix);
+	//cout << "position---------------------" << endl;
+	//cout << s.x << " " << s.y << " " << s.z << endl ;
+	//cout << r.x << " " << r.y << " " << r.z << endl ;
+	//cout << t.x << " " << t.y << " " << t.z << endl << endl ;
 
-	//»∏¿¸«‡∑ƒ ±∏«œ±‚	
-	Matrix rotationMatrix;
+	////»∏¿¸«‡∑ƒ ±∏«œ±‚	
+	//Matrix rotationMatrix;
 
-	D3DXMatrixRotationYawPitchRoll(&rotationMatrix, 45, 45, 45);
+	//D3DXMatrixRotationYawPitchRoll(&rotationMatrix, 45, 45, 45);
 
-	//D3DXMatrixRotationX(&rotationMatrix, 45);
-	////D3DXQuaternion(&m1, 45);
+	////D3DXMatrixRotationX(&rotationMatrix, 45);
+	//////D3DXQuaternion(&m1, 45);
 
-	//D3DXMatrixDecompose(&s, &r, &t, &rotationMatrix);
+	////D3DXMatrixDecompose(&s, &r, &t, &rotationMatrix);
+	////cout << "rotation---------------------" << endl;
+	////cout << s.x << " " << s.y << " " << s.z << endl;
+	////cout << r.x << " " << r.y << " " << r.z << endl;
+	////cout << t.x << " " << t.y << " " << t.z << endl << endl;
+
+	////D3DXMatrixRotationY(&rotationMatrix, 45);
+	////D3DXMatrixRotationZ(&rotationMatrix, 45);
+
 	//cout << "rotation---------------------" << endl;
 	//cout << s.x << " " << s.y << " " << s.z << endl;
 	//cout << r.x << " " << r.y << " " << r.z << endl;
 	//cout << t.x << " " << t.y << " " << t.z << endl << endl;
 
-	//D3DXMatrixRotationY(&rotationMatrix, 45);
-	//D3DXMatrixRotationZ(&rotationMatrix, 45);
+	////≈©±‚ ∫Ø»Ø ±∏«œ±‚	
+	//Matrix scaleMatrix;
+	//D3DXMatrixScaling(&scaleMatrix, 2, 2, 2);
 
-	cout << "rotation---------------------" << endl;
-	cout << s.x << " " << s.y << " " << s.z << endl;
-	cout << r.x << " " << r.y << " " << r.z << endl;
-	cout << t.x << " " << t.y << " " << t.z << endl << endl;
+	//scaleMatrix *= rotationMatrix;
+	//scaleMatrix *= positionMatrix;
 
-	//≈©±‚ ∫Ø»Ø ±∏«œ±‚	
-	Matrix scaleMatrix;
-	D3DXMatrixScaling(&scaleMatrix, 2, 2, 2);
+	//
 
-	scaleMatrix *= rotationMatrix;
-	scaleMatrix *= positionMatrix;
-
-	
-
-	D3DXMatrixDecompose(&s, &r, &t, &scaleMatrix);
-	cout << "scale---------------------" << endl;
-	cout << s.x << " " << s.y << " " << s.z << endl;
-	cout << r.x << " " << r.y << " " << r.z << endl;
-	cout << t.x << " " << t.y << " " << t.z << endl << endl;
+	//D3DXMatrixDecompose(&s, &r, &t, &scaleMatrix);
+	//cout << "scale---------------------" << endl;
+	//cout << s.x << " " << s.y << " " << s.z << endl;
+	//cout << r.x << " " << r.y << " " << r.z << endl;
+	//cout << t.x << " " << t.y << " " << t.z << endl << endl;
 
 	//Matrix ø¨ªÍ¿∫ ≈©±‚, »∏¿¸, ¿Ãµø º¯¿∏∑Œ ∞ˆ«ÿ¡÷±‚
 	
 	//∫§≈Õ ∫Ø»Ø D3DXVec3TransformCoord(∞·∞˙, ∫Ø»Ø«“ ∫§≈Õ, ∫Ø»Ø«‡∑ƒ) w∞° 1¿∏∑Œ ¿ŒΩƒ
 	//∫§≈Õ ∫Ø»Ø D3DXVec3TransformNormal(∞·∞˙, ∫Ø»Ø«“ ∫§≈Õ, ∫Ø»Ø«‡∑ƒ) w∞° 0¿∏∑Œ ¿ŒΩƒ
+
+	D3DXVECTOR3 Poiation(10, 0, 10);
+	D3DXVECTOR3 v1(0, 0, -1);
+
+	D3DXMATRIX matRot;
+	float dist =  3;
+	//D3DXMatrixRotationYawPitchRoll(&matRot, D3DXToRadian(45), D3DXToRadian(45), 0);
+	D3DXMatrixRotationY(&matRot, D3DXToRadian(0));
+	
+	D3DXVec3TransformCoord(&v1, &v1, &matRot);
+	v1 *= dist;
+	v1 += Poiation;
+
+	cout << v1.x << endl;
+	cout << v1.y << endl;
+	cout << v1.z << endl;
 	
 
 	return 0;

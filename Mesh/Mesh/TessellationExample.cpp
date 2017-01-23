@@ -38,7 +38,7 @@ void InitMatrix()
 		D3DXToRadian(45),
 		800 / 600,
 		1.0f,
-		100.0f);
+		10000.0f);
 	D3DDevice->SetTransform(D3DTS_PROJECTION, &matProjection);
 
 	float index = 1.5f;
@@ -280,7 +280,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 			DispatchMessage(&msg);
 		}
 				
-		ProcessInputs();		
+		//ProcessInputs();		
 		GeneratePatchMesh(Segs);
 		Render();
 

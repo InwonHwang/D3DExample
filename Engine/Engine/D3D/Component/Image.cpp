@@ -1,22 +1,22 @@
 #include "Image.h"
+#include "..\Resource\Texture.h"
 
 
-
-Image::Image(ResourceHandle handle, ResourcePoolImpl* pool)
-	: ResourceItem(handle, pool)
+Image::Image()
 {
+	Debug::MsgBox(0, _T("持失切"));
 }
 
 
 Image::~Image()
 {
+	Debug::MsgBox(0, _T("社瑚切"));
 }
 
-void Image::Create(IDirect3DDevice9& device, const sp<Texture>& texture, RECT rect)
+void Image::Create(IDirect3DDevice9& device, const sp<Texture>& texture)
 {
 	D3DXCreateSprite(&device, &_sprite);
 	_texture = texture;
-	_rect = rect;
 }
 
 void Image::Destroy()
@@ -36,7 +36,7 @@ void Image::Draw(IDirect3DDevice9& device)
 	D3DXVECTOR3 position(50.0f, 50.0f, 0.0f); 
 
 	if(texture)
-		_sprite->Draw(texture, NULL, &center, &position, D3DCOLOR_ARGB(127, 255, 255, 255));
+		_sprite->Draw(texture, NULL, &center, &position, D3DCOLOR_ARGB(255, 255, 255, 255));
 
 	_sprite->End();    // end sprite drawing
 
