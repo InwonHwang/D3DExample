@@ -5,8 +5,8 @@ class Component
 public:
 	Component() {}
 	~Component() {}
-
-	virtual void Destroy() = 0;
+		
+	virtual void Destroy() = 0;	
 
 private:	
 	bool _enabled;

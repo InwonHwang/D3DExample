@@ -2,43 +2,52 @@
 
 #include "..\..\Core\Core.h"
 #include "Component.h"
+#include "TransformImpl.h"
 
 class Transform : public Component
 {
 public:
 	Transform();
-	~Transform();
+	virtual ~Transform();
 
-	virtual void Destroy() override {}
+	template<typename T> sp<T> GetComponent();
+	template<typename T> sp<T> AddComponent();
 
-	template<typename T>
-	sp<T> GetComponent();
+	virtual void Destroy() override;
+	void Update();
 
-	template<typename T>
-	sp<T> AddComponent();
+	void SetLocalScale(const Vector3& scale);
+	void SetLocalRotation(const Quaternion& rotation);
+	void SetLocalPosition(const Vector3& position);
 
-	void Clear();
+	Vector3 GetLocalScale() const;
+	Quaternion GetLocalRotation() const;
+	Vector3 GetLocalEulerAngle() const;
+	Vector3 GetLocalPosition() const;
+
+	Vector3 GetScale() const;
+	Quaternion GetRotation() const;
+	Vector3 GetEulerAngle() const;
+	Vector3 GetPosition() const;
+
+	D3DXMATRIX GetMatrix() const;
 
 private:
-	std::vector<sp<Component>> _components;
-	
+	void Clear();			// components 비우기
+
+private:
+	std::vector<sp<Component>>*	_components;
+	sp<TransformImpl>			_impl;			//공유될 가능성 0
 };
 
 template<typename T>
 inline sp<T> Transform::GetComponent()
 {	
-	for (auto c : _components)
+	for (auto c : *_components)
 	{
 		sp<T> ret = boost::dynamic_pointer_cast<T>(c);
-		if (ret)
-		{
-			Debug::MsgBox(0, _T("ok"));
-			return ret;
-		}
-		else
-		{
-			Debug::MsgBox(0, _T("failed"));
-		}
+
+		if (ret) return ret;		
 	}
 	
 	return nullptr;
@@ -50,17 +59,55 @@ inline sp<T> Transform::AddComponent()
 {
 	T* c = Memory<T>::OrderedAlloc(sizeof(T));	
 	sp<T> component(c, Memory<T>::OrderedFree);
-	_components.push_back(component);
+	_components->push_back(component);
 
 	return component;
 }
 
-inline void Transform::Clear()
+inline Vector3 Transform::GetLocalScale() const
 {
-	for (auto c : _components)
-	{
-		c->Destroy();		
-	}
-	_components.clear();
+	return _impl->GetLocalScale();
 }
+
+inline Quaternion Transform::GetLocalRotation() const
+{
+	return _impl->GetLocalRotation();
+}
+
+inline Vector3 Transform::GetLocalEulerAngle() const
+{
+	return _impl->GetLocalEulerAngle();
+}
+
+inline Vector3 Transform::GetLocalPosition() const
+{
+	return _impl->GetLocalPosition();
+}
+
+inline Vector3 Transform::GetScale() const
+{
+	return _impl->GetScale();
+}
+
+inline Quaternion Transform::GetRotation() const
+{
+	return _impl->GetRotation();
+}
+
+inline Vector3 Transform::GetEulerAngle() const
+{
+	return _impl->GetEulerAngle();
+}
+
+inline Vector3 Transform::GetPosition() const
+{
+	return _impl->GetPosition();
+}
+
+inline D3DXMATRIX Transform::GetMatrix() const
+{
+	return _impl->GetMatrix();
+}
+
+
 

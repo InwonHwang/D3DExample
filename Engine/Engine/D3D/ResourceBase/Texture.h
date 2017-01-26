@@ -14,13 +14,13 @@ public:
 	
 	virtual void Destroy() override;
 
+	void CreateTexture(IDirect3DDevice9& device, String fileName);	// 텍스쳐 로드 테스트 용
+	void CreateRenderTarget(IDirect3DDevice9& device, String fileName, flag32 state, uint width, uint height); // 이펙트 파일을 사용할 때.	
+
 	uint GetWitdh() const;
 	uint GetHeight() const;	
-	bool MipmapState() const;
+	bool Mipmap() const;
 	IDirect3DTexture9* GetD3DTexture() const;
-
-	void LoadTexture(IDirect3DDevice9& device, String fileName);	// 텍스쳐 로드 테스트 용
-	void LoadRenderTarget(IDirect3DDevice9& device, String fileName, flag32 state, uint width, uint height); // 이펙트 파일을 사용할 때.	
 
 private:	
 	IDirect3DTexture9*		_texture;
@@ -39,7 +39,7 @@ inline uint Texture::GetHeight() const
 	return _height;
 }
 
-inline bool Texture::MipmapState() const
+inline bool Texture::Mipmap() const
 {
 	return _state.check(eMipmap);
 }

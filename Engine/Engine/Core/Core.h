@@ -1,6 +1,7 @@
 #pragma once
 
 #include <d3d9.h>
+#include <cassert>
 
 #include "Math\Math.h"
 #include "BitFlag.h"

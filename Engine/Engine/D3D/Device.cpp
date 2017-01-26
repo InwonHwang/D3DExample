@@ -19,7 +19,7 @@ bool Device::Init()
 	D3DDISPLAYMODE d3ddm;
 	if (FAILED(_d3d->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &d3ddm)))
 	{
-		SAFE_RELEASE(_d3d);
+		SafeRelease<IDirect3D9>(_d3d);
 		return FALSE;
 	}
 
@@ -30,14 +30,14 @@ bool Device::Init()
 	{
 		if (hr == D3DERR_NOTAVAILABLE)
 		{
-			SAFE_RELEASE(_d3d);
+			SafeRelease(_d3d);
 			return false;
 		}
 	}
 	D3DCAPS9 d3dCaps;
 	if (FAILED(_d3d->GetDeviceCaps(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, &d3dCaps)))
 	{
-		SAFE_RELEASE(_d3d);
+		SafeRelease<IDirect3D9>(_d3d);
 		return false;
 	}
 
@@ -64,7 +64,7 @@ bool Device::Init()
 
 	if (FAILED(_d3d->CreateDevice(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, GetActiveWindow(), vp, &d3dpp, &_d3dDevice)))
 	{
-		SAFE_RELEASE(_d3d);
+		SafeRelease<IDirect3D9>(_d3d);
 		return false;
 	}
 
@@ -73,6 +73,6 @@ bool Device::Init()
 
 void Device::Release()
 {
-	SAFE_RELEASE(_d3dDevice);
-	SAFE_RELEASE(_d3d);
+	SafeRelease<IDirect3DDevice9>(_d3dDevice);
+	SafeRelease<IDirect3D9>(_d3d);
 }

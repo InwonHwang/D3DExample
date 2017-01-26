@@ -155,17 +155,19 @@
     <ClCompile Include="Core\Math\QuaternionFunction.cpp" />
     <ClCompile Include="Core\ResourcePool.cpp" />
     <ClCompile Include="D3D\Device.cpp" />
-    <ClCompile Include="D3D\Resource\IndexBuffer.cpp" />
+    <ClCompile Include="D3D\ResourceBase\IndexBuffer.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Core\ResourceItem.cpp" />
     <ClCompile Include="Core\Resource.cpp" />
     <ClCompile Include="Core\ResourcePoolImpl.cpp" />
-    <ClCompile Include="D3D\Resource\Texture.cpp" />
+    <ClCompile Include="D3D\ResourceBase\Texture.cpp" />
     <ClCompile Include="D3D\Component\Image.cpp" />
     <ClCompile Include="D3D\Resource\Sprite.cpp" />
     <ClCompile Include="D3D\Component\Transform.cpp" />
-    <ClCompile Include="D3D\Resource\VertexBuffer.cpp" />
-    <ClCompile Include="D3D\Resource\TransformData.cpp" />
+    <ClCompile Include="D3D\ResourceBase\VertexBuffer.cpp" />
+    <ClCompile Include="D3D\ResourceBase\TransformData.cpp" />
+    <ClCompile Include="D3D\Component\TransformImpl.cpp" />
+    <ClCompile Include="D3D\Component\SpriteRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\BitFlag.h" />
@@ -188,16 +190,21 @@
     <ClInclude Include="Core\Singleton.h" />
     <ClInclude Include="D3D\Component\Component.h" />
     <ClInclude Include="D3D\Component\D3DComponent.h" />
-    <ClInclude Include="D3D\Resource\D3DResource.h" />
-    <ClInclude Include="D3D\Resource\Texture.h" />
+    <ClInclude Include="D3D\Description\D3DDescription.h" />
+    <ClInclude Include="D3D\Description\IndexDescription.h" />
+    <ClInclude Include="D3D\Description\VertexDescription.h" />
+    <ClInclude Include="D3D\ResourceBase\D3DResourceBase.h" />
+    <ClInclude Include="D3D\ResourceBase\Texture.h" />
     <ClInclude Include="D3D\Component\Image.h" />
     <ClInclude Include="D3D\Device.h" />
     <ClInclude Include="D3D\Resource\Sprite.h" />
-    <ClInclude Include="D3D\Resource\IndexBuffer.h" />
+    <ClInclude Include="D3D\ResourceBase\IndexBuffer.h" />
+    <ClInclude Include="D3D\Component\SpriteRenderer.h" />
     <ClInclude Include="ThirdParty\ThirdParty.h" />
     <ClInclude Include="D3D\Component\Transform.h" />
-    <ClInclude Include="D3D\Resource\VertexBuffer.h" />
-    <ClInclude Include="D3D\Resource\TransformData.h" />
+    <ClInclude Include="D3D\ResourceBase\VertexBuffer.h" />
+    <ClInclude Include="D3D\ResourceBase\TransformData.h" />
+    <ClInclude Include="D3D\Component\TransformImpl.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

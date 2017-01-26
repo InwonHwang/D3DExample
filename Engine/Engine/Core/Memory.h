@@ -15,8 +15,8 @@ public:
 
 	static T* OrderedAlloc(size_t size);
 	static void OrderedFree(void * p);
+		
 
-	static void Release() {}
 	static void Clear() {}	//할당되었던 모든 메모리 클리어
 };
 
@@ -50,9 +50,32 @@ inline void Memory<T>::OrderedFree(void * p)
 	SingletonPool::ordered_free(p);
 }
 
-#define ALLOC() Memory::Alloc()
-#define FREE(p) Memory::Free(p)
-//#define SAFE_RELEASE() Memory::Release()
-#define SAFE_RELEASE(p) if(p) { p->Release(); }
-#define SAFE_DELETE(p) if(p) { delete p; p = nullptr; }
-#define SAFE_DELETE_ARRAY(p) if(p) { delete[] p; p = nullptr; }
+template <typename T>
+inline void SafeRelease(T* p)
+{
+	if (p)
+	{
+		p->Release();
+		p = nullptr;
+	}
+}
+
+template <typename T>
+inline void SafeDelete(T* p)
+{
+	if (p)
+	{
+		delete p;
+		p = nullptr;
+	}
+}
+
+template <typename T>
+inline void SafeDeleteArray(T* p)
+{
+	if (p)
+	{
+		delete[] p;
+		p = nullptr;
+	}
+}

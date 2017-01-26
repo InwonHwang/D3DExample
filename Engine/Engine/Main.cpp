@@ -1,5 +1,5 @@
 #include "Core\Core.h"
-#include "D3D\Resource\D3DResource.h"
+#include "D3D\ResourceBase\D3DResourceBase.h"
 #include "D3D\Component\D3DComponent.h"
 #include "D3D\Device.h"
 
@@ -16,7 +16,7 @@ void Init()
 	Device::Instance()->Init();
 
 	texture = g_TexturePool.Create();
-	texture->LoadTexture(*Device::Instance()->GetD3DDevice(), _T("Media\\Sample.bmp"));
+	texture->CreateTexture(*Device::Instance()->GetD3DDevice(), _T("Media\\Sample.bmp"));
 
 	Transform* tr = (Transform *)Memory<Transform>::OrderedAlloc(sizeof(Transform));	
 	transform.reset(tr, Memory<Transform>::OrderedFree);
@@ -26,6 +26,11 @@ void Init()
 	image.lock()->Create(*Device::Instance()->GetD3DDevice(), texture);
 }
 
+void Update()
+{
+	transform->Update();
+}
+
 void Render()
 {
 	Device::Instance()->GetD3DDevice()->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0, 32, 64, 128), 1.0f, 0);
@@ -33,7 +38,6 @@ void Render()
 
 	if (SUCCEEDED(Device::Instance()->GetD3DDevice()->BeginScene()))
 	{		
-		//transform->GetComponent<Image>()->Draw(*Device::Instance()->GetD3DDevice());
 		image.lock()->Draw(*Device::Instance()->GetD3DDevice());
 		Device::Instance()->GetD3DDevice()->EndScene();
 	}
@@ -83,7 +87,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	}
 		
 
-	transform->Clear();
+	transform->Destroy();
 	g_TexturePool.Clear();	
 	Device::Instance()->Release();
 

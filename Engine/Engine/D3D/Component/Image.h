@@ -19,5 +19,5 @@ public:
 
 private:
 	ID3DXSprite*	_sprite;
-	wp<Texture>		_texture;
+	sp<Texture>		_texture;
 };
