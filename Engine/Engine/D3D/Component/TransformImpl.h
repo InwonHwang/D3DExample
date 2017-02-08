@@ -1,6 +1,6 @@
 #pragma once
 #include "..\..\Core\Core.h"
-#include "..\ResourceBase\D3DResourceBase.h"
+#include "..\Resource\D3DResource.h"
 
 class TransformData;
 
@@ -10,7 +10,8 @@ public:
 	TransformImpl();
 	~TransformImpl();
 
-	virtual void Update();
+	virtual void Update(IDirect3DDevice9& device);
+	void UpdateWorldMatrix();
 
 	void SetLocalScale(const Vector3& scale);
 	void SetLocalRotation(const Quaternion& rotation);
@@ -26,13 +27,17 @@ public:
 	Vector3 GetEulerAngle() const;
 	Vector3 GetPosition() const;
 
+	Vector3 GetAxisX() const;
+	Vector3 GetAxisY() const;
+	Vector3 GetAxisZ() const;
+
 	D3DXMATRIX GetMatrix() const;
 
 private:
 	void InternalSetScale(const Vector3& s);
 	void InternalSetRotation(const Quaternion& q);
 	void InternalSetTranslation(const Vector3& t);
-	void InternalUpdateMatrix();
+	void InternalUpdateWorldMatrix();
 
 	Vector3 InternalMatrixToScale(const D3DXMATRIX& matrix) const;
 	Quaternion InternalMatrixToRotation(const D3DXMATRIX& matrix) const;
@@ -49,13 +54,11 @@ private:
 	Vector3*		_axisX;
 	Vector3*		_axisY;
 	Vector3*		_axisZ;
-
-	Vector3*		_lookAt;
 };
 
 inline Vector3 TransformImpl::GetLocalScale() const
 {
-	return InternalMatrixToScale(_transformData->GetMatrix());
+	return *_scale;
 }
 
 inline Quaternion TransformImpl::GetLocalRotation() const
@@ -75,28 +78,41 @@ inline Vector3 TransformImpl::GetLocalPosition() const
 
 inline Vector3 TransformImpl::GetScale() const
 {
-	return InternalMatrixToScale(_transformData->GetMatrix());
+	return InternalMatrixToScale(_transformData->GetMatrix() * _transformData->GetMatrixParent());
 }
 
 inline Quaternion TransformImpl::GetRotation() const
 {
-	return InternalMatrixToRotation(_transformData->GetMatrix());
+	return InternalMatrixToRotation(_transformData->GetMatrix() * _transformData->GetMatrixParent());
 }
 
 inline Vector3 TransformImpl::GetEulerAngle() const
 {
-	return Quaternion::ToEulerAngle(InternalMatrixToRotation(_transformData->GetMatrix()));
+	return Quaternion::ToEulerAngle(InternalMatrixToRotation(_transformData->GetMatrix() * _transformData->GetMatrixParent()));
 }
 
 inline Vector3 TransformImpl::GetPosition() const
 {
-	return InternalMatrixToTranslation(_transformData->GetMatrix());
+	return InternalMatrixToTranslation(_transformData->GetMatrix() * _transformData->GetMatrixParent());
+}
+
+inline Vector3 TransformImpl::GetAxisX() const
+{
+	return *_axisX;
+}
+
+inline Vector3 TransformImpl::GetAxisY() const
+{
+	return *_axisY;
+}
+
+inline Vector3 TransformImpl::GetAxisZ() const
+{
+	return *_axisZ;
 }
 
 inline D3DXMATRIX TransformImpl::GetMatrix() const
 {
-	D3DXMATRIX ret;
-	D3DXMatrixMultiply(&ret, &_transformData->GetMatrix(), &_transformData->GetMatrixParent());
-	return ret;
+	return _transformData->GetMatrixParent() * _transformData->GetMatrix();
 }
 

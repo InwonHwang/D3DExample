@@ -1,5 +1,5 @@
 #include "Transform.h"
-#include "..\ResourceBase\TransformData.h"
+#include "..\Resource\D3DResource.h"
 
 
 Transform::Transform()	
@@ -14,14 +14,22 @@ Transform::~Transform()
 }
 
 void Transform::Destroy()
-{	
-	Clear();
+{
+	for (auto c : *_components)	
+		c->Destroy();
+	
+	_components->clear();
 	SafeDelete<std::vector<sp<Component>>>(_components);
 }
 
-void Transform::Update()
+void Transform::Update(IDirect3DDevice9& device)
 {
-	_impl->Update();
+	_impl->Update(device);
+}
+
+void Transform::UpdateWorldMatrix()
+{
+	_impl->UpdateWorldMatrix();
 }
 
 void Transform::SetLocalScale(const Vector3& scale)
@@ -37,14 +45,4 @@ void Transform::SetLocalRotation(const Quaternion& rotation)
 void Transform::SetLocalPosition(const Vector3& position)
 {
 	_impl->SetLocalPosition(position);
-}
-
-
-void Transform::Clear()
-{
-	for (auto c : *_components)
-	{
-		c->Destroy();
-	}
-	_components->clear();
 }

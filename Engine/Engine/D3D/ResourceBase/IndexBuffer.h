@@ -9,7 +9,7 @@ public:
 
 	virtual void Destroy() override;
 
-	bool Create(IDirect3DDevice9& device, int size, DWORD usage, D3DPOOL pool);
+	bool CreateIndexBuffer(IDirect3DDevice9& device, int size, DWORD usage, D3DPOOL pool);
 
 	bool Lock(int offset, int size, void** ppData, DWORD flags);
 	bool Unlock();

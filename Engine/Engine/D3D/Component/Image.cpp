@@ -4,13 +4,11 @@
 
 Image::Image()
 {
-	DebugBox(0, _T("持失切"));
 }
 
 
 Image::~Image()
 {
-	DebugBox(0, _T("社瑚切"));
 }
 
 void Image::Create(IDirect3DDevice9& device, const sp<Texture>& texture)

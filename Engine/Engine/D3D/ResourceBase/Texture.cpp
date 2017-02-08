@@ -17,10 +17,10 @@ void Texture::Destroy()
 	ResourceItem::Clear();
 }
 
-void Texture::CreateRenderTarget(IDirect3DDevice9& device, String fileName, flag32 state, uint width, uint height)
+bool Texture::CreateRenderTarget(IDirect3DDevice9& device, String fileName, flag32 state, uint width, uint height)
 {
 	// 이미 로드 되있으면 리턴
-	if (IsLoaded()) return;
+	if (IsLoaded()) return false;
 
 	DWORD usage = D3DUSAGE_RENDERTARGET;
 	HRESULT hr = 0;
@@ -35,7 +35,7 @@ void Texture::CreateRenderTarget(IDirect3DDevice9& device, String fileName, flag
 		D3DFMT_R32F, D3DPOOL_DEFAULT, &_texture, NULL)))
 	{
 		DebugError(hr);
-		return;
+		return false;
 	}
 
 	if (IsBackup()) // 백업 옵션을 갖고 있으면 힙에 백업 데이터 저장
@@ -48,13 +48,15 @@ void Texture::CreateRenderTarget(IDirect3DDevice9& device, String fileName, flag
 	SetName(fileName);
 
 	ResourceItem::Load();
+
+	return true;
 }
 
 
-void Texture::CreateTexture(IDirect3DDevice9& device, String fileName)
+bool Texture::CreateTexture(IDirect3DDevice9& device, const String& fileName)
 {
 	// 이미 로드 되있으면 리턴
-	if (IsLoaded()) return;
+	if (IsLoaded()) return false;
 	
 	HRESULT hr = 0;
 #ifdef UNICODE 
@@ -64,7 +66,7 @@ void Texture::CreateTexture(IDirect3DDevice9& device, String fileName)
 #endif
 	{
 		DebugError(hr);
-		return;
+		return false;
 	}
 
 	if (IsBackup()) // 백업 옵션을 갖고 있으면 힙에 백업 데이터 저장
@@ -77,6 +79,8 @@ void Texture::CreateTexture(IDirect3DDevice9& device, String fileName)
 	_height = desc.Height;
 	SetName(fileName);
 	ResourceItem::Load();
+
+	return true;
 }
 
 

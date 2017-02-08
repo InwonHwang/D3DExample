@@ -43,8 +43,8 @@ protected:
 
 protected:
 	uint				_resourceCount;	// 리소스 개수.
-	ResourceNamesMap	_names;
-	ResourceItemsMap	_items;
+	ResourceNamesMap	_nameMap;
+	ResourceItemsMap	_resourceMap;
 	ResourcePoolHandle	_handle;
 };
 

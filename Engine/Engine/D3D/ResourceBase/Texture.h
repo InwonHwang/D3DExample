@@ -14,8 +14,8 @@ public:
 	
 	virtual void Destroy() override;
 
-	void CreateTexture(IDirect3DDevice9& device, String fileName);	// 텍스쳐 로드 테스트 용
-	void CreateRenderTarget(IDirect3DDevice9& device, String fileName, flag32 state, uint width, uint height); // 이펙트 파일을 사용할 때.	
+	bool CreateTexture(IDirect3DDevice9& device, const String& fileName);	// 텍스쳐 로드 테스트 용
+	bool CreateRenderTarget(IDirect3DDevice9& device, String fileName, flag32 state, uint width, uint height); // 이펙트 파일을 사용할 때.	
 
 	uint GetWitdh() const;
 	uint GetHeight() const;	

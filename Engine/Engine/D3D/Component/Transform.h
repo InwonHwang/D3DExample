@@ -14,7 +14,9 @@ public:
 	template<typename T> sp<T> AddComponent();
 
 	virtual void Destroy() override;
-	void Update();
+
+	void Update(IDirect3DDevice9& device);
+	void UpdateWorldMatrix();
 
 	void SetLocalScale(const Vector3& scale);
 	void SetLocalRotation(const Quaternion& rotation);
@@ -30,10 +32,12 @@ public:
 	Vector3 GetEulerAngle() const;
 	Vector3 GetPosition() const;
 
+	Vector3 GetAxisX() const;
+	Vector3 GetAxisY() const;
+	Vector3 GetAxisZ() const;
+
 	D3DXMATRIX GetMatrix() const;
 
-private:
-	void Clear();			// components ºñ¿ì±â
 
 private:
 	std::vector<sp<Component>>*	_components;
@@ -102,6 +106,21 @@ inline Vector3 Transform::GetEulerAngle() const
 inline Vector3 Transform::GetPosition() const
 {
 	return _impl->GetPosition();
+}
+
+inline Vector3 Transform::GetAxisX() const
+{
+	return _impl->GetAxisX();
+}
+
+inline Vector3 Transform::GetAxisY() const
+{
+	return _impl->GetAxisY();
+}
+
+inline Vector3 Transform::GetAxisZ() const
+{
+	return _impl->GetAxisZ();
 }
 
 inline D3DXMATRIX Transform::GetMatrix() const

@@ -11,6 +11,7 @@ typedef struct tagStaticMeshVertex
 	Vector3 Tangent;
 }STATICMESHVERTEX, *LPSTATICMESHVERTEX;
 
+
 typedef struct tagSkinnedMeshVertex
 {
 	Vector3 Position;
@@ -19,7 +20,7 @@ typedef struct tagSkinnedMeshVertex
 	Vector2 TexCoord;
 	Vector3 Tangent;
 	Vector3	Weight{ 0.0f, 0.0f, 0.0f };	// °¡ÁßÄ¡ °ª 4°³
-	int			Index[4] = { 0, 0, 0, 0 };			// »À´ë ÀÎµ¦½º
+	int		Index[4] = { 0, 0, 0, 0 };			// »À´ë ÀÎµ¦½º
 
 
 }SKINNEDMESHVERTEX, *LPSKINNEDMESHVERTEX;

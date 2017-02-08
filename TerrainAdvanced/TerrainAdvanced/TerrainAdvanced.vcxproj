@@ -150,7 +150,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Core\STL.h" />
+    <ClInclude Include="D3D\Description\Description.h" />
+    <ClInclude Include="D3D\Description\Vertex.h" />
     <ClInclude Include="D3D\Math\QuaternionOperator.h" />
+    <ClInclude Include="D3D\Math\VectorFunction.h" />
     <ClInclude Include="D3D\Math\VectorOperator.h" />
     <ClInclude Include="D3D\Method\Camera.h" />
     <ClInclude Include="Core\BitFlags.h" />
@@ -166,16 +170,20 @@
     <ClInclude Include="D3D\Method\Terrain.h" />
     <ClInclude Include="D3D\Method\Transform.h" />
     <ClInclude Include="D3D\Math\Mathf.h" />
+    <ClInclude Include="D3D\Frustum.h" />
+    <ClInclude Include="D3D\QuadTree.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Core\Core.cpp" />
     <ClCompile Include="D3D\Math\QuaternionFunction.cpp" />
     <ClCompile Include="D3D\Method\Camera.cpp" />
+    <ClCompile Include="D3D\Frustum.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="D3D\Device.cpp" />
     <ClCompile Include="D3D\Resource\IndexBuffer.cpp" />
     <ClCompile Include="D3D\Method\Terrain.cpp" />
     <ClCompile Include="D3D\Method\Transform.cpp" />
+    <ClCompile Include="D3D\QuadTree.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

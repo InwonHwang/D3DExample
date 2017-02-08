@@ -14,14 +14,8 @@ typedef unsigned __int64  uint64;
 typedef std::basic_string<TCHAR> String;
 
 
-
-//class String : public std::basic_string<TCHAR>
+//class String : public TString
 //{
 //public:
-//	String(const TCHAR* p)
-//		: std::basic_string<TCHAR>(p)
-//	{ }
-//	~String() {}
-//
-//	
+//	LPCSTR string
 //};

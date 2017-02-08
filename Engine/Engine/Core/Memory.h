@@ -10,6 +10,8 @@ class Memory abstract
 {	
 	using SingletonPool = boost::singleton_pool<T, sizeof(T), boost::default_user_allocator_new_delete, boost::details::pool::null_mutex>;
 public:
+	static void Clear(); //할당되었던 모든 메모리 클리어
+
 	static T* Alloc();
 	static void Free(void * p);
 
@@ -17,8 +19,13 @@ public:
 	static void OrderedFree(void * p);
 		
 
-	static void Clear() {}	//할당되었던 모든 메모리 클리어
+	
 };
+template <typename T>
+inline void Memory<T>::Clear()
+{
+	SingletonPool::purge_memory();
+}
 
 template <typename T>
 inline T* Memory<T>::Alloc()

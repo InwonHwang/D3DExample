@@ -8,7 +8,7 @@ public:
 	~VertexBuffer();
 
 	virtual void Destroy() override;
-
+		
 	bool CreateVertexBuffer(IDirect3DDevice9& device, int size, DWORD usage, D3DPOOL pool);
 	bool CreateVertexDeclaration(IDirect3DDevice9& device, const D3DVERTEXELEMENT9* vertexElement);
 

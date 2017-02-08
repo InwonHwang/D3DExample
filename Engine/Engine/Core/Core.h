@@ -2,6 +2,7 @@
 
 #include <d3d9.h>
 #include <cassert>
+#include <fstream>
 
 #include "Math\Math.h"
 #include "BitFlag.h"
@@ -9,8 +10,8 @@
 #include "DataTypes.h"
 #include "Debug.h"
 #include "Memory.h"
-#include "Resource.h"
 #include "ResourceItem.h"
+#include "ResourceManager.h"
 #include "ResourcePool.h"
 #include "ResourcePoolImpl.h"
 #include "Singleton.h"

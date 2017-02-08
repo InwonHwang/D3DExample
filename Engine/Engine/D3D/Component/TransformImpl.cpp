@@ -1,15 +1,16 @@
 #include "TransformImpl.h"
 
+extern ResourceManager resourceManager;
 
 TransformImpl::TransformImpl()
 {
 	_scale = new Vector3(1.0f, 1.0f, 1.0f);
-	_rotation = new Quaternion(Quaternion::Euler(0.0f, 0.0f, 0.0f));
+	_rotation = new Quaternion(Quaternion::Euler(0.0f, 0.0f, 0.0f));	
 	_position = new Vector3(0.0f, 0.0f, 0.0f);
 	_axisX = new Vector3(1.0f, 0.0f, 0.0f);
 	_axisY = new Vector3(0.0f, 1.0f, 0.0f);
 	_axisZ = new Vector3(0.0f, 0.0f, 1.0f);
-	_lookAt = new Vector3(0.0f, 0.0f, -1.0f);
+	_transformData = resourceManager.Create<TransformData>();
 }
 
 
@@ -21,12 +22,17 @@ TransformImpl::~TransformImpl()
 	SafeDelete<Vector3>(_axisX);
 	SafeDelete<Vector3>(_axisY);
 	SafeDelete<Vector3>(_axisZ);
-	SafeDelete<Vector3>(_lookAt);
 }
 
-void TransformImpl::Update()
+void TransformImpl::Update(IDirect3DDevice9& device)
 {
-	InternalUpdateMatrix();
+	D3DXMATRIX matWorld = _transformData->GetMatrix() * _transformData->GetMatrixParent();
+	device.SetTransform(D3DTS_WORLD, &matWorld);	
+}
+
+void TransformImpl::UpdateWorldMatrix()
+{
+	InternalUpdateWorldMatrix();
 }
 
 void TransformImpl::SetLocalScale(const Vector3& scale)
@@ -62,27 +68,23 @@ void TransformImpl::InternalSetRotation(const Quaternion& q)
 	D3DXVec3Normalize(_axisX, _axisX);
 	D3DXVec3Normalize(_axisY, _axisY);
 	D3DXVec3Normalize(_axisZ, _axisZ);
-
-	*_lookAt = *_position - *_axisZ;
 }
 
 void TransformImpl::InternalSetTranslation(const Vector3& t)
 {
-	*_lookAt -= *_position;
 	*_position = t;
-	*_lookAt += t;
 }
 
-void TransformImpl::InternalUpdateMatrix()
+void TransformImpl::InternalUpdateWorldMatrix()
 {
-	D3DXMATRIX scale;
+	D3DXMATRIX scale, rotation , translation;
 	D3DXMATRIX result;
 	D3DXMatrixScaling(&scale, _scale->x, _scale->y, _scale->z);
-	D3DXMatrixLookAtLH(&result, _position, _lookAt, _axisY);
-	D3DXMatrixMultiply(&result, &scale, &result);
+	D3DXMatrixRotationQuaternion(&rotation, _rotation);
+	D3DXMatrixTranslation(&translation, _position->x, _position->y, _position->z);
+	result = scale * rotation * translation;
 
-	_transformData->SetMatrix(result);
-
+	_transformData->SetMatrix(result);	
 }
 
 Vector3 TransformImpl::InternalMatrixToScale(const D3DXMATRIX& matrix) const

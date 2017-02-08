@@ -151,25 +151,32 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="D3D\Component\Camera.cpp" />
     <ClCompile Include="Core\Debug.cpp" />
     <ClCompile Include="Core\Math\QuaternionFunction.cpp" />
     <ClCompile Include="Core\ResourcePool.cpp" />
     <ClCompile Include="D3D\Device.cpp" />
     <ClCompile Include="D3D\ResourceBase\IndexBuffer.cpp" />
+    <ClCompile Include="D3D\ResourceBase\Effect.cpp" />
+    <ClCompile Include="D3D\Frustum.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Core\ResourceItem.cpp" />
-    <ClCompile Include="Core\Resource.cpp" />
+    <ClCompile Include="Core\ResourceManager.cpp" />
     <ClCompile Include="Core\ResourcePoolImpl.cpp" />
     <ClCompile Include="D3D\ResourceBase\Texture.cpp" />
     <ClCompile Include="D3D\Component\Image.cpp" />
     <ClCompile Include="D3D\Resource\Sprite.cpp" />
     <ClCompile Include="D3D\Component\Transform.cpp" />
     <ClCompile Include="D3D\ResourceBase\VertexBuffer.cpp" />
-    <ClCompile Include="D3D\ResourceBase\TransformData.cpp" />
+    <ClCompile Include="D3D\Resource\TransformData.cpp" />
     <ClCompile Include="D3D\Component\TransformImpl.cpp" />
     <ClCompile Include="D3D\Component\SpriteRenderer.cpp" />
+    <ClCompile Include="D3D\Resource\SurfaceMaterial.cpp" />
+    <ClCompile Include="D3D\Resource\TerrainData.cpp" />
+    <ClCompile Include="D3D\Component\Terrain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="D3D\Component\Camera.h" />
     <ClInclude Include="Core\BitFlag.h" />
     <ClInclude Include="Core\Core.h" />
     <ClInclude Include="Core\DataStructure.h" />
@@ -184,7 +191,7 @@
     <ClInclude Include="Core\ResourceItem.h" />
     <ClInclude Include="Core\DataTypes.h" />
     <ClInclude Include="Core\ResourcePool.h" />
-    <ClInclude Include="Core\Resource.h" />
+    <ClInclude Include="Core\ResourceManager.h" />
     <ClInclude Include="Core\ResourcePoolImpl.h" />
     <ClInclude Include="Core\Debug.h" />
     <ClInclude Include="Core\Singleton.h" />
@@ -197,13 +204,19 @@
     <ClInclude Include="D3D\ResourceBase\Texture.h" />
     <ClInclude Include="D3D\Component\Image.h" />
     <ClInclude Include="D3D\Device.h" />
+    <ClInclude Include="D3D\Resource\D3DResource.h" />
     <ClInclude Include="D3D\Resource\Sprite.h" />
     <ClInclude Include="D3D\ResourceBase\IndexBuffer.h" />
     <ClInclude Include="D3D\Component\SpriteRenderer.h" />
+    <ClInclude Include="D3D\Resource\SurfaceMaterial.h" />
+    <ClInclude Include="D3D\ResourceBase\Effect.h" />
+    <ClInclude Include="D3D\Resource\TerrainData.h" />
+    <ClInclude Include="D3D\Component\Terrain.h" />
+    <ClInclude Include="D3D\Frustum.h" />
     <ClInclude Include="ThirdParty\ThirdParty.h" />
     <ClInclude Include="D3D\Component\Transform.h" />
     <ClInclude Include="D3D\ResourceBase\VertexBuffer.h" />
-    <ClInclude Include="D3D\ResourceBase\TransformData.h" />
+    <ClInclude Include="D3D\Resource\TransformData.h" />
     <ClInclude Include="D3D\Component\TransformImpl.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
