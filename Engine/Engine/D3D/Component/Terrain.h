@@ -4,6 +4,7 @@
 #include "Component.h"
 
 class Frustum;
+class QuadTree;
 
 class Terrain : public Component
 {
@@ -13,14 +14,16 @@ public:
 
 	virtual void Destroy() override;
 
-	virtual void Draw(IDirect3DDevice9& device);	// Renderer에서 상속 예정
-	
+	// friend private 함수로 바꾸기, Renderer에서 상속 예정
+	virtual void Draw(IDirect3DDevice9& device);
 	void SetTerrainData(const sp<TerrainData> terrainData);
 
 	//Test 용
 	void DrawFrustum(IDirect3DDevice9& device, sp<Frustum> frustum);
+	void DrawLOD(IDirect3DDevice9& device, sp<Frustum> frustum);
 
 private:
 	sp<TerrainData> _terrainData;
+	sp<QuadTree>	_quadTree;
 };
 

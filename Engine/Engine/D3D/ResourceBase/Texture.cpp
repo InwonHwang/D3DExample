@@ -17,7 +17,7 @@ void Texture::Destroy()
 	ResourceItem::Clear();
 }
 
-bool Texture::CreateRenderTarget(IDirect3DDevice9& device, String fileName, flag32 state, uint width, uint height)
+bool Texture::CreateRenderTarget(IDirect3DDevice9& device, const String& fileName, flag32 state, uint width, uint height)
 {
 	// 이미 로드 되있으면 리턴
 	if (IsLoaded()) return false;

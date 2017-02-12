@@ -15,8 +15,10 @@ public:
 
 	virtual void Destroy() override;
 
+	// friend private 함수로 바꾸기
 	void Update(IDirect3DDevice9& device);
 	void UpdateWorldMatrix();
+	//
 
 	void SetLocalScale(const Vector3& scale);
 	void SetLocalRotation(const Quaternion& rotation);
@@ -36,8 +38,8 @@ public:
 	Vector3 GetAxisY() const;
 	Vector3 GetAxisZ() const;
 
+	// friend private 함수로 바꾸기
 	D3DXMATRIX GetMatrix() const;
-
 
 private:
 	std::vector<sp<Component>>*	_components;

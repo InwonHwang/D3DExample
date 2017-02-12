@@ -9,6 +9,7 @@ public:
 
 	virtual void Destroy() override;
 
+	// friend class SpriteRenderer private함수로 바꾸기
 	void SetMatrix(const D3DXMATRIX& matrix);
 	void SetMatrixParent(const D3DXMATRIX& matrix);
 	D3DXMATRIX GetMatrix() const;

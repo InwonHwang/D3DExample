@@ -56,7 +56,7 @@ bool VertexBuffer::CreateVertexDeclaration(IDirect3DDevice9& device, const D3DVE
 
 bool VertexBuffer::Lock(int offset, int size, void** ppData, DWORD flags)
 {
-	if (!_vb) return false;
+	assert(_vb && "null reference: _vb");
 
 	HRESULT hr = 0;
 	if (FAILED(hr = _vb->Lock(offset, size, ppData, flags)))
@@ -70,7 +70,7 @@ bool VertexBuffer::Lock(int offset, int size, void** ppData, DWORD flags)
 
 bool VertexBuffer::Unlock()
 {
-	if (!_vb) return false;
+	assert(_vb && "null reference: _vb");
 
 	HRESULT hr = 0;
 	if (FAILED(hr = _vb->Unlock()))

@@ -4,8 +4,8 @@
 #include "D3D\Device.h"
 #include "D3D\Frustum.h"
 
-#define MOVESPEED 0.1f
-#define ROTATIONSPEED 1.0f
+#define MOVESPEED 0.5f
+#define ROTATIONSPEED 2.0f
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
@@ -32,7 +32,9 @@ int cam = 1;
 void SetRenderState()
 {
 	Device::Instance()->GetD3DDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+	//Device::Instance()->GetD3DDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 	Device::Instance()->GetD3DDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
+	Device::Instance()->GetD3DDevice()->LightEnable(0, true);
 }
 
 void processInput()
@@ -130,14 +132,15 @@ void Init()
 	transformSprite2->SetLocalPosition(Vector3(-100, -100, 0));
 
 	
-	transformTerrain->SetLocalPosition(Vector3(0, -20, 0));
+	transformTerrain->SetLocalPosition(Vector3(0, 0, 0));
 	//transformTerrain->SetLocalRotation(Quaternion::Euler(0, 180, 0));	
 
-	transformCamera1->SetLocalPosition(Vector3(0, 0, -100));
-	transformCamera2->SetLocalPosition(Vector3(0, 100, -100));
-	transformCamera2->SetLocalRotation(Quaternion::Euler(45, 0, 0));
+	transformCamera1->SetLocalPosition(Vector3(0, 90, 0));
+	transformCamera1->SetLocalRotation(Quaternion::Euler(90, 0, 0));
+	transformCamera2->SetLocalPosition(Vector3(0, 100, 0));
+	transformCamera2->SetLocalRotation(Quaternion::Euler(90, 0, 0));
 	
-	frustum.reset(new Frustum);	
+	frustum.reset(new Frustum);
 
 	SetRenderState();
 }
@@ -167,7 +170,7 @@ void Render()
 		D3DXMatrixIdentity(&world);
 		Device::Instance()->GetD3DDevice()->SetTransform(D3DTS_WORLD, &world);
 		frustum->Make(camera1->GetViewMatrix() * camera1->GetProjMatrix());
-		frustum->Draw(*Device::Instance()->GetD3DDevice());
+		//frustum->Draw(*Device::Instance()->GetD3DDevice());
 
 		material->SetMatrix(_T("gViewMatrix"), camera1->GetViewMatrix());
 		material->SetMatrix(_T("gProjectionMatrix"), camera1->GetProjMatrix());
@@ -175,16 +178,18 @@ void Render()
 		
 		transformTerrain->UpdateWorldMatrix();
 		transformTerrain->Update(*Device::Instance()->GetD3DDevice());
-		transformTerrain->GetComponent<Terrain>()->DrawFrustum(*Device::Instance()->GetD3DDevice(), frustum);
+		//transformTerrain->GetComponent<Terrain>()->Draw(*Device::Instance()->GetD3DDevice());
+		//transformTerrain->GetComponent<Terrain>()->DrawFrustum(*Device::Instance()->GetD3DDevice(), frustum);
+		transformTerrain->GetComponent<Terrain>()->DrawLOD(*Device::Instance()->GetD3DDevice(), frustum);
 
 		/*transformSprite1->UpdateWorldMatrix();
-		transformSprite1->Update(*Device::Instance()->GetD3DDevice());
 		material->SetMatrix(_T("gWorldMatrix"), transformSprite1->GetMatrix());
+		transformSprite1->Update(*Device::Instance()->GetD3DDevice());		
 		transformSprite1->GetComponent<SpriteRenderer>()->Draw(*Device::Instance()->GetD3DDevice());
 
 		transformSprite2->UpdateWorldMatrix();
-		transformSprite2->Update(*Device::Instance()->GetD3DDevice());
 		material->SetMatrix(_T("gWorldMatrix"), transformSprite2->GetMatrix());
+		transformSprite2->Update(*Device::Instance()->GetD3DDevice());		
 		transformSprite2->GetComponent<SpriteRenderer>()->Draw(*Device::Instance()->GetD3DDevice());*/
 
 		Device::Instance()->GetD3DDevice()->EndScene();
@@ -239,7 +244,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 			
 	}
 
-	frustum.reset();
+	frustum.reset();	
 	transformSprite1->Destroy();
 	transformSprite2->Destroy();
 	transformCamera1->Destroy();

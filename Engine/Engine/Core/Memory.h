@@ -17,10 +17,8 @@ public:
 
 	static T* OrderedAlloc(size_t size);
 	static void OrderedFree(void * p);
-		
-
-	
 };
+
 template <typename T>
 inline void Memory<T>::Clear()
 {

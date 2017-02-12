@@ -21,6 +21,7 @@ public:
 	void SetMatrix(const String& semantic, const D3DXMATRIX& matrix);
 	void SetTexture(const String& semantic, const sp<Texture> texture);
 
+	// friend class SpriteRenderer private함수로 바꾸기
 	uint GetParamCount() const;							// effect 파일 안에 parameter 개수
 	String GetSementic(uint index) const;
 	D3DXPARAMETER_TYPE GetParamType(uint index) const;	// paramete 타입 정보	

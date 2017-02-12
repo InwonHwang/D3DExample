@@ -23,9 +23,13 @@ void SpriteRenderer::Draw(IDirect3DDevice9& device)
 {
 	if (!_sprite) return;
 
-	device.SetStreamSource(0, _sprite->GetD3DVertexBuffer(), 0, sizeof(STATICMESHVERTEX));
-	device.SetVertexDeclaration(_sprite->GetD3DVertexDeclaration());
-	device.SetIndices(_sprite->GetD3DIndexBuffer());	
+	IDirect3DVertexDeclaration9* vd = _sprite->GetVertexBuffer()->GetD3DVertexDeclaration();
+	IDirect3DVertexBuffer9* vb = _sprite->GetVertexBuffer()->GetD3DVertexBuffer();	
+	IDirect3DIndexBuffer9* ib = _sprite->GetIndexBuffer()->GetD3DIndexBuffer();
+
+	device.SetStreamSource(0, vb, 0, sizeof(STATICMESHVERTEX));
+	device.SetVertexDeclaration(vd);
+	device.SetIndices(ib);
 	
 	uint materialCount = _materials->size();
 

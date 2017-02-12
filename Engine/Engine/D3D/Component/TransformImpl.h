@@ -10,8 +10,10 @@ public:
 	TransformImpl();
 	~TransformImpl();
 
+	// friend private 함수로 바꾸기
 	virtual void Update(IDirect3DDevice9& device);
 	void UpdateWorldMatrix();
+	//
 
 	void SetLocalScale(const Vector3& scale);
 	void SetLocalRotation(const Quaternion& rotation);
@@ -31,6 +33,7 @@ public:
 	Vector3 GetAxisY() const;
 	Vector3 GetAxisZ() const;
 
+	// friend private 함수로 바꾸기
 	D3DXMATRIX GetMatrix() const;
 
 private:

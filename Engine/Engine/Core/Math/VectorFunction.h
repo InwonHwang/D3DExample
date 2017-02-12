@@ -6,3 +6,8 @@ inline float Vector3::GetDistance(const Vector3& v1, const Vector3& v2)
 {
 	return D3DXVec3Length(&(v2 - v1));
 }
+
+inline float Vector3::GetLength(const Vector3& v)
+{
+	return D3DXVec3Length(&v);
+}

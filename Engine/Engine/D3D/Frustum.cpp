@@ -15,7 +15,8 @@ Frustum::~Frustum()
 
 bool Frustum::Make(const D3DXMATRIXA16& matViewProj)
 {
-	assert(_planes != nullptr && "vertice are not created");
+	assert(_vertice && "null reference: _vertice");
+	assert(_planes && "null reference: _planes");
 
 	_vertice[0].x = -1.0f;	_vertice[0].y = -1.0f;	_vertice[0].z = 0.0f;
 	_vertice[1].x = 1.0f;	_vertice[1].y = -1.0f;	_vertice[1].z = 0.0f;
@@ -46,9 +47,9 @@ bool Frustum::Make(const D3DXMATRIXA16& matViewProj)
 
 bool Frustum::IsIn(const Vector3& position) const
 {
-	assert(_planes != nullptr && "plane is not created");
+	assert(_planes && "plane is not created");
 
-	for (int i = 3; i < 6; i++)
+	for (int i = 0; i < 6; i++)
 	{
 		if (D3DXPlaneDotCoord(&_planes[i], &position) > PLANE_EPSILON)
 		{
@@ -60,9 +61,9 @@ bool Frustum::IsIn(const Vector3& position) const
 
 bool Frustum::IsInSphere(const Vector3& position, float radius) const
 {
-	assert(_planes != nullptr && "plane is not created");
+	assert(_planes && "plane is not created");
 
-	for (int i = 3; i < 6; i++)
+	for (int i = 0; i < 6; i++)
 	{
 		if (D3DXPlaneDotCoord(&_planes[i], &position) > radius + PLANE_EPSILON)
 		{
@@ -74,7 +75,7 @@ bool Frustum::IsInSphere(const Vector3& position, float radius) const
 
 void Frustum::Draw(IDirect3DDevice9& device)
 {
-	WORD		index[] = { 0, 1, 2,
+	WORD index[] = { 0, 1, 2,
 		0, 2, 3,
 		4, 7, 6,
 		4, 6, 5,

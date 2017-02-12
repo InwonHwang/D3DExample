@@ -12,7 +12,9 @@ public:
 	~SpriteRenderer();
 
 	virtual void Destroy();	
-	virtual void Draw(IDirect3DDevice9& device);	// Renderer에서 상속 예정
+
+	// friend private 함수로 바꾸기, Renderer에서 상속 예정
+	virtual void Draw(IDirect3DDevice9& device);
 
 	void SetSprite(const sp<Sprite> sprite);
 	void SetMaterialCount(uint count);

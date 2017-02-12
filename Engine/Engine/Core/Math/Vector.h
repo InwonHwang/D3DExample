@@ -51,6 +51,7 @@ public:
 
 public:
 	static float GetDistance(const Vector3& v1, const Vector3& v2);
+	static float GetLength(const Vector3& v);
 };
 
 class Vector4 : public D3DXVECTOR4
