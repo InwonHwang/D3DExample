@@ -1,14 +1,16 @@
 #pragma once
 
 #include <d3d9.h>
-#include <cassert>
-#include <fstream>
 
+
+#include "D3DDescription\D3DDescription.h"
 #include "Math\Math.h"
 #include "BitFlag.h"
 #include "DataStructure.h"
 #include "DataTypes.h"
 #include "Debug.h"
+#include "FBXData.h"
+#include "FBXParser.h"
 #include "Memory.h"
 #include "ResourceItem.h"
 #include "ResourceManager.h"

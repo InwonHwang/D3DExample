@@ -1,5 +1,4 @@
 #include "SpriteRenderer.h"
-#include "..\Description\D3DDescription.h"
 
 
 SpriteRenderer::SpriteRenderer()

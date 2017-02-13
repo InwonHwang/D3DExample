@@ -1,7 +1,6 @@
 #include "VertexBuffer.h"
 
 
-
 VertexBuffer::VertexBuffer(ResourceHandle handle, ResourcePoolImpl* pool)
 	: ResourceItem(handle, pool),
 	_vb(nullptr),

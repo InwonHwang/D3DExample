@@ -159,6 +159,8 @@
     <ClCompile Include="D3D\ResourceBase\IndexBuffer.cpp" />
     <ClCompile Include="D3D\ResourceBase\Effect.cpp" />
     <ClCompile Include="D3D\Frustum.cpp" />
+    <ClCompile Include="Core\FBXParser.cpp" />
+    <ClCompile Include="Core\FbxDXUtil.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Core\ResourceItem.cpp" />
     <ClCompile Include="Core\ResourceManager.cpp" />
@@ -175,8 +177,10 @@
     <ClCompile Include="D3D\Resource\TerrainData.cpp" />
     <ClCompile Include="D3D\Component\Terrain.cpp" />
     <ClCompile Include="D3D\QuadTree.cpp" />
+    <ClCompile Include="D3D\Resource\Mesh.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Core\D3DDescription\AnimDescription.h" />
     <ClInclude Include="D3D\Component\Camera.h" />
     <ClInclude Include="Core\BitFlag.h" />
     <ClInclude Include="Core\Core.h" />
@@ -198,9 +202,9 @@
     <ClInclude Include="Core\Singleton.h" />
     <ClInclude Include="D3D\Component\Component.h" />
     <ClInclude Include="D3D\Component\D3DComponent.h" />
-    <ClInclude Include="D3D\Description\D3DDescription.h" />
-    <ClInclude Include="D3D\Description\IndexDescription.h" />
-    <ClInclude Include="D3D\Description\VertexDescription.h" />
+    <ClInclude Include="Core\D3DDescription\D3DDescription.h" />
+    <ClInclude Include="Core\D3DDescription\IndexDescription.h" />
+    <ClInclude Include="Core\D3DDescription\VertexDescription.h" />
     <ClInclude Include="D3D\ResourceBase\D3DResourceBase.h" />
     <ClInclude Include="D3D\ResourceBase\Texture.h" />
     <ClInclude Include="D3D\Component\Image.h" />
@@ -215,6 +219,10 @@
     <ClInclude Include="D3D\Component\Terrain.h" />
     <ClInclude Include="D3D\Frustum.h" />
     <ClInclude Include="D3D\QuadTree.h" />
+    <ClInclude Include="Core\FBXParser.h" />
+    <ClInclude Include="Core\FBXData.h" />
+    <ClInclude Include="D3D\Resource\Mesh.h" />
+    <ClInclude Include="Core\FbxDXUtil.h" />
     <ClInclude Include="ThirdParty\ThirdParty.h" />
     <ClInclude Include="D3D\Component\Transform.h" />
     <ClInclude Include="D3D\ResourceBase\VertexBuffer.h" />

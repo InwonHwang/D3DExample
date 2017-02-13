@@ -1,5 +1,4 @@
 #include "Sprite.h"
-#include "..\Description\D3DDescription.h"
 
 extern ResourceManager resourceManager;
 
@@ -42,20 +41,20 @@ bool Sprite::Create(IDirect3DDevice9& device, sp<Texture> texture)
 	float width = texture->GetWitdh() / 2.0f;
 	float height = texture->GetHeight() / 2.0f;
 
-	vertex[0].Position = Vector3(-width, height, 0.0f);	// 좌측 위
-	vertex[1].Position = Vector3(width, height, 0.0f);		// 우측 위
-	vertex[2].Position = Vector3(-width, -height, 0.0f);	// 좌측 아래
-	vertex[3].Position = Vector3(width, -height, 0.0f);	// 우측 아래
-	vertex[0].TexCoord = Vector2(0.0f, 0.0f);
-	vertex[1].TexCoord = Vector2(1.0f, 0.0f);
-	vertex[2].TexCoord = Vector2(0.0f, 1.0f);
-	vertex[3].TexCoord = Vector2(1.0f, 1.0f);
+	vertex[0].position = Vector3(-width, height, 0.0f);	// 좌측 위
+	vertex[1].position = Vector3(width, height, 0.0f);		// 우측 위
+	vertex[2].position = Vector3(-width, -height, 0.0f);	// 좌측 아래
+	vertex[3].position = Vector3(width, -height, 0.0f);	// 우측 아래
+	vertex[0].texCoord = Vector2(0.0f, 0.0f);
+	vertex[1].texCoord = Vector2(1.0f, 0.0f);
+	vertex[2].texCoord = Vector2(0.0f, 1.0f);
+	vertex[3].texCoord = Vector2(1.0f, 1.0f);
 
 	for (int i = 0; i < 4; i++)
 	{
-		vertex[i].Color = Vector4(255, 255, 255, 255);
-		vertex[i].Normal = vertex[i].Position;
-		vertex[i].Tangent = Vector3(0, 0, 0);
+		vertex[i].color = Vector4(255, 255, 255, 255);
+		vertex[i].normal = vertex[i].position;
+		vertex[i].tangent = Vector3(0, 0, 0);
 	}
 
 	if (_vb->Lock(0, sizeof(STATICMESHVERTEX) * 4, &pVertexData, 0))

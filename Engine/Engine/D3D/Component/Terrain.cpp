@@ -1,5 +1,4 @@
 #include "Terrain.h"
-#include "..\Description\D3DDescription.h"
 #include "..\Frustum.h"
 #include "..\QuadTree.h"
 

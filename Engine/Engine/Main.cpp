@@ -11,6 +11,12 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 
 ResourceManager resourceManager;
 
+IDirect3DDevice9* device;
+FbxManager* fbxManager;
+
+FBXData fbxData;
+FBXParser fbxParser;
+
 sp<Texture> texture;
 sp<Sprite> sprite;
 sp<Effect> effect;
@@ -31,10 +37,10 @@ int cam = 1;
 
 void SetRenderState()
 {
-	Device::Instance()->GetD3DDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
-	//Device::Instance()->GetD3DDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
-	Device::Instance()->GetD3DDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
-	Device::Instance()->GetD3DDevice()->LightEnable(0, true);
+	Device::Instance()->Get()->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+	//Device::Instance()->Get()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+	Device::Instance()->Get()->SetRenderState(D3DRS_ZENABLE, TRUE);
+	Device::Instance()->Get()->LightEnable(0, true);
 }
 
 void processInput()
@@ -74,30 +80,35 @@ void processInput()
 	{
 		Vector3 euler = transformCamera1->GetLocalEulerAngle() + Vector3(0, ROTATIONSPEED, 0);
 		transformCamera1->SetLocalRotation(Quaternion::Euler(euler.x, euler.y, euler.z));
-	}
-	
-	
+	}	
 }
 
 void Init()
 {
 	Device::Instance()->Init();
+	device = Device::Instance()->Get();
+
+	FBXMgr::Instance()->Init();
+	fbxManager = FBXMgr::Instance()->Get();
+
+	bool t = fbxParser.Init(*fbxManager, _T(""));
+	fbxParser.Load(fbxData);
 
 	// texture »ý¼º
 	texture = resourceManager.Create<Texture>();
-	texture->CreateTexture(*Device::Instance()->GetD3DDevice(), _T("Media\\Texture\\Sample.bmp"));	
+	texture->CreateTexture(*device, _T("Media\\Texture\\Sample.bmp"));	
 
 	effect = resourceManager.Create<Effect>();
-	effect->CreateEffect(*Device::Instance()->GetD3DDevice(), _T("Media\\Effect\\TextureMapping.fx"));
+	effect->CreateEffect(*device, _T("Media\\Effect\\TextureMapping.fx"));
 
 	material = resourceManager.Create<SurfaceMaterial>();
 	material->SetEffect(effect);
 
 	terrainData = resourceManager.Create<TerrainData>();
-	terrainData->Create(*Device::Instance()->GetD3DDevice(), _T("Media\\Terrain\\coastMountain64.raw"));
+	terrainData->Create(*device, _T("Media\\Terrain\\coastMountain64.raw"));
 
 	sprite = resourceManager.Create<Sprite>();
-	sprite->Create(*Device::Instance()->GetD3DDevice(), texture);
+	sprite->Create(*device, texture);
 
 	Transform* trs1 = Memory<Transform>::OrderedAlloc(sizeof(Transform));
 	Transform* trs2 = Memory<Transform>::OrderedAlloc(sizeof(Transform));
@@ -148,55 +159,55 @@ void Init()
 
 void Render()
 {
-	Device::Instance()->GetD3DDevice()->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0, 32, 64, 128), 1.0f, 0);
-	Device::Instance()->GetD3DDevice()->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_ARGB(0, 32, 64, 128), 1.0f, 0);
+	device->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0, 32, 64, 128), 1.0f, 0);
+	device->Clear(0, NULL, D3DCLEAR_ZBUFFER, D3DCOLOR_ARGB(0, 32, 64, 128), 1.0f, 0);
 
-	if (SUCCEEDED(Device::Instance()->GetD3DDevice()->BeginScene()))
+	if (SUCCEEDED(device->BeginScene()))
 	{
 		if (cam == 1)
 		{
 			transformCamera1->UpdateWorldMatrix();
 			camera1->UpdateViewMatrix();
-			camera1->Update(*Device::Instance()->GetD3DDevice());
+			camera1->Update(*device);
 		}
 		else if (cam == 2)
 		{
 			transformCamera2->UpdateWorldMatrix();
 			camera2->UpdateViewMatrix();
-			camera2->Update(*Device::Instance()->GetD3DDevice());
+			camera2->Update(*device);
 		}
 
 		D3DXMATRIX world;
 		D3DXMatrixIdentity(&world);
-		Device::Instance()->GetD3DDevice()->SetTransform(D3DTS_WORLD, &world);
+		device->SetTransform(D3DTS_WORLD, &world);
 		frustum->Make(camera1->GetViewMatrix() * camera1->GetProjMatrix());
-		//frustum->Draw(*Device::Instance()->GetD3DDevice());
+		//frustum->Draw(*device);
 
 		material->SetMatrix(_T("gViewMatrix"), camera1->GetViewMatrix());
 		material->SetMatrix(_T("gProjectionMatrix"), camera1->GetProjMatrix());
 		material->SetTexture(_T("DiffuseMap_Tex"), texture);
 		
 		transformTerrain->UpdateWorldMatrix();
-		transformTerrain->Update(*Device::Instance()->GetD3DDevice());
-		//transformTerrain->GetComponent<Terrain>()->Draw(*Device::Instance()->GetD3DDevice());
-		//transformTerrain->GetComponent<Terrain>()->DrawFrustum(*Device::Instance()->GetD3DDevice(), frustum);
-		transformTerrain->GetComponent<Terrain>()->DrawLOD(*Device::Instance()->GetD3DDevice(), frustum);
+		transformTerrain->Update(*device);
+		//transformTerrain->GetComponent<Terrain>()->Draw(*device);
+		//transformTerrain->GetComponent<Terrain>()->DrawFrustum(*device, frustum);
+		transformTerrain->GetComponent<Terrain>()->DrawLOD(*device, frustum);
 
 		/*transformSprite1->UpdateWorldMatrix();
 		material->SetMatrix(_T("gWorldMatrix"), transformSprite1->GetMatrix());
-		transformSprite1->Update(*Device::Instance()->GetD3DDevice());		
-		transformSprite1->GetComponent<SpriteRenderer>()->Draw(*Device::Instance()->GetD3DDevice());
+		transformSprite1->Update(*device);		
+		transformSprite1->GetComponent<SpriteRenderer>()->Draw(*device);
 
 		transformSprite2->UpdateWorldMatrix();
 		material->SetMatrix(_T("gWorldMatrix"), transformSprite2->GetMatrix());
-		transformSprite2->Update(*Device::Instance()->GetD3DDevice());		
-		transformSprite2->GetComponent<SpriteRenderer>()->Draw(*Device::Instance()->GetD3DDevice());*/
+		transformSprite2->Update(*device);		
+		transformSprite2->GetComponent<SpriteRenderer>()->Draw(*device);*/
 
-		Device::Instance()->GetD3DDevice()->EndScene();
+		device->EndScene();
 
 	}
 
-	Device::Instance()->GetD3DDevice()->Present(NULL, NULL, NULL, NULL);
+	device->Present(NULL, NULL, NULL, NULL);
 }
 
 
@@ -258,6 +269,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	Memory<TransformImpl>::Clear();
 	Memory<SpriteRenderer>::Clear();
 
+	fbxParser.Release();
+	FBXMgr::Instance()->Release();
 	Device::Instance()->Release();
 
 	return msg.wParam;

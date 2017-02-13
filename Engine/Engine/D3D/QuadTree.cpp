@@ -1,6 +1,5 @@
 #include "QuadTree.h"
 #include "Frustum.h"
-#include "Description\D3DDescription.h"
 
 QuadTree::QuadTree(QuadTree* parent, int topLeft, int topRight, int bottomLeft, int bottomRight)
 	:
@@ -215,7 +214,7 @@ int QuadTree::GenrateTriangleIndex(int numTriangles, void* indices, sp<HeightMap
 
 		int	n;
 
-		if (!b[UP]) // 상단 부분분할이 필요한가?
+		if (!b[UP] && _neighbour[UP]) // 상단 부분분할이 필요한가?
 		{			
 			n = (_coner[2] + _coner[3]) / 2;
 			index._0 = _center;
@@ -239,7 +238,7 @@ int QuadTree::GenrateTriangleIndex(int numTriangles, void* indices, sp<HeightMap
 			numTriangles++;
 		}
 
-		if (!b[DN]) // 하단 부분분할이 필요한가?
+		if (!b[DN] && _neighbour[DN]) // 하단 부분분할이 필요한가?
 		{
 			n = (_coner[0] + _coner[1]) / 2;
 			index._0 = _center;
@@ -262,7 +261,7 @@ int QuadTree::GenrateTriangleIndex(int numTriangles, void* indices, sp<HeightMap
 			numTriangles++;
 		}
 
-		if (!b[LT]) // 좌측 부분분할이 필요한가?
+		if (!b[LT] && _neighbour[LT]) // 좌측 부분분할이 필요한가?
 		{
 			n = (_coner[0] + _coner[2]) / 2;
 			index._0 = _center;
@@ -285,7 +284,7 @@ int QuadTree::GenrateTriangleIndex(int numTriangles, void* indices, sp<HeightMap
 			numTriangles++;
 		}
 
-		if (!b[RT]) // 우측 부분분할이 필요한가?
+		if (!b[RT] && _neighbour[RT]) // 우측 부분분할이 필요한가?
 		{
 			n = (_coner[1] + _coner[3]) / 2;
 			index._0 = _center;
