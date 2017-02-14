@@ -101,11 +101,11 @@ void FBXParser::LoadRecursively(FbxNode& fbxNode, FBXData& fbxData)
 
 			case FbxNodeAttribute::eMesh:
 			{				
-				ReadMesh(fbxNode, fbxData);				
+				ReadMesh(fbxNode, fbxData);
 			}
 				break;
 
-			case FbxNodeAttribute::eNurbs:				
+			case FbxNodeAttribute::eNurbs:
 				break;
 
 			case FbxNodeAttribute::ePatch:
@@ -131,6 +131,11 @@ void FBXParser::LoadRecursively(FbxNode& fbxNode, FBXData& fbxData)
 		LoadRecursively(*childNode, fbxData);
 	}
 
+}
+
+void FBXParser::ReadSkinInfo(FbxNode& fbxNode, FBXData& fbxData)
+{
+	
 }
 
 void FBXParser::ReadMesh(FbxNode& fbxNode, FBXData& fbxData)
@@ -165,7 +170,7 @@ void FBXParser::ReadMesh(FbxNode& fbxNode, FBXData& fbxData)
 			ReadPosition(*pMesh, ctrlPointIndex, position);
 			ReadColor(*pMesh, ctrlPointIndex, vertexCount, color);
 			ReadNormal(*pMesh, ctrlPointIndex, vertexCount, normal);
-			ReadUV(*pMesh, ctrlPointIndex, pMesh->GetTextureUVIndex(i, j), texCoord);
+			ReadUV(*pMesh, ctrlPointIndex, vertexCount, texCoord);
 			ReadTangent(*pMesh, ctrlPointIndex, vertexCount, tangent);
 
 			meshData->_positionVec.push_back(position);
@@ -277,7 +282,7 @@ void FBXParser::ReadColor(FbxMesh& mesh, int ctrlPointIndex, int vertexCount, Ve
 	}
 }
 
-void FBXParser::ReadUV(FbxMesh& mesh, int ctrlPointIndex, int uvIndex, Vector2& uv)
+void FBXParser::ReadUV(FbxMesh& mesh, int ctrlPointIndex, int vertexCount, Vector2& uv)
 {
 	if (mesh.GetElementUVCount() < 1) return;
 
@@ -311,11 +316,14 @@ void FBXParser::ReadUV(FbxMesh& mesh, int ctrlPointIndex, int uvIndex, Vector2& 
 		switch (referenceMode)
 		{
 		case FbxGeometryElement::eDirect:
+			uv.x = (float)pUV->GetDirectArray().GetAt(vertexCount).mData[0];
+			uv.y = (float)pUV->GetDirectArray().GetAt(vertexCount).mData[1];
 			break;
 		case FbxGeometryElement::eIndexToDirect:
 		{
-			uv.x = (float)pUV->GetDirectArray().GetAt(uvIndex).mData[0];
-			uv.y = (float)pUV->GetDirectArray().GetAt(uvIndex).mData[1];
+			int index = pUV->GetIndexArray().GetAt(vertexCount);
+			uv.x = (float)pUV->GetDirectArray().GetAt(index).mData[0];
+			uv.y = 1.0f - (float)pUV->GetDirectArray().GetAt(index).mData[1];
 		}
 		break;
 		}
@@ -430,121 +438,5 @@ void FBXParser::ReadTangent(FbxMesh& mesh, int ctrlPointIndex, int vertexCount, 
 		break;
 		}
 		break;
-	}
-}
-
-void FBXParser::ReadSkinInfo(FbxMesh& mesh, sp<FBXMeshData> meshData)
-{
-	FbxMesh* currMesh = fbxNode.GetMesh();
-	DWORD dwDeformerCnt = (DWORD)currMesh->GetDeformerCount();
-	// This geometry transform is something I cannot understand
-	// I think it is from MotionBuilder
-	// If you are using Maya for your models, 99% this is just an
-	// identity matrix
-	// But I am taking it into account anyways......
-
-	// A deformer is a FBX thing, which contains some clusters
-	// A cluster contains a link, which is basically a joint
-	// Normally, there is only one deformer in a mesh
-
-	const FbxVector4 lT = fbxNode.GetGeometricTranslation(FbxNode::eSourcePivot);
-	const FbxVector4 lR = fbxNode.GetGeometricRotation(FbxNode::eSourcePivot);
-	const FbxVector4 lS = fbxNode.GetGeometricScaling(FbxNode::eSourcePivot);
-
-	FbxAMatrix t(lT, lR, lS);
-
-	for (DWORD i = 0; i < dwDeformerCnt; ++i)
-	{
-		// There are many types of deformers in Maya,
-		// We are using only skins, so we see if this is a skin
-		FbxSkin* currSkin = reinterpret_cast< FbxSkin* >(currMesh->GetDeformer(i, FbxDeformer::eSkin));
-		if (!currSkin)	continue;
-
-		_boneOffset.resize(_bones->size());
-
-		int boneOffsetCount = _boneOffset.size();
-		D3DXMATRIX identity(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-		D3DXMatrixIdentity(&identity);
-
-		for (int i = 0; i < _boneOffset.size(); ++i)
-		{
-			_boneOffset[i] = identity;
-		}
-
-
-		DWORD dwClusterCnt = (DWORD)currSkin->GetClusterCount();
-
-		for (DWORD j = 0; j < dwClusterCnt; ++j)
-		{
-			FbxCluster* currCluster = currSkin->GetCluster(j);
-			std::string currJointName = currCluster->GetLink()->GetName();
-			int currJointIndex = 0;
-
-
-
-			for (int i = 0; i < _bones->size(); ++i)
-			{
-				if (currJointName.compare(_bones->data()[i]->GetName()) == 0)
-				{
-					currJointIndex = i;	// 인덱스
-					break;
-				}
-			}
-
-			FbxAMatrix transformMatrix;
-			FbxAMatrix transformLinkMatrix;
-			FbxAMatrix globalBindposeInverseMatrix;
-
-			currCluster->GetTransformMatrix(transformMatrix);	// The transformation of the mesh at binding time
-			currCluster->GetTransformLinkMatrix(transformLinkMatrix);	// The transformation of the cluster(joint) at binding time from joint space to world space
-
-			globalBindposeInverseMatrix = transformLinkMatrix.Inverse() * transformMatrix * t;
-
-			_boneOffset[currJointIndex] = FbxDXUtil::ToDXMatrix(globalBindposeInverseMatrix);
-
-			double *pWeights = currCluster->GetControlPointWeights();		// 해당 본에 의한 정점의 가중치
-			int *pIndices = currCluster->GetControlPointIndices();			// 해당 본에 영향을 받는 정점들																				
-			int numBoneVertexIndices = currCluster->GetControlPointIndicesCount(); // 해당 본에 영향을 받는 모든 정점을 하나씩 가져옴	
-
-			for (int k = 0; k < numBoneVertexIndices; k++)
-			{
-				float tempWeight = (float)pWeights[k];	// 영향을 받는 정점의 가중치 정도
-				int tempIndex = pIndices[k];			// 영향을 받는 정점의 인덱스
-
-														// 가중치가 0이면 다음걸로 넘김
-				if (tempWeight == 0) continue;
-
-				SKININFO skinInfo;
-				// 가중치 중 x가 0이면 첫번째 인덱스
-				//if (bufferVertex[tempIndex].Weight.x == 0)
-				//{
-				//	bufferVertex[tempIndex].Weight.x = tempWeight;
-				//	bufferVertex[tempIndex].Index[0] = currJointIndex;
-				//}
-				//// 가중치 중 x가 0이 아니고 y가 0이면 두번째 인덱스
-				//else if (bufferVertex[tempIndex].Weight.x != 0 &&
-				//	bufferVertex[tempIndex].Weight.y == 0)
-				//{
-				//	bufferVertex[tempIndex].Weight.y = tempWeight;
-				//	bufferVertex[tempIndex].Index[1] = currJointIndex;
-				//}
-				//// 가중치 중 x가 0이 아니고 y가 0이 아니고 z가 0이면 세번째 인덱스
-				//else if (bufferVertex[tempIndex].Weight.x != 0 &&
-				//	bufferVertex[tempIndex].Weight.y != 0 &&
-				//	bufferVertex[tempIndex].Weight.z == 0)
-				//{
-				//	bufferVertex[tempIndex].Weight.z = tempWeight;
-				//	bufferVertex[tempIndex].Index[2] = currJointIndex;
-				//}
-				//// 모두 0이 아니면 4번째 인덱스, 가중치는 1에서 xyz 빼면 나머지 구할 수 있음
-				//else if (bufferVertex[tempIndex].Weight.x != 0 &&
-				//	bufferVertex[tempIndex].Weight.y != 0 &&
-				//	bufferVertex[tempIndex].Weight.z != 0)
-				//{
-				//	bufferVertex[tempIndex].Index[3] = currJointIndex;
-				//}
-			} // k
-
-		}
 	}
 }

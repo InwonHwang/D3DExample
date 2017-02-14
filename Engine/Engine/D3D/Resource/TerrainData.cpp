@@ -5,7 +5,9 @@ extern ResourceManager resourceManager;
 TerrainData::TerrainData(ResourceHandle handle, ResourcePoolImpl* pool)
 	: ResourceItem(handle, pool),
 	_vb(nullptr),
-	_ib(nullptr)
+	_ib(nullptr),
+	_verticeCount(0),
+	_width(0)
 {
 }
 

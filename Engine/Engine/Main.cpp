@@ -18,16 +18,21 @@ FBXData fbxData;
 FBXParser fbxParser;
 
 sp<Texture> texture;
+sp<Texture> textureMesh;
+
 sp<Sprite> sprite;
 sp<Effect> effect;
 sp<SurfaceMaterial> material;
+sp<SurfaceMaterial> materialMesh;
 sp<TerrainData> terrainData;
+sp<Mesh> mesh;
 
 sp<Transform> transformSprite1;
 sp<Transform> transformSprite2;
 sp<Transform> transformCamera1;
 sp<Transform> transformCamera2;
 sp<Transform> transformTerrain;
+sp<Transform> transformMesh;
 sp<Camera> camera1;
 sp<Camera> camera2;
 
@@ -39,8 +44,8 @@ void SetRenderState()
 {
 	Device::Instance()->Get()->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
 	//Device::Instance()->Get()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
-	Device::Instance()->Get()->SetRenderState(D3DRS_ZENABLE, TRUE);
-	Device::Instance()->Get()->LightEnable(0, true);
+	device->SetRenderState(D3DRS_ZENABLE, TRUE);
+	device->LightEnable(0, true);
 }
 
 void processInput()
@@ -94,9 +99,15 @@ void Init()
 	bool t = fbxParser.Init(*fbxManager, _T(""));
 	fbxParser.Load(fbxData);
 
+	DebugBox(fbxData._fbxMeshDataMgr._fbxMeshDataVec[2]->_positionVec.size(), 0);
+	DebugBox(fbxData._fbxMeshDataMgr._fbxMeshDataVec[2]->_texCroodVec.size(), 0);
+
 	// texture »ý¼º
 	texture = resourceManager.Create<Texture>();
 	texture->CreateTexture(*device, _T("Media\\Texture\\Sample.bmp"));	
+
+	textureMesh = resourceManager.Create<Texture>();
+	textureMesh->CreateTexture(*device, _T("Media\\Texture\\hero_color.bmp"));
 
 	effect = resourceManager.Create<Effect>();
 	effect->CreateEffect(*device, _T("Media\\Effect\\TextureMapping.fx"));
@@ -104,23 +115,31 @@ void Init()
 	material = resourceManager.Create<SurfaceMaterial>();
 	material->SetEffect(effect);
 
+	materialMesh = resourceManager.Create<SurfaceMaterial>();
+	materialMesh->SetEffect(effect);
+
 	terrainData = resourceManager.Create<TerrainData>();
 	terrainData->Create(*device, _T("Media\\Terrain\\coastMountain64.raw"));
 
 	sprite = resourceManager.Create<Sprite>();
 	sprite->Create(*device, texture);
 
+	mesh = resourceManager.Create<Mesh>();
+	mesh->Create(*device, fbxData._fbxMeshDataMgr._fbxMeshDataVec[2]);
+
 	Transform* trs1 = Memory<Transform>::OrderedAlloc(sizeof(Transform));
 	Transform* trs2 = Memory<Transform>::OrderedAlloc(sizeof(Transform));
 	Transform* trc1 = Memory<Transform>::OrderedAlloc(sizeof(Transform));
 	Transform* trc2 = Memory<Transform>::OrderedAlloc(sizeof(Transform));
 	Transform* trt = Memory<Transform>::OrderedAlloc(sizeof(Transform));
+	Transform* trm = Memory<Transform>::OrderedAlloc(sizeof(Transform));
 
 	transformSprite1.reset(trs1, Memory<Transform>::OrderedFree);
 	transformSprite2.reset(trs2, Memory<Transform>::OrderedFree);
 	transformCamera1.reset(trc1, Memory<Transform>::OrderedFree);
 	transformCamera2.reset(trc2, Memory<Transform>::OrderedFree);
 	transformTerrain.reset(trt, Memory<Transform>::OrderedFree);
+	transformMesh.reset(trm, Memory<Transform>::OrderedFree);
 
 	transformSprite1->AddComponent<SpriteRenderer>()->SetSprite(sprite);
 	transformSprite1->GetComponent<SpriteRenderer>()->SetMaterialCount(1);
@@ -132,12 +151,15 @@ void Init()
 
 	transformTerrain->AddComponent<Terrain>()->SetTerrainData(terrainData);
 
-
 	camera1 = transformCamera1->AddComponent<Camera>();
 	camera1->SetTransform(transformCamera1);
 
 	camera2 = transformCamera2->AddComponent<Camera>();
 	camera2->SetTransform(transformCamera2);
+
+	transformMesh->AddComponent<MeshRenderer>()->SetMesh(mesh);
+	transformMesh->GetComponent<MeshRenderer>()->SetMaterialCount(1);
+	transformMesh->GetComponent<MeshRenderer>()->SetMaterial(0, materialMesh);
 
 	transformSprite1->SetLocalPosition(Vector3(100, 100, 0));
 	transformSprite2->SetLocalPosition(Vector3(-100, -100, 0));
@@ -149,7 +171,7 @@ void Init()
 	transformCamera1->SetLocalPosition(Vector3(0, 90, 0));
 	transformCamera1->SetLocalRotation(Quaternion::Euler(90, 0, 0));
 	transformCamera2->SetLocalPosition(Vector3(0, 100, 0));
-	transformCamera2->SetLocalRotation(Quaternion::Euler(90, 0, 0));
+	transformCamera2->SetLocalRotation(Quaternion::Euler(90, 0, 0));	
 	
 	frustum.reset(new Frustum);
 
@@ -185,7 +207,12 @@ void Render()
 
 		material->SetMatrix(_T("gViewMatrix"), camera1->GetViewMatrix());
 		material->SetMatrix(_T("gProjectionMatrix"), camera1->GetProjMatrix());
-		material->SetTexture(_T("DiffuseMap_Tex"), texture);
+		material->SetTexture(_T("DiffuseMap_Tex"), textureMesh);
+
+		transformMesh->UpdateWorldMatrix();
+		material->SetMatrix(_T("gWorldMatrix"), transformMesh->GetMatrix());
+		transformMesh->Update(*device);
+		//transformMesh->GetComponent<MeshRenderer>()->Draw(*device);
 		
 		transformTerrain->UpdateWorldMatrix();
 		transformTerrain->Update(*device);
@@ -266,6 +293,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	Memory<Camera>::Clear();
 	Memory<Transform>::Clear();
 	Memory<Terrain>::Clear();
+	Memory<MeshRenderer>::Clear();
 	Memory<TransformImpl>::Clear();
 	Memory<SpriteRenderer>::Clear();
 

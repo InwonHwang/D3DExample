@@ -45,16 +45,18 @@ public:
 private:
 	void LoadRecursively(FbxNode& fbxNode, FBXData& fbxData);
 
+	void ReadSkinInfo(FbxNode& fbxNode, FBXData& fbxData);
+
 	// Mesh ÆÄ½Ì
-	void ReadMesh(FbxNode& fbxNode, FBXData& fbxData);
+	void ReadMesh(FbxNode& fbxNode, FBXData& fbxData);	
 		
 	void ReadPosition(FbxMesh& mesh, int ctrlPointIndex, Vector3& position);
 	void ReadColor(FbxMesh& mesh, int ctrlPointIndex, int vertexCount, Vector4& color);
-	void ReadUV(FbxMesh& mesh, int ctrlPointIndex, int uvIndex, Vector2& uv);
+	void ReadUV(FbxMesh& mesh, int ctrlPointIndex, int vertexCount, Vector2& uv);
 	void ReadNormal(FbxMesh& mesh, int ctrlPointIndex, int vertexCount, Vector3& normal);
 	void ReadTangent(FbxMesh& mesh, int ctrlPointIndex, int vertexCount, Vector3& tangent);
 
-	void ReadSkinInfo(FbxMesh& mesh, sp<FBXMeshData> meshData);
+	
 
 	//void ReadSkeleton(FbxNode& fbxNode);
 

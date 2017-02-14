@@ -3,7 +3,10 @@
 extern ResourceManager resourceManager;
 
 Sprite::Sprite(ResourceHandle handle, ResourcePoolImpl* pool)
-	: ResourceItem(handle, pool)
+	: ResourceItem(handle, pool),
+	_vb(nullptr),
+	_ib(nullptr),
+	_texture(nullptr)
 {
 }
 
@@ -22,7 +25,7 @@ void Sprite::Destroy()
 }
 
 bool Sprite::Create(IDirect3DDevice9& device, sp<Texture> texture)
-{	
+{		
 	_vb = resourceManager.Create<VertexBuffer>(); // VertexBuffer Pool로 VertexBuffer만들기	
 	_ib = resourceManager.Create<IndexBuffer>(); // IndexBuffer Pool로 IndexBuffer만들기
 	

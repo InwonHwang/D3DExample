@@ -2,10 +2,6 @@
 #include "..\..\Core\Core.h"
 #include "..\ResourceBase\D3DResourceBase.h"
 
-class VertexBuffer;
-class IndexBuffer;
-class Texture;
-
 class Sprite : public ResourceItem
 {
 public:

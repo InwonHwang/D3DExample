@@ -3,7 +3,9 @@
 
 
 SurfaceMaterial::SurfaceMaterial(ResourceHandle handle, ResourcePoolImpl* pool)
-	: ResourceItem(handle, pool)
+	: ResourceItem(handle, pool),
+	_paramEffect(nullptr),
+	_effect(nullptr)
 {
 	_paramEffect.reset(new ParamEffectVec);
 }

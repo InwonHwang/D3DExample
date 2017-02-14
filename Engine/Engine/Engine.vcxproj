@@ -178,6 +178,7 @@
     <ClCompile Include="D3D\Component\Terrain.cpp" />
     <ClCompile Include="D3D\QuadTree.cpp" />
     <ClCompile Include="D3D\Resource\Mesh.cpp" />
+    <ClCompile Include="D3D\Component\MeshRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\D3DDescription\AnimDescription.h" />
@@ -223,6 +224,7 @@
     <ClInclude Include="Core\FBXData.h" />
     <ClInclude Include="D3D\Resource\Mesh.h" />
     <ClInclude Include="Core\FbxDXUtil.h" />
+    <ClInclude Include="D3D\Component\MeshRenderer.h" />
     <ClInclude Include="ThirdParty\ThirdParty.h" />
     <ClInclude Include="D3D\Component\Transform.h" />
     <ClInclude Include="D3D\ResourceBase\VertexBuffer.h" />

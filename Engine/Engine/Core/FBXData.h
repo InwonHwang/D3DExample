@@ -7,6 +7,18 @@
 #include "DataStructure.h"
 #include "DataTypes.h"
 
+class FBXTransformData
+{
+public:
+	FBXTransformData() {}
+	~FBXTransformData() {}
+
+	D3DXMATRIX	_matLocal;				// 로컬 행렬
+	D3DXMATRIX	_matWorldParent;		// 부모의 월드 행렬
+
+	bool _isBone;
+};
+
 class FBXMeshData
 {
 public:
