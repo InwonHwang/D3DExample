@@ -2,126 +2,162 @@
 // FBX 파일의 파싱한 정보를 담아주는 클래스 정의
 
 #include "..\ThirdParty\ThirdParty.h"
-#include "D3DDescription\D3DDescription.h"
 #include "Math\Math.h"
 #include "DataStructure.h"
 #include "DataTypes.h"
 
-class FBXTransformData
+// 버텍스
+typedef struct tagVertex
 {
-public:
-	FBXTransformData() {}
-	~FBXTransformData() {}
+	Vector3 position;
+	Vector4 color;
+	Vector3 normal;
+	Vector2 texCoord;
+	Vector3 tangent;
 
-	D3DXMATRIX	_matLocal;				// 로컬 행렬
-	D3DXMATRIX	_matWorldParent;		// 부모의 월드 행렬
-
-	bool _isBone;
-};
-
-class FBXMeshData
-{
-public:
-	FBXMeshData() {}
-	~FBXMeshData()
-	{	
-		_positionVec.clear();
-		_colorVec.clear();
-		_normalVec.clear();
-		_binormalVec.clear();
-		_tangentVec.clear();
-		_texCroodVec.clear();
-		_skinInfo.clear();
-		_indiceVec.clear();
-
-		_positionVec.resize(0);
-		_colorVec.resize(0);
-		_normalVec.resize(0);
-		_binormalVec.resize(0);
-		_tangentVec.resize(0);
-		_texCroodVec.resize(0);
-		_skinInfo.resize(0);
-		_indiceVec.resize(0);
-	}
-
-	D3DXMATRIX	_matLocal;				// 로컬 행렬
-	D3DXMATRIX	_matWorldParent;		// 부모의 월드 행렬
-
-	std::vector<Vector3> _positionVec;	// 위치
-	std::vector<Vector4> _colorVec;		// 색
-	std::vector<Vector3> _normalVec;	// 노멀
-	std::vector<Vector3> _binormalVec;	// 바이노멀
-	std::vector<Vector3> _tangentVec;	// 탄젠트
-	std::vector<Vector2> _texCroodVec;	// 텍스쳐 uv
-	std::vector<SKININFO> _skinInfo;	// 정점 무게값
-
-	std::vector<INDEX>	 _indiceVec;	// 인덱스
-
-	bool _isSkinned;
-};
-
-class FBXTrackData	// 애니메이션 트랙
-{
-	std::vector<AnimKey> scale;	
-	std::vector<AnimKey> rotation;
-	std::vector<AnimKey> position;
-	float start;
-	float end;
-	
-	~FBXTrackData()
+	bool operator==(const tagVertex& rhs) const
 	{
-		std::vector<AnimKey> emptyData;
-		scale.swap(emptyData);
-		rotation.swap(emptyData);
-		position.swap(emptyData);
-	}
-};
+		bool flag;
 
-class FBXMeshDataMgr
+		flag = this->position == rhs.position;
+		flag &= this->color == rhs.color;
+		flag &= this->normal == rhs.normal;
+		flag &= this->texCoord == rhs.texCoord;
+		flag &= this->tangent == rhs.tangent;
+
+		return flag;
+	}
+}VERTEX, *LPVERTEX;
+
+// 스키닝 정보
+typedef struct tagVertexBlendingInfo
 {
-public:
-	~FBXMeshDataMgr()
+	uint blendingIndex;
+	double blendingWeight;
+
+	tagVertexBlendingInfo() :
+		blendingIndex(0),
+		blendingWeight(0.0)
+	{}
+
+	bool operator < (const tagVertexBlendingInfo& rhs)
 	{
-		for (auto data : _fbxMeshDataVec)
-			data.reset();
-
-		_fbxMeshDataVec.clear();
+		return (blendingWeight < rhs.blendingWeight);
 	}
+}VERTEXBLENDINGINFO, *LPVERTEXBLENDINGINFO;
 
-	std::vector<sp<FBXMeshData>> _fbxMeshDataVec;
-};
-
-class FBXAnimationData
+// 스키닝 정보 + 버텍스정보
+typedef struct tagSkinnedVertex
 {
-public:
-	~FBXAnimationData()
+	VERTEX vertex;
+	std::vector<VERTEXBLENDINGINFO> vertexBlendingInfoVec;
+
+	void SortBlendingInfoByWeight()
 	{
-		for (auto data : _fbxTrackDataVec)
-			data.reset();
-
-		_fbxTrackDataVec.clear();
+		std::sort(vertexBlendingInfoVec.begin(), vertexBlendingInfoVec.end());
 	}
 
-	std::vector<sp<FBXTrackData>> _fbxTrackDataVec;
-};
-
-class FBXAnimationDataMgr
-{
-public:
-	~FBXAnimationDataMgr()
+	bool operator == (const tagSkinnedVertex& rhs) const
 	{
-		for (auto data : _fbxAnimationDataVec)
-			data.reset();
+		bool flag = true;
 
-		_fbxAnimationDataVec.clear();
+		if (!(vertexBlendingInfoVec.empty() && rhs.vertexBlendingInfoVec.empty()))
+		{
+			for (uint i = 0; i < 4; ++i)
+			{
+				if (vertexBlendingInfoVec[i].blendingIndex != rhs.vertexBlendingInfoVec[i].blendingIndex ||
+					abs(vertexBlendingInfoVec[i].blendingWeight - rhs.vertexBlendingInfoVec[i].blendingWeight) > 0.001)
+				{
+					flag = false;
+					break;
+				}
+			}
+		}
+
+		flag &= vertex == rhs.vertex;
+
+		return flag;
+	}
+}SKINNEDVERTEX, LPSKINNEDVERTEX;
+
+// 애니메이션 키 (Matrix 값)
+typedef struct tagKeyframe
+{
+	FbxLongLong frameCount;
+	FbxAMatrix globalTransform;
+	tagKeyframe* pNext;
+
+	tagKeyframe()
+	{
+		globalTransform.SetIdentity();
+	}
+}KEYFRAME, *LPKEYFRAME;
+
+typedef struct tagFBXData
+{
+	enum DataType
+	{
+		eTransform,
+		eBone,
+		eMesh		
+	};
+
+	int dataType;
+
+}FBXDATA,* LPFBXDATA;
+
+// 트랜스폼 값
+typedef struct tagFBXTransformData : public FBXDATA
+{
+	String name;
+	FbxAMatrix local;
+	FbxAMatrix world;
+	int parentIndex;
+
+	tagFBXTransformData()
+	{
+		local.SetIdentity();
+		world.SetIdentity();
 	}
 
-	std::vector<sp<FBXAnimationData>> _fbxAnimationDataVec;
-};
+}FBXTRANSFORMDATA, *LPFBXTRANSFORMDATA;
 
-class FBXData
+
+// 뼈대 및 애니메이션 정보
+typedef struct tagFBXBoneData : public tagFBXTransformData
 {
-public:
-	FBXMeshDataMgr _fbxMeshDataMgr;
-	FBXAnimationDataMgr _fbxAnimationDataMgr;
-};
+	FbxAMatrix globalBindposeInverse;
+	KEYFRAME* pAnimation;
+	//FbxNode* pNode;
+	int start;
+	int end;
+
+	tagFBXBoneData()
+		: pAnimation(nullptr),
+		//pNode(nullptr),
+		start(0),
+		end(0)
+	{		
+		globalBindposeInverse.SetIdentity();
+	}
+	~tagFBXBoneData() {
+		while (pAnimation) {
+			KEYFRAME* temp = pAnimation->pNext;
+			delete pAnimation;
+			pAnimation = temp;
+		}
+	}
+}FBXBONEDATA, *LPFBXBONEDATA;
+
+typedef struct tagFBXMeshData : public tagFBXTransformData
+{
+	std::vector<SKINNEDVERTEX> verticeDataVec; //vertex Data
+	std::vector<uint>	indiceDataVec; //indeice Data
+	bool isSkinned;
+
+}FBXMESHDATA, *LPFBXMESHDATA;
+
+typedef struct tagFBXDataSet
+{
+	std::vector<sp<FBXDATA>> fbxDataVec;
+}FBXDATASET, *LPFBXDATASET;

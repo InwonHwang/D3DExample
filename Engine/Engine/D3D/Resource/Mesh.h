@@ -1,26 +1,26 @@
 #pragma once
 #include "..\..\Core\Core.h"
 #include "..\ResourceBase\D3DResourceBase.h"
+#include "..\D3DDescription\D3DDescription.h"
 
 class Mesh : public ResourceItem
 {
 public:
 	Mesh(ResourceHandle handle, ResourcePoolImpl* pool);
-	~Mesh();
+	virtual ~Mesh();
 
 	virtual void Destroy() override;
 
-	bool Create(IDirect3DDevice9& device, sp<FBXMeshData> fbxData);
+	virtual bool Create(IDirect3DDevice9& device, sp<FBXMESHDATA> fbxData) = 0;
 
 	sp<VertexBuffer> GetVertexBuffer() const;
 	sp<IndexBuffer> GetIndexBuffer() const;
 	int	GetVertexCount() const;
 	int GetPrimitiveCount() const;
-private:
+
+protected:
 	sp<VertexBuffer> _vb;
 	sp<IndexBuffer>	 _ib;
-
-	bool _isSkinned;
 	int  _vertexCount;
 	int  _primitiveCount;
 };

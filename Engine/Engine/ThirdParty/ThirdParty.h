@@ -11,6 +11,7 @@
 
 #include <cassert>
 #include <fstream>
+#include <algorithm>
 
 template<typename T>
 using sp = boost::shared_ptr<T>;

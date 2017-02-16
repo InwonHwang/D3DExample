@@ -13,6 +13,30 @@ typedef unsigned __int64  uint64;
 
 typedef std::basic_string<TCHAR> String;
 
+class StringUtil
+{
+public:
+	inline static void SetName(const char* str, String& dest)
+	{
+		std::string temp = str;
+		dest.assign(temp.begin(), temp.end());
+	}
+
+	inline static String FloatToString(float f)
+	{
+		std::string temp = std::to_string(f);
+		String ret;
+		ret.assign(temp.begin(), temp.end());
+	}
+
+	inline static String IntegerToString(int i)
+	{
+		std::string temp = std::to_string(i);
+		String ret;
+		ret.assign(temp.begin(), temp.end());
+	}
+};
+
 
 //class String : public TString
 //{

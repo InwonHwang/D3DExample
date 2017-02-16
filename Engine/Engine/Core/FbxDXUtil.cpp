@@ -24,7 +24,6 @@ Vector3 FbxDXUtil::ToVector3(const FbxDouble3 &m) {
 	return Vector3((float)m[0], (float)m[1], (float)m[2]);
 }
 
-
 D3DXMATRIX FbxDXUtil::ToDXMatrix(const FbxAMatrix &mtx)
 {
 

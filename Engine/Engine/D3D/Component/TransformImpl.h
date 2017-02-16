@@ -61,22 +61,22 @@ private:
 
 inline Vector3 TransformImpl::GetLocalScale() const
 {
-	return *_scale;
+	return InternalMatrixToScale(_transformData->GetMatrix());
 }
 
 inline Quaternion TransformImpl::GetLocalRotation() const
 {
-	return *_rotation;
+	return InternalMatrixToRotation(_transformData->GetMatrix());
 }
 
 inline Vector3 TransformImpl::GetLocalEulerAngle() const
 {
-	return Quaternion::ToEulerAngle(*_rotation);
+	return Quaternion::ToEulerAngle(InternalMatrixToRotation(_transformData->GetMatrix()));
 }
 
 inline Vector3 TransformImpl::GetLocalPosition() const
 {
-	return *_position;
+	return InternalMatrixToTranslation(_transformData->GetMatrix());
 }
 
 inline Vector3 TransformImpl::GetScale() const

@@ -40,21 +40,26 @@ public:
 	bool Init(FbxManager& fbxManager, const String& fileName);
 	void Release();
 
-	void Load(FBXData& fbxData);
+	void Load(FBXDATASET& fbxData);
 
 private:
-	void LoadRecursively(FbxNode& fbxNode, FBXData& fbxData);
+	void LoadRecursively(FbxNode& fbxNode, FBXDATASET& fbxData, int index, int parentIndex);
 
-	void ReadSkinInfo(FbxNode& fbxNode, FBXData& fbxData);
+	void ReadTransform(FbxNode& fbxNode, FBXDATASET& fbxData, int index, int parentIndex);
+	void ReadMatrix(FbxNode& fbxNode, FbxAMatrix& local, FbxAMatrix& worldParent);
+
+	void ReadBone(FbxNode& fbxNode, FBXDATASET& fbxData, int index, int parentIndex);
+
+	void ReadSkinInfo(FbxNode& fbxNode, FBXDATASET& fbxData, sp<FBXMESHDATA> meshData);
 
 	// Mesh ÆÄ½Ì
-	void ReadMesh(FbxNode& fbxNode, FBXData& fbxData);	
+	void ReadMesh(FbxNode& fbxNode, FBXDATASET& fbxData, int index, int parentIndex);
 		
-	void ReadPosition(FbxMesh& mesh, int ctrlPointIndex, Vector3& position);
-	void ReadColor(FbxMesh& mesh, int ctrlPointIndex, int vertexCount, Vector4& color);
-	void ReadUV(FbxMesh& mesh, int ctrlPointIndex, int vertexCount, Vector2& uv);
-	void ReadNormal(FbxMesh& mesh, int ctrlPointIndex, int vertexCount, Vector3& normal);
-	void ReadTangent(FbxMesh& mesh, int ctrlPointIndex, int vertexCount, Vector3& tangent);
+	void ReadPosition(FbxMesh& fbxMesh, int ctrlPointIndex, Vector3& position);
+	void ReadColor(FbxMesh& fbxMesh, int ctrlPointIndex, int vertexCount, Vector4& color);
+	void ReadUV(FbxMesh& fbxMesh, int ctrlPointIndex, int vertexCount, Vector2& uv);
+	void ReadNormal(FbxMesh& fbxMesh, int ctrlPointIndex, int vertexCount, Vector3& normal);
+	void ReadTangent(FbxMesh& fbxMesh, int ctrlPointIndex, int vertexCount, Vector3& tangent);
 
 	
 

@@ -14,36 +14,32 @@ ResourceManager resourceManager;
 IDirect3DDevice9* device;
 FbxManager* fbxManager;
 
-FBXData fbxData;
+FBXDATASET fbxDataSet;
 FBXParser fbxParser;
 
-sp<Texture> texture;
 sp<Texture> textureMesh;
 
-sp<Sprite> sprite;
 sp<Effect> effect;
 sp<SurfaceMaterial> material;
 sp<SurfaceMaterial> materialMesh;
 sp<TerrainData> terrainData;
-sp<Mesh> mesh;
+sp<SkinnedMesh> mesh;
 
-sp<Transform> transformSprite1;
-sp<Transform> transformSprite2;
+
 sp<Transform> transformCamera1;
-sp<Transform> transformCamera2;
-sp<Transform> transformTerrain;
+//sp<Transform> transformTerrain;
 sp<Transform> transformMesh;
-sp<Camera> camera1;
-sp<Camera> camera2;
 
+sp<Camera> camera1;
 sp<Frustum> frustum;
+
+std::vector<sp<FBXBONEDATA>> boneDataVec;
 
 int cam = 1;
 
 void SetRenderState()
 {
 	Device::Instance()->Get()->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
-	//Device::Instance()->Get()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 	device->SetRenderState(D3DRS_ZENABLE, TRUE);
 	device->LightEnable(0, true);
 }
@@ -97,14 +93,20 @@ void Init()
 	fbxManager = FBXMgr::Instance()->Get();
 
 	bool t = fbxParser.Init(*fbxManager, _T(""));
-	fbxParser.Load(fbxData);
-
-	DebugBox(fbxData._fbxMeshDataMgr._fbxMeshDataVec[2]->_positionVec.size(), 0);
-	DebugBox(fbxData._fbxMeshDataMgr._fbxMeshDataVec[2]->_texCroodVec.size(), 0);
+	fbxParser.Load(fbxDataSet);
+	sp<FBXMESHDATA> meshData;
+	for (auto data : fbxDataSet.fbxDataVec)
+	{
+		if (data->dataType == FBXDATA::eMesh)
+			meshData = boost::static_pointer_cast<FBXMESHDATA>(data);
+		else if (data->dataType == FBXDATA::eBone)
+		{
+			sp<FBXBONEDATA> temp = boost::static_pointer_cast<FBXBONEDATA>(data);
+			boneDataVec.push_back(temp);			
+		}
+	}
 
 	// texture »ý¼º
-	texture = resourceManager.Create<Texture>();
-	texture->CreateTexture(*device, _T("Media\\Texture\\Sample.bmp"));	
 
 	textureMesh = resourceManager.Create<Texture>();
 	textureMesh->CreateTexture(*device, _T("Media\\Texture\\hero_color.bmp"));
@@ -121,63 +123,73 @@ void Init()
 	terrainData = resourceManager.Create<TerrainData>();
 	terrainData->Create(*device, _T("Media\\Terrain\\coastMountain64.raw"));
 
-	sprite = resourceManager.Create<Sprite>();
-	sprite->Create(*device, texture);
-
-	mesh = resourceManager.Create<Mesh>();
-	mesh->Create(*device, fbxData._fbxMeshDataMgr._fbxMeshDataVec[2]);
-
-	Transform* trs1 = Memory<Transform>::OrderedAlloc(sizeof(Transform));
-	Transform* trs2 = Memory<Transform>::OrderedAlloc(sizeof(Transform));
+	mesh = resourceManager.Create<SkinnedMesh>();
+	mesh->Create(*device, meshData);
+	
+	//Transform
 	Transform* trc1 = Memory<Transform>::OrderedAlloc(sizeof(Transform));
-	Transform* trc2 = Memory<Transform>::OrderedAlloc(sizeof(Transform));
-	Transform* trt = Memory<Transform>::OrderedAlloc(sizeof(Transform));
-	Transform* trm = Memory<Transform>::OrderedAlloc(sizeof(Transform));
-
-	transformSprite1.reset(trs1, Memory<Transform>::OrderedFree);
-	transformSprite2.reset(trs2, Memory<Transform>::OrderedFree);
 	transformCamera1.reset(trc1, Memory<Transform>::OrderedFree);
-	transformCamera2.reset(trc2, Memory<Transform>::OrderedFree);
-	transformTerrain.reset(trt, Memory<Transform>::OrderedFree);
-	transformMesh.reset(trm, Memory<Transform>::OrderedFree);
-
-	transformSprite1->AddComponent<SpriteRenderer>()->SetSprite(sprite);
-	transformSprite1->GetComponent<SpriteRenderer>()->SetMaterialCount(1);
-	transformSprite1->GetComponent<SpriteRenderer>()->SetMaterial(0, material);
-
-	transformSprite2->AddComponent<SpriteRenderer>()->SetSprite(sprite);
-	transformSprite2->GetComponent<SpriteRenderer>()->SetMaterialCount(1);
-	transformSprite2->GetComponent<SpriteRenderer>()->SetMaterial(0, material);
-
-	transformTerrain->AddComponent<Terrain>()->SetTerrainData(terrainData);
-
+	transformCamera1->SetLocalPosition(Vector3(0, 500, 0));
+	transformCamera1->SetLocalRotation(Quaternion::Euler(90, 0, 0));
+	/*transformCamera1->SetLocalPosition(Vector3(0, 0, -500));
+	transformCamera1->SetLocalRotation(Quaternion::Euler(0, 0, 0));*/
 	camera1 = transformCamera1->AddComponent<Camera>();
 	camera1->SetTransform(transformCamera1);
 
-	camera2 = transformCamera2->AddComponent<Camera>();
-	camera2->SetTransform(transformCamera2);
+	////Terrain
+	//Transform* trt = Memory<Transform>::OrderedAlloc(sizeof(Transform));
+	//transformTerrain.reset(trt, Memory<Transform>::OrderedFree);
+	//transformTerrain->AddComponent<Terrain>()->SetTerrainData(terrainData);
+	//transformTerrain->SetLocalPosition(Vector3(0, 0, 0));
 
-	transformMesh->AddComponent<MeshRenderer>()->SetMesh(mesh);
-	transformMesh->GetComponent<MeshRenderer>()->SetMaterialCount(1);
-	transformMesh->GetComponent<MeshRenderer>()->SetMaterial(0, materialMesh);
-
-	transformSprite1->SetLocalPosition(Vector3(100, 100, 0));
-	transformSprite2->SetLocalPosition(Vector3(-100, -100, 0));
-
-	
-	transformTerrain->SetLocalPosition(Vector3(0, 0, 0));
-	//transformTerrain->SetLocalRotation(Quaternion::Euler(0, 180, 0));	
-
-	transformCamera1->SetLocalPosition(Vector3(0, 90, 0));
-	transformCamera1->SetLocalRotation(Quaternion::Euler(90, 0, 0));
-	transformCamera2->SetLocalPosition(Vector3(0, 100, 0));
-	transformCamera2->SetLocalRotation(Quaternion::Euler(90, 0, 0));	
-	
+	//Mesh Renderer
+	Transform* trm = Memory<Transform>::OrderedAlloc(sizeof(Transform));
+	transformMesh.reset(trm, Memory<Transform>::OrderedFree);
+	transformMesh->AddComponent<SkinnedMeshRenderer>()->SetMesh(mesh);
+	transformMesh->GetComponent<SkinnedMeshRenderer>()->SetMaterialCount(1);
+	transformMesh->GetComponent<SkinnedMeshRenderer>()->SetMaterial(0, materialMesh);
+	transformMesh->GetComponent<SkinnedMeshRenderer>()->SetBone(boneDataVec);
+		
 	frustum.reset(new Frustum);
 
 	SetRenderState();
 }
 
+void RenderBone()
+{
+	for (uint i = 0; i < boneDataVec.size(); i++)
+	{
+		BOXVERTEX vtx[8];
+		vtx[0] = BOXVERTEX(-2, 2, 2, 0xffff0000);		/// v0
+		vtx[1] = BOXVERTEX(2, 2, 2, 0xffff0000);		/// v1
+		vtx[2] = BOXVERTEX(2, 2, -2, 0xffff0000);		/// v2
+		vtx[3] = BOXVERTEX(-2, 2, -2, 0xffff0000);		/// v3
+		vtx[4] = BOXVERTEX(-2, -2, 2, 0xffff0000);		/// v4
+		vtx[5] = BOXVERTEX(2, -2, 2, 0xffff0000);		/// v5
+		vtx[6] = BOXVERTEX(2, -2, -2, 0xffff0000);		/// v6
+		vtx[7] = BOXVERTEX(-2, -2, -2, 0xffff0000);		/// v7
+
+		INDEX idx[12] =
+		{
+			{ 0, 1, 2 } ,{ 0, 2, 3 } ,	/// À­¸é
+			{ 4, 6, 5 } ,{ 4, 7, 6 } ,	/// ¾Æ·§¸é
+			{ 0, 3, 7 } ,{ 0, 7, 4 } ,	/// ¿Þ¸é
+			{ 1, 5, 6 } ,{ 1, 6, 2 } ,	/// ¿À¸¥¸é
+			{ 3, 2, 6 } ,{ 3, 6, 7 } ,	/// ¾Õ¸é
+			{ 0, 4, 5 } ,{ 0, 5, 1 } 	/// µÞ¸é
+		};
+	
+		if (boneDataVec[i]->pAnimation)
+		{
+			//D3DXMATRIX m = FbxDXUtil::ToDXMatrix(boneDataVec[i]->local) * FbxDXUtil::ToDXMatrix(boneDataVec[i]->world);
+			D3DXMATRIX m = FbxDXUtil::ToDXMatrix(boneDataVec[i]->pAnimation->pNext->pNext->pNext->pNext->pNext->globalTransform);
+
+			device->SetTransform(D3DTS_WORLD, &m);
+			device->SetFVF(BOXVERTEX::FVF);
+			device->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, 8, 12, idx, D3DFMT_INDEX32, vtx, sizeof BOXVERTEX);
+		}
+	}
+}
 
 void Render()
 {
@@ -186,24 +198,19 @@ void Render()
 
 	if (SUCCEEDED(device->BeginScene()))
 	{
-		if (cam == 1)
-		{
-			transformCamera1->UpdateWorldMatrix();
-			camera1->UpdateViewMatrix();
-			camera1->Update(*device);
-		}
-		else if (cam == 2)
-		{
-			transformCamera2->UpdateWorldMatrix();
-			camera2->UpdateViewMatrix();
-			camera2->Update(*device);
-		}
+
+		transformCamera1->UpdateWorldMatrix();
+		camera1->UpdateViewMatrix();
+		camera1->Update(*device);
+
 
 		D3DXMATRIX world;
 		D3DXMatrixIdentity(&world);
 		device->SetTransform(D3DTS_WORLD, &world);
 		frustum->Make(camera1->GetViewMatrix() * camera1->GetProjMatrix());
 		//frustum->Draw(*device);
+		
+		RenderBone();
 
 		material->SetMatrix(_T("gViewMatrix"), camera1->GetViewMatrix());
 		material->SetMatrix(_T("gProjectionMatrix"), camera1->GetProjMatrix());
@@ -212,23 +219,13 @@ void Render()
 		transformMesh->UpdateWorldMatrix();
 		material->SetMatrix(_T("gWorldMatrix"), transformMesh->GetMatrix());
 		transformMesh->Update(*device);
-		//transformMesh->GetComponent<MeshRenderer>()->Draw(*device);
+		transformMesh->GetComponent<SkinnedMeshRenderer>()->Draw(*device);
 		
-		transformTerrain->UpdateWorldMatrix();
-		transformTerrain->Update(*device);
+		//transformTerrain->UpdateWorldMatrix();
+		//transformTerrain->Update(*device);
 		//transformTerrain->GetComponent<Terrain>()->Draw(*device);
 		//transformTerrain->GetComponent<Terrain>()->DrawFrustum(*device, frustum);
-		transformTerrain->GetComponent<Terrain>()->DrawLOD(*device, frustum);
-
-		/*transformSprite1->UpdateWorldMatrix();
-		material->SetMatrix(_T("gWorldMatrix"), transformSprite1->GetMatrix());
-		transformSprite1->Update(*device);		
-		transformSprite1->GetComponent<SpriteRenderer>()->Draw(*device);
-
-		transformSprite2->UpdateWorldMatrix();
-		material->SetMatrix(_T("gWorldMatrix"), transformSprite2->GetMatrix());
-		transformSprite2->Update(*device);		
-		transformSprite2->GetComponent<SpriteRenderer>()->Draw(*device);*/
+		//transformTerrain->GetComponent<Terrain>()->DrawLOD(*device, frustum);
 
 		device->EndScene();
 
@@ -282,18 +279,16 @@ int WINAPI WinMain(HINSTANCE hInstance,
 			
 	}
 
-	frustum.reset();	
-	transformSprite1->Destroy();
-	transformSprite2->Destroy();
+	frustum.reset();
 	transformCamera1->Destroy();
-	transformCamera2->Destroy();
-	transformTerrain->Destroy();
+	//transformTerrain->Destroy();
 	resourceManager.Destroy();
 
 	Memory<Camera>::Clear();
 	Memory<Transform>::Clear();
 	Memory<Terrain>::Clear();
 	Memory<MeshRenderer>::Clear();
+	Memory<SkinnedMeshRenderer>::Clear();
 	Memory<TransformImpl>::Clear();
 	Memory<SpriteRenderer>::Clear();
 

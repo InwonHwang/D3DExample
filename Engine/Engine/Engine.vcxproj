@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="D3D\Resource\Animation.cpp" />
     <ClCompile Include="D3D\Component\Camera.cpp" />
     <ClCompile Include="Core\Debug.cpp" />
     <ClCompile Include="Core\Math\QuaternionFunction.cpp" />
@@ -179,9 +180,13 @@
     <ClCompile Include="D3D\QuadTree.cpp" />
     <ClCompile Include="D3D\Resource\Mesh.cpp" />
     <ClCompile Include="D3D\Component\MeshRenderer.cpp" />
+    <ClCompile Include="D3D\Resource\SkinnedMesh.cpp" />
+    <ClCompile Include="D3D\Resource\StaticMesh.cpp" />
+    <ClCompile Include="D3D\Component\SkinnedMeshRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Core\D3DDescription\AnimDescription.h" />
+    <ClInclude Include="D3D\Resource\Animation.h" />
+    <ClInclude Include="D3D\D3DDescription\AnimDescription.h" />
     <ClInclude Include="D3D\Component\Camera.h" />
     <ClInclude Include="Core\BitFlag.h" />
     <ClInclude Include="Core\Core.h" />
@@ -203,9 +208,9 @@
     <ClInclude Include="Core\Singleton.h" />
     <ClInclude Include="D3D\Component\Component.h" />
     <ClInclude Include="D3D\Component\D3DComponent.h" />
-    <ClInclude Include="Core\D3DDescription\D3DDescription.h" />
-    <ClInclude Include="Core\D3DDescription\IndexDescription.h" />
-    <ClInclude Include="Core\D3DDescription\VertexDescription.h" />
+    <ClInclude Include="D3D\D3DDescription\D3DDescription.h" />
+    <ClInclude Include="D3D\D3DDescription\IndexDescription.h" />
+    <ClInclude Include="D3D\D3DDescription\VertexDescription.h" />
     <ClInclude Include="D3D\ResourceBase\D3DResourceBase.h" />
     <ClInclude Include="D3D\ResourceBase\Texture.h" />
     <ClInclude Include="D3D\Component\Image.h" />
@@ -225,6 +230,9 @@
     <ClInclude Include="D3D\Resource\Mesh.h" />
     <ClInclude Include="Core\FbxDXUtil.h" />
     <ClInclude Include="D3D\Component\MeshRenderer.h" />
+    <ClInclude Include="D3D\Resource\SkinnedMesh.h" />
+    <ClInclude Include="D3D\Resource\StaticMesh.h" />
+    <ClInclude Include="D3D\Component\SkinnedMeshRenderer.h" />
     <ClInclude Include="ThirdParty\ThirdParty.h" />
     <ClInclude Include="D3D\Component\Transform.h" />
     <ClInclude Include="D3D\ResourceBase\VertexBuffer.h" />

@@ -1,5 +1,6 @@
 #pragma once
 #include "..\Core\Core.h"
+#include "D3DDescription\D3DDescription.h"
 
 class Frustum;
 

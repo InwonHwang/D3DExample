@@ -1,6 +1,7 @@
 #pragma once
 #include "..\..\Core\Core.h"
 #include "..\ResourceBase\D3DResourceBase.h"
+#include "..\D3DDescription\D3DDescription.h"
 
 class Sprite : public ResourceItem
 {

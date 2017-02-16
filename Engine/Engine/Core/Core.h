@@ -2,8 +2,6 @@
 
 #include <d3d9.h>
 
-
-#include "D3DDescription\D3DDescription.h"
 #include "Math\Math.h"
 #include "BitFlag.h"
 #include "DataStructure.h"

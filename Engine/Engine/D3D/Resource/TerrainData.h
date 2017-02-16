@@ -1,6 +1,7 @@
 #pragma once
 #include "..\..\Core\Core.h"
 #include "..\ResourceBase\D3DResourceBase.h"
+#include "..\D3DDescription\D3DDescription.h"
 
 class TerrainData : public ResourceItem
 {
@@ -41,7 +42,7 @@ inline int TerrainData::GetWidth() const
 	return _width;
 }
 
-inline sp<std::vector<Vector3>> TerrainData::GetHeightMap() const
+inline sp<TerrainData::HeightMapVec> TerrainData::GetHeightMap() const
 {
 	assert(_heightMap && "null reference: _heightMap");
 	return _heightMap;
