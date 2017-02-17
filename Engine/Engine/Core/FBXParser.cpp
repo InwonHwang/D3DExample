@@ -275,7 +275,7 @@ void FBXParser::ReadSkinInfo(FbxNode& fbxNode, FBXDATASET& fbxData, sp<FBXMESHDA
 			
 			FbxAnimStack* animStack = _scene->GetSrcObject<FbxAnimStack>(0);
 			FbxString animStackName = animStack->GetName();
-
+			
 			FbxTakeInfo* takeInfo = _scene->GetTakeInfo(animStackName);
 			FbxTime start = takeInfo->mLocalTimeSpan.GetStart();
 			FbxTime end = takeInfo->mLocalTimeSpan.GetStop();
@@ -291,7 +291,7 @@ void FBXParser::ReadSkinInfo(FbxNode& fbxNode, FBXDATASET& fbxData, sp<FBXMESHDA
 				FbxTime currTime;
 				currTime.SetFrame(l, FbxTime::eFrames24);
 				
-				(*currAnim)->frameCount = l;								
+				(*currAnim)->frame = l;								
 				FbxAMatrix currentTransformOffset = fbxNode.EvaluateGlobalTransform(currTime);// *transform;
 				(*currAnim)->globalTransform = currentTransformOffset.Inverse() * pCluster->GetLink()->EvaluateGlobalTransform(currTime);
 

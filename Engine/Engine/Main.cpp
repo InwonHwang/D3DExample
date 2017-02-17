@@ -9,6 +9,8 @@
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
+Timer appTimer;
+
 ResourceManager resourceManager;
 
 IDirect3DDevice9* device;
@@ -24,6 +26,7 @@ sp<SurfaceMaterial> material;
 sp<SurfaceMaterial> materialMesh;
 sp<TerrainData> terrainData;
 sp<SkinnedMesh> mesh;
+sp<Animation> animation;
 
 
 sp<Transform> transformCamera1;
@@ -34,6 +37,8 @@ sp<Camera> camera1;
 sp<Frustum> frustum;
 
 std::vector<sp<FBXBONEDATA>> boneDataVec;
+std::vector<D3DXMATRIX> matLocalVec;
+std::vector<D3DXMATRIX> matWorldVec;
 
 int cam = 1;
 
@@ -86,6 +91,9 @@ void processInput()
 
 void Init()
 {
+	appTimer.SetUp();
+	appTimer.Start();
+
 	Device::Instance()->Init();
 	device = Device::Instance()->Get();
 
@@ -102,7 +110,14 @@ void Init()
 		else if (data->dataType == FBXDATA::eBone)
 		{
 			sp<FBXBONEDATA> temp = boost::static_pointer_cast<FBXBONEDATA>(data);
-			boneDataVec.push_back(temp);			
+			boneDataVec.push_back(temp);		
+			if (temp->pAnimation)
+			{
+				D3DXMATRIX templocal = FbxDXUtil::ToDXMatrix(temp->local);
+				D3DXMATRIX tempworld = FbxDXUtil::ToDXMatrix(temp->globalBindposeInverse);
+				matLocalVec.push_back(templocal);
+				matWorldVec.push_back(tempworld);
+			}
 		}
 	}
 
@@ -125,6 +140,10 @@ void Init()
 
 	mesh = resourceManager.Create<SkinnedMesh>();
 	mesh->Create(*device, meshData);
+
+	animation = resourceManager.Create<Animation>();
+	animation->Create(boneDataVec);
+
 	
 	//Transform
 	Transform* trc1 = Memory<Transform>::OrderedAlloc(sizeof(Transform));
@@ -157,7 +176,7 @@ void Init()
 
 void RenderBone()
 {
-	for (uint i = 0; i < boneDataVec.size(); i++)
+	for (int i = 0; i < animation->GetAnimCurveVec()->size(); ++i)
 	{
 		BOXVERTEX vtx[8];
 		vtx[0] = BOXVERTEX(-2, 2, 2, 0xffff0000);		/// v0
@@ -178,16 +197,18 @@ void RenderBone()
 			{ 3, 2, 6 } ,{ 3, 6, 7 } ,	/// ¾Õ¸é
 			{ 0, 4, 5 } ,{ 0, 5, 1 } 	/// µÞ¸é
 		};
-	
-		if (boneDataVec[i]->pAnimation)
-		{
-			//D3DXMATRIX m = FbxDXUtil::ToDXMatrix(boneDataVec[i]->local) * FbxDXUtil::ToDXMatrix(boneDataVec[i]->world);
-			D3DXMATRIX m = FbxDXUtil::ToDXMatrix(boneDataVec[i]->pAnimation->pNext->pNext->pNext->pNext->pNext->globalTransform);
 
-			device->SetTransform(D3DTS_WORLD, &m);
-			device->SetFVF(BOXVERTEX::FVF);
-			device->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, 8, 12, idx, D3DFMT_INDEX32, vtx, sizeof BOXVERTEX);
-		}
+		appTimer.Update();
+		uint time = appTimer.GetElapsedTime();
+
+		int frame = time % animation->GetAnimCurveVec()->data()[i]->GetLength();
+
+		D3DXMATRIX m;
+		animation->GetAnimCurveVec()->data()[i]->GetAnimatedMatrix(frame, m);		
+
+		device->SetTransform(D3DTS_WORLD, &m);
+		device->SetFVF(BOXVERTEX::FVF);
+		device->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, 8, 12, idx, D3DFMT_INDEX32, vtx, sizeof BOXVERTEX);
 	}
 }
 
@@ -216,6 +237,7 @@ void Render()
 		material->SetMatrix(_T("gProjectionMatrix"), camera1->GetProjMatrix());
 		material->SetTexture(_T("DiffuseMap_Tex"), textureMesh);
 
+		
 		transformMesh->UpdateWorldMatrix();
 		material->SetMatrix(_T("gWorldMatrix"), transformMesh->GetMatrix());
 		transformMesh->Update(*device);
@@ -276,9 +298,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
 			processInput();
 			Render();
 		}
-			
 	}
-
+	
 	frustum.reset();
 	transformCamera1->Destroy();
 	//transformTerrain->Destroy();

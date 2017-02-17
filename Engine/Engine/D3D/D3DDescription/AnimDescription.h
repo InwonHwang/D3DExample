@@ -4,7 +4,7 @@
 
 typedef struct tagAnimationKey	// 애니메이션 키
 {
-	float frame;
+	int frame;
 	Vector3 value;
 }ANIMATIONKEY, *LPANIMATIONKEY;
 

@@ -15,18 +15,6 @@ typedef struct tagVertex
 	Vector2 texCoord;
 	Vector3 tangent;
 
-	bool operator==(const tagVertex& rhs) const
-	{
-		bool flag;
-
-		flag = this->position == rhs.position;
-		flag &= this->color == rhs.color;
-		flag &= this->normal == rhs.normal;
-		flag &= this->texCoord == rhs.texCoord;
-		flag &= this->tangent == rhs.tangent;
-
-		return flag;
-	}
 }VERTEX, *LPVERTEX;
 
 // 스키닝 정보
@@ -42,7 +30,7 @@ typedef struct tagVertexBlendingInfo
 
 	bool operator < (const tagVertexBlendingInfo& rhs)
 	{
-		return (blendingWeight < rhs.blendingWeight);
+		return (blendingWeight > rhs.blendingWeight);
 	}
 }VERTEXBLENDINGINFO, *LPVERTEXBLENDINGINFO;
 
@@ -56,39 +44,19 @@ typedef struct tagSkinnedVertex
 	{
 		std::sort(vertexBlendingInfoVec.begin(), vertexBlendingInfoVec.end());
 	}
-
-	bool operator == (const tagSkinnedVertex& rhs) const
-	{
-		bool flag = true;
-
-		if (!(vertexBlendingInfoVec.empty() && rhs.vertexBlendingInfoVec.empty()))
-		{
-			for (uint i = 0; i < 4; ++i)
-			{
-				if (vertexBlendingInfoVec[i].blendingIndex != rhs.vertexBlendingInfoVec[i].blendingIndex ||
-					abs(vertexBlendingInfoVec[i].blendingWeight - rhs.vertexBlendingInfoVec[i].blendingWeight) > 0.001)
-				{
-					flag = false;
-					break;
-				}
-			}
-		}
-
-		flag &= vertex == rhs.vertex;
-
-		return flag;
-	}
 }SKINNEDVERTEX, LPSKINNEDVERTEX;
 
 // 애니메이션 키 (Matrix 값)
 typedef struct tagKeyframe
 {
-	FbxLongLong frameCount;
+	FbxLongLong frame;
 	FbxAMatrix globalTransform;
 	tagKeyframe* pNext;
 
 	tagKeyframe()
 	{
+		frame = 0;
+		pNext = nullptr;
 		globalTransform.SetIdentity();
 	}
 }KEYFRAME, *LPKEYFRAME;
@@ -128,13 +96,11 @@ typedef struct tagFBXBoneData : public tagFBXTransformData
 {
 	FbxAMatrix globalBindposeInverse;
 	KEYFRAME* pAnimation;
-	//FbxNode* pNode;
 	int start;
 	int end;
 
 	tagFBXBoneData()
 		: pAnimation(nullptr),
-		//pNode(nullptr),
 		start(0),
 		end(0)
 	{		

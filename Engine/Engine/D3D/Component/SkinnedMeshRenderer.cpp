@@ -77,7 +77,8 @@ void SkinnedMeshRenderer::ApplyMatrix(IDirect3DDevice9& device)
 		D3DXMatrixIdentity(&m);
 		if (_boneDataVec[index]->pAnimation)
 		{
-			m = FbxDXUtil::ToDXMatrix(_boneDataVec[index]->pAnimation->pNext->pNext->pNext->pNext->pNext->globalTransform);
+			m = FbxDXUtil::ToDXMatrix(_boneDataVec[index]->globalBindposeInverse);
+			m *= FbxDXUtil::ToDXMatrix(_boneDataVec[index]->pAnimation->pNext->globalTransform);
 		}
 		device.SetTransform(D3DTS_WORLDMATRIX(index), &m);
 	}

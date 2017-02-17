@@ -151,6 +151,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Core\Timer.cpp" />
+    <ClCompile Include="D3D\D3DStructure\AnimationCurve.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="D3D\Resource\Animation.cpp" />
     <ClCompile Include="D3D\Component\Camera.cpp" />
     <ClCompile Include="Core\Debug.cpp" />
@@ -185,6 +189,9 @@
     <ClCompile Include="D3D\Component\SkinnedMeshRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Core\Timer.h" />
+    <ClInclude Include="D3D\D3DStructure\AnimationCurve.h" />
+    <ClInclude Include="D3D\D3DStructure\D3DStructure.h" />
     <ClInclude Include="D3D\Resource\Animation.h" />
     <ClInclude Include="D3D\D3DDescription\AnimDescription.h" />
     <ClInclude Include="D3D\Component\Camera.h" />

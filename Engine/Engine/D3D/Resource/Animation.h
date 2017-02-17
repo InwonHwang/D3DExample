@@ -1,11 +1,11 @@
 #pragma once
 
 #include "..\..\Core\Core.h"
-#include "..\D3DDescription\D3DDescription.h"
+#include "..\D3DStructure\D3DStructure.h"
 
 class Animation : public ResourceItem
 {
-	typedef std::vector<sp<ANIMATIONKEYSET>> AnimSetVec;
+	typedef std::vector<sp<AnimationCurve>> AnimCurveVec;
 public:
 	Animation(ResourceHandle handle, ResourcePoolImpl* pool);
 	~Animation();
@@ -14,14 +14,10 @@ public:
 
 	bool Create(std::vector<sp<FBXBONEDATA>> fbxBoneDataVec);
 
-	sp<AnimSetVec> GetAnimSetVec() const;
+	sp<AnimCurveVec> GetAnimCurveVec() { return _animCurveVec; }
 
 private:
-	sp<AnimSetVec> _animSetVec;
+	sp<AnimCurveVec> _animCurveVec;
 };
 
-inline sp<Animation::AnimSetVec> Animation::GetAnimSetVec() const
-{
-	return _animSetVec;
-}
 

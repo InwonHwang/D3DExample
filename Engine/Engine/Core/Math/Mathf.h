@@ -30,5 +30,6 @@ public:
 	static float Floor(float f) { return floorf(f); }
 	static float Ceil(float f) { return ceilf(f); }
 	static float Clamp(float f, float min, float max) { return std::fmax(min, std::fmin(f, max)); }
+	static float Lerp(float f1, float f2, float frame) { return ((frame - f1) / (f2 - f1)); }
 };
 

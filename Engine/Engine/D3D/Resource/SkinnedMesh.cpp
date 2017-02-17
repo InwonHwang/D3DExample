@@ -76,8 +76,11 @@ bool SkinnedMesh::Create(IDirect3DDevice9& device, sp<FBXMESHDATA> fbxData)
 
 		_vb->Unlock();
 	}
-	
-	_boneIndexVec->assign(boneIndex.begin(), boneIndex.end());
+
+	for (int i = 0; i < _boneIndexVec->size(); ++i)
+	{
+		DebugBox(_boneIndexVec->data()[i], 0);
+	}
 	
 	pData = nullptr;
 	if (_ib->Lock(0, _primitiveCount * sizeof(INDEX), &pData, 0))
