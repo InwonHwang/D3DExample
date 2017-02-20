@@ -14,10 +14,13 @@ public:
 
 	virtual void Destroy() override;
 
+	//virtual void Draw(IDirect3DDevice9& device);
 	virtual void Draw(IDirect3DDevice9& device);
 	
 	// Test¿ë
+	//void ApplyMatrix(IDirect3DDevice9& device);
 	void ApplyMatrix(IDirect3DDevice9& device);
+	void Test(IDirect3DDevice9& device, int frame);
 	void SetBone(BoneDataVec b)
 	{
 		_boneDataVec = b;

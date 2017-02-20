@@ -21,20 +21,20 @@ void Animation::Destroy()
 bool Animation::Create(std::vector<sp<FBXBONEDATA>> fbxBoneDataVec)
 {	
 	sp<AnimationCurve> pAnimCurve;
-
+	
 	for (auto boneData : fbxBoneDataVec)
 	{
-		KEYFRAME* temp = boneData->pAnimation;
+		sp<KEYFRAME> temp;
 
-		if (!temp) continue;
-		
 		pAnimCurve.reset(new AnimationCurve);
 		pAnimCurve->SetBoneName(boneData->name);
 
-		while (temp)
-		{			
+		for (uint i = 0; i < boneData->animVec.size(); ++i)
+		{
+			temp = boneData->animVec[i];
+
 			FbxAMatrix tempMatrix = temp->globalTransform;
-			int frame = (static_cast<int>(temp->frame) - boneData->start) * 100;
+			int frame = (static_cast<int>(temp->frame) - boneData->start) * 60;
 
 			Vector3 value;
 
@@ -46,9 +46,8 @@ bool Animation::Create(std::vector<sp<FBXBONEDATA>> fbxBoneDataVec)
 
 			value = FbxDXUtil::ToVector3(tempMatrix.GetT());
 			pAnimCurve->SetPositionKey(frame, value);
-
-			temp = temp->pNext;
-		}		
+		}
+	
 
 		pAnimCurve->SetFrame();
 

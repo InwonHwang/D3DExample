@@ -9,6 +9,24 @@
 // ¹öÅØ½º
 typedef struct tagVertex
 {
+	tagVertex()
+	{
+		memset(&position, 0, sizeof(Vector3));
+		memset(&color, 0, sizeof(Vector3));
+		memset(&normal, 0, sizeof(Vector3));
+		memset(&texCoord, 0, sizeof(Vector3));
+		memset(&tangent, 0, sizeof(Vector3));
+	}
+
+	bool operator == (const tagVertex& rhs)
+	{
+		return (position == rhs.position) &
+			(color == rhs.color) &
+			(normal == rhs.normal) &
+			(texCoord == rhs.texCoord) &
+			(tangent == rhs.tangent);
+	}
+
 	Vector3 position;
 	Vector4 color;
 	Vector3 normal;
@@ -21,16 +39,21 @@ typedef struct tagVertex
 typedef struct tagVertexBlendingInfo
 {
 	uint blendingIndex;
-	double blendingWeight;
+	float blendingWeight;
 
 	tagVertexBlendingInfo() :
 		blendingIndex(0),
 		blendingWeight(0.0)
-	{}
+	{}	
 
 	bool operator < (const tagVertexBlendingInfo& rhs)
 	{
 		return (blendingWeight > rhs.blendingWeight);
+	}
+
+	bool operator == (const tagVertexBlendingInfo& rhs)
+	{		
+		return (blendingIndex == rhs.blendingIndex) & Mathf::EqualWithEpsilon(blendingWeight, rhs.blendingWeight);
 	}
 }VERTEXBLENDINGINFO, *LPVERTEXBLENDINGINFO;
 
@@ -39,6 +62,11 @@ typedef struct tagSkinnedVertex
 {
 	VERTEX vertex;
 	std::vector<VERTEXBLENDINGINFO> vertexBlendingInfoVec;
+
+	~tagSkinnedVertex()
+	{
+		vertexBlendingInfoVec.swap(std::vector<VERTEXBLENDINGINFO>());
+	}
 
 	void SortBlendingInfoByWeight()
 	{
@@ -79,13 +107,13 @@ typedef struct tagFBXTransformData : public FBXDATA
 {
 	String name;
 	FbxAMatrix local;
-	FbxAMatrix world;
+	FbxAMatrix worldParent;
 	int parentIndex;
 
 	tagFBXTransformData()
 	{
 		local.SetIdentity();
-		world.SetIdentity();
+		worldParent.SetIdentity();
 	}
 
 }FBXTRANSFORMDATA, *LPFBXTRANSFORMDATA;
@@ -95,35 +123,49 @@ typedef struct tagFBXTransformData : public FBXDATA
 typedef struct tagFBXBoneData : public tagFBXTransformData
 {
 	FbxAMatrix globalBindposeInverse;
-	KEYFRAME* pAnimation;
+	std::vector<sp<KEYFRAME>> animVec;
+	FbxNode* pNode;
 	int start;
 	int end;
 
-	tagFBXBoneData()
-		: pAnimation(nullptr),
+	tagFBXBoneData()		
+		:
+		pNode(nullptr),
 		start(0),
 		end(0)
 	{		
 		globalBindposeInverse.SetIdentity();
 	}
-	~tagFBXBoneData() {
-		while (pAnimation) {
-			KEYFRAME* temp = pAnimation->pNext;
-			delete pAnimation;
-			pAnimation = temp;
-		}
+	~tagFBXBoneData()
+	{	
+		animVec.swap(std::vector<sp<KEYFRAME>>());
+		pNode = nullptr;
 	}
 }FBXBONEDATA, *LPFBXBONEDATA;
 
 typedef struct tagFBXMeshData : public tagFBXTransformData
 {
+	std::vector<SKINNEDVERTEX> controlPointDataVec; //vertex Data
 	std::vector<SKINNEDVERTEX> verticeDataVec; //vertex Data
 	std::vector<uint>	indiceDataVec; //indeice Data
 	bool isSkinned;
+
+	~tagFBXMeshData()
+	{
+		controlPointDataVec.swap(std::vector<SKINNEDVERTEX>());
+		verticeDataVec.swap(std::vector<SKINNEDVERTEX>());
+		indiceDataVec.swap(std::vector<uint>());
+	}
 
 }FBXMESHDATA, *LPFBXMESHDATA;
 
 typedef struct tagFBXDataSet
 {
+	std::vector<int> lengthAnim;
 	std::vector<sp<FBXDATA>> fbxDataVec;
+
+	~tagFBXDataSet()
+	{
+		fbxDataVec.swap(std::vector<sp<FBXDATA>>());
+	}
 }FBXDATASET, *LPFBXDATASET;

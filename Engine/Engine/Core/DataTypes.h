@@ -27,6 +27,8 @@ public:
 		std::string temp = std::to_string(f);
 		String ret;
 		ret.assign(temp.begin(), temp.end());
+
+		return ret;
 	}
 
 	inline static String IntegerToString(int i)
@@ -34,6 +36,8 @@ public:
 		std::string temp = std::to_string(i);
 		String ret;
 		ret.assign(temp.begin(), temp.end());
+
+		return ret;
 	}
 };
 

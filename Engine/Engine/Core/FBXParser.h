@@ -45,27 +45,33 @@ public:
 private:
 	void LoadRecursively(FbxNode& fbxNode, FBXDATASET& fbxData, int index, int parentIndex);
 
-	void ReadTransform(FbxNode& fbxNode, FBXDATASET& fbxData, int index, int parentIndex);
-	void ReadMatrix(FbxNode& fbxNode, FbxAMatrix& local, FbxAMatrix& worldParent);
+	// Transform Data ÆÄ½Ì
+	void ReadTransform(FbxNode& fbxNode, FBXDATASET& fbxData, int index, int parentIndex);	
 
+	// Bone Data ÆÄ½Ì
 	void ReadBone(FbxNode& fbxNode, FBXDATASET& fbxData, int index, int parentIndex);
+	
+	void ReadMatrix(FbxNode& fbxNode, FbxAMatrix& local, FbxAMatrix& worldParent);
 
 	void ReadSkinInfo(FbxNode& fbxNode, FBXDATASET& fbxData, sp<FBXMESHDATA> meshData);
 
+	void ReadAnimation(FbxNode& fbxNode, std::vector<sp<FBXBONEDATA>>& fbxData);
+
 	// Mesh ÆÄ½Ì
 	void ReadMesh(FbxNode& fbxNode, FBXDATASET& fbxData, int index, int parentIndex);
-		
-	void ReadPosition(FbxMesh& fbxMesh, int ctrlPointIndex, Vector3& position);
+
+	void ReadPositionControlPoint(FbxMesh& fbxMesh, int ctrlPointCount, Vector3& position);
+	void ReadlPositionTriangle(FbxMesh& fbxMesh, int ctrlPointIndex, Vector3& position);
 	void ReadColor(FbxMesh& fbxMesh, int ctrlPointIndex, int vertexCount, Vector4& color);
 	void ReadUV(FbxMesh& fbxMesh, int ctrlPointIndex, int vertexCount, Vector2& uv);
 	void ReadNormal(FbxMesh& fbxMesh, int ctrlPointIndex, int vertexCount, Vector3& normal);
 	void ReadTangent(FbxMesh& fbxMesh, int ctrlPointIndex, int vertexCount, Vector3& tangent);
+	void Optimize(sp<FBXMESHDATA> meshData);
 
-	
-
-	//void ReadSkeleton(FbxNode& fbxNode);
+	void GetGeometryMatrix(FbxNode& fbxNode, FbxAMatrix& matrix);
 
 private:
 	FbxScene* _scene;
+	bool _existAnimation;
 };
 

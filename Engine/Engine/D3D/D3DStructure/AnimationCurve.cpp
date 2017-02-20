@@ -18,9 +18,18 @@ void AnimationCurve::SetBoneName(const String& name)
 
 void AnimationCurve::SetFrame()
 {
-	_animKeySet.start = _animKeySet.scale.front().frame;
-	_animKeySet.end = _animKeySet.scale.back().frame;
-	_animKeySet.length = _animKeySet.end - _animKeySet.start;
+	if (_animKeySet.scale.size() > 0)
+	{
+		_animKeySet.start = _animKeySet.scale.front().frame;
+		_animKeySet.end = _animKeySet.scale.back().frame;
+		_animKeySet.length = _animKeySet.end - _animKeySet.start;
+	}
+	else
+	{
+		_animKeySet.start = 0;
+		_animKeySet.end = 0;
+		_animKeySet.length = 1;
+	}
 }
 
 void AnimationCurve::SetScaleKey(int frame, const Vector3& scale)
@@ -113,7 +122,7 @@ bool AnimationCurve::GetKey(const std::vector<ANIMATIONKEY>& keySetVec, int fram
 	}
 	else
 	{
-		float t = Mathf::Lerp(keySetVec[index - 1].frame, keySetVec[index].frame, frame);
+		float t = Mathf::Lerp(float(keySetVec[index - 1].frame), float(keySetVec[index].frame), (float)frame);
 		D3DXVec3Lerp(&value, &keySetVec[index - 1].value, &keySetVec[index].value, t);
 	}
 

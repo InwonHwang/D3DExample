@@ -4,7 +4,7 @@
 #include "D3D\Device.h"
 #include "D3D\Frustum.h"
 
-#define MOVESPEED 0.5f
+#define MOVESPEED 3
 #define ROTATIONSPEED 2.0f
 
 LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -39,6 +39,10 @@ sp<Frustum> frustum;
 std::vector<sp<FBXBONEDATA>> boneDataVec;
 std::vector<D3DXMATRIX> matLocalVec;
 std::vector<D3DXMATRIX> matWorldVec;
+D3DXMATRIX rootLocal;
+D3DXMATRIX rootWorldParent;
+D3DXMATRIX meshLocal;
+D3DXMATRIX meshWorldParent;
 
 int cam = 1;
 
@@ -106,21 +110,24 @@ void Init()
 	for (auto data : fbxDataSet.fbxDataVec)
 	{
 		if (data->dataType == FBXDATA::eMesh)
+		{
 			meshData = boost::static_pointer_cast<FBXMESHDATA>(data);
+			meshLocal = FbxDXUtil::ToDXMatrix(meshData->local);
+			meshWorldParent = FbxDXUtil::ToDXMatrix(meshData->worldParent);
+		}
 		else if (data->dataType == FBXDATA::eBone)
 		{
 			sp<FBXBONEDATA> temp = boost::static_pointer_cast<FBXBONEDATA>(data);
-			boneDataVec.push_back(temp);		
-			if (temp->pAnimation)
-			{
-				D3DXMATRIX templocal = FbxDXUtil::ToDXMatrix(temp->local);
-				D3DXMATRIX tempworld = FbxDXUtil::ToDXMatrix(temp->globalBindposeInverse);
-				matLocalVec.push_back(templocal);
-				matWorldVec.push_back(tempworld);
-			}
+			boneDataVec.push_back(temp);
+		}
+		else if (data->dataType == FBXDATA::eTransform)
+		{
+			sp<FBXTRANSFORMDATA> temp = boost::static_pointer_cast<FBXTRANSFORMDATA>(data);
+			rootLocal = FbxDXUtil::ToDXMatrix(temp->local);
+			rootWorldParent = FbxDXUtil::ToDXMatrix(temp->worldParent);
 		}
 	}
-
+	
 	// texture »ý¼º
 
 	textureMesh = resourceManager.Create<Texture>();
@@ -144,14 +151,13 @@ void Init()
 	animation = resourceManager.Create<Animation>();
 	animation->Create(boneDataVec);
 
-	
 	//Transform
 	Transform* trc1 = Memory<Transform>::OrderedAlloc(sizeof(Transform));
 	transformCamera1.reset(trc1, Memory<Transform>::OrderedFree);
-	transformCamera1->SetLocalPosition(Vector3(0, 500, 0));
-	transformCamera1->SetLocalRotation(Quaternion::Euler(90, 0, 0));
-	/*transformCamera1->SetLocalPosition(Vector3(0, 0, -500));
-	transformCamera1->SetLocalRotation(Quaternion::Euler(0, 0, 0));*/
+	/*transformCamera1->SetLocalPosition(Vector3(0, 500, 0));
+	transformCamera1->SetLocalRotation(Quaternion::Euler(90, 0, 0));*/
+	transformCamera1->SetLocalPosition(Vector3(0, 0, 500));
+	transformCamera1->SetLocalRotation(Quaternion::Euler(0, 180, 0));
 	camera1 = transformCamera1->AddComponent<Camera>();
 	camera1->SetTransform(transformCamera1);
 
@@ -176,7 +182,7 @@ void Init()
 
 void RenderBone()
 {
-	for (int i = 0; i < animation->GetAnimCurveVec()->size(); ++i)
+	for (uint i = 0; i < animation->GetAnimCurveVec()->size(); ++i)
 	{
 		BOXVERTEX vtx[8];
 		vtx[0] = BOXVERTEX(-2, 2, 2, 0xffff0000);		/// v0
@@ -202,10 +208,10 @@ void RenderBone()
 		uint time = appTimer.GetElapsedTime();
 
 		int frame = time % animation->GetAnimCurveVec()->data()[i]->GetLength();
+		D3DXMATRIX m;		
 
-		D3DXMATRIX m;
-		animation->GetAnimCurveVec()->data()[i]->GetAnimatedMatrix(frame, m);		
-
+		animation->GetAnimCurveVec()->data()[i]->GetAnimatedMatrix(frame, m);
+		
 		device->SetTransform(D3DTS_WORLD, &m);
 		device->SetFVF(BOXVERTEX::FVF);
 		device->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, 8, 12, idx, D3DFMT_INDEX32, vtx, sizeof BOXVERTEX);
@@ -224,24 +230,26 @@ void Render()
 		camera1->UpdateViewMatrix();
 		camera1->Update(*device);
 
+		//RenderBone();
 
 		D3DXMATRIX world;
 		D3DXMatrixIdentity(&world);
-		device->SetTransform(D3DTS_WORLD, &world);
+		//device->SetTransform(D3DTS_WORLD, &world);
 		frustum->Make(camera1->GetViewMatrix() * camera1->GetProjMatrix());
 		//frustum->Draw(*device);
-		
-		RenderBone();
 
 		material->SetMatrix(_T("gViewMatrix"), camera1->GetViewMatrix());
 		material->SetMatrix(_T("gProjectionMatrix"), camera1->GetProjMatrix());
 		material->SetTexture(_T("DiffuseMap_Tex"), textureMesh);
 
 		
-		transformMesh->UpdateWorldMatrix();
+		/*transformMesh->UpdateWorldMatrix();
 		material->SetMatrix(_T("gWorldMatrix"), transformMesh->GetMatrix());
-		transformMesh->Update(*device);
-		transformMesh->GetComponent<SkinnedMeshRenderer>()->Draw(*device);
+		transformMesh->Update(*device);*/
+		appTimer.Update();
+		uint time = appTimer.GetElapsedTime();
+		int frame = time % animation->GetAnimCurveVec()->data()[0]->GetLength();
+		transformMesh->GetComponent<SkinnedMeshRenderer>()->Test(*device, frame / 60);
 		
 		//transformTerrain->UpdateWorldMatrix();
 		//transformTerrain->Update(*device);

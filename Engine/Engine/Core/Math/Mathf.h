@@ -2,10 +2,11 @@
 
 #define _USE_MATH_DEFINES
 #include <cmath>
+#include <float.h>
 
 
 class Mathf abstract
-{
+{	
 public:
 	static float Infinity() { return INFINITY; }
 	static float RadToDeg() { return (float)(180 / 3.14159265358979323846); }
@@ -31,5 +32,7 @@ public:
 	static float Ceil(float f) { return ceilf(f); }
 	static float Clamp(float f, float min, float max) { return std::fmax(min, std::fmin(f, max)); }
 	static float Lerp(float f1, float f2, float frame) { return ((frame - f1) / (f2 - f1)); }
+
+	static bool EqualWithEpsilon(float f1, float f2) { return fabsf(f1 = f2) <= FLT_EPSILON; }
 };
 

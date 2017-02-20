@@ -58,11 +58,11 @@ bool FBXParser::Init(FbxManager& fbxManager, const String& fileName)
 	pFbxImporter->Destroy();
 
 	// triangle방식으로 변경 (ctrl point 방식 X)
-	FbxGeometryConverter converter(&fbxManager);
+	/*FbxGeometryConverter converter(&fbxManager);
 	converter.Triangulate(_scene, true);
 
 	// 좌표계 설정
-	/*FbxAxisSystem axisSystem = FbxAxisSystem::DirectX;
+	FbxAxisSystem axisSystem = FbxAxisSystem::DirectX;
 
 	if (_scene->GetGlobalSettings().GetAxisSystem() != axisSystem)
 	{
@@ -82,7 +82,7 @@ void FBXParser::Load(FBXDATASET& fbxData)
 	FbxNode* pRootNode = _scene->GetRootNode();
 
 	if (pRootNode)
-		LoadRecursively(*pRootNode, fbxData, 0, -1);
+		LoadRecursively(*pRootNode, fbxData, 0, -1);	
 }
 
 void FBXParser::LoadRecursively(FbxNode& fbxNode, FBXDATASET& fbxData, int index, int parentIndex)
@@ -97,6 +97,7 @@ void FBXParser::LoadRecursively(FbxNode& fbxNode, FBXDATASET& fbxData, int index
 				break;
 							
 			case FbxNodeAttribute::eSkeleton:
+				_existAnimation = true;
 				ReadBone(fbxNode, fbxData, index, parentIndex);
 				break;
 
@@ -145,7 +146,7 @@ void FBXParser::ReadTransform(FbxNode& fbxNode, FBXDATASET& fbxData, int index, 
 	transformData->dataType = FBXDATA::eTransform;
 	
 	// 매트릭스 읽기
-	ReadMatrix(fbxNode, transformData->local, transformData->world);
+	ReadMatrix(fbxNode, transformData->local, transformData->worldParent);
 
 	// 이름 읽기
 	StringUtil::SetName(fbxNode.GetName(), transformData->name);
@@ -174,9 +175,10 @@ void FBXParser::ReadBone(FbxNode& fbxNode, FBXDATASET& fbxData, int index, int p
 	sp<FBXBONEDATA> boneData(new FBXBONEDATA);
 	boneData->parentIndex = parentIndex;
 	boneData->dataType = FBXDATA::eBone;
+	boneData->pNode = &fbxNode;
 	
 	// 매트릭스 읽기
-	ReadMatrix(fbxNode, boneData->local, boneData->world);
+	ReadMatrix(fbxNode, boneData->local, boneData->worldParent);
 
 	// 이름 읽기
 	StringUtil::SetName(fbxNode.GetName(), boneData->name);
@@ -193,14 +195,6 @@ void FBXParser::ReadSkinInfo(FbxNode& fbxNode, FBXDATASET& fbxData, sp<FBXMESHDA
 
 	meshData->isSkinned = true;
 
-	// 노드 transform 구하기
-	FbxVector4 lT = fbxNode.GetGeometricTranslation(FbxNode::eSourcePivot);
-	FbxVector4 lR = fbxNode.GetGeometricRotation(FbxNode::eSourcePivot);
-	FbxVector4 lS = fbxNode.GetGeometricScaling(FbxNode::eSourcePivot);
-
-	FbxAMatrix transform = FbxAMatrix(lT, lR, lS);
-	transform.SetS(FbxVector4(1.0f, 1.0f, 1.0f));
-
 	std::vector<sp<FBXBONEDATA>> boneDataVec;
 
 	// boneData만 넣어두기
@@ -213,10 +207,9 @@ void FBXParser::ReadSkinInfo(FbxNode& fbxNode, FBXDATASET& fbxData, sp<FBXMESHDA
 		}
 	}
 
-
 	for (int i = 0; i < deformerCount; ++i)
 	{
-		FbxSkin* pSkin = reinterpret_cast< FbxSkin* >(mesh->GetDeformer(i, FbxDeformer::eSkin));
+		FbxSkin* pSkin = FbxCast<FbxSkin>(mesh->GetDeformer(i, FbxDeformer::eSkin));
 
 		if (!pSkin)	continue;
 
@@ -247,17 +240,14 @@ void FBXParser::ReadSkinInfo(FbxNode& fbxNode, FBXDATASET& fbxData, sp<FBXMESHDA
 			pCluster->GetTransformMatrix(transformMatrix);			// The transformation of the mesh at binding time
 			pCluster->GetTransformLinkMatrix(transformLinkMatrix);	// The transformation of the cluster(joint) at binding time from joint space to world space
 
-			globalBindposeInverseMatrix = transformLinkMatrix.Inverse() * transformMatrix;// *transform;
-			//FbxVector4 vS = globalBindposeInverseMatrix.GetS();
-			//globalBindposeInverseMatrix.SetS(FbxVector4(vS.mData[0], -vS.mData[1], vS.mData[2], vS.mData[3]));
+			globalBindposeInverseMatrix = transformLinkMatrix.Inverse() * transformMatrix;
 
 			boneDataVec[curBoneIdx]->globalBindposeInverse = globalBindposeInverseMatrix;
-				
+			
 			double *pWeights = pCluster->GetControlPointWeights();		// 해당 본에 의한 정점의 가중치
 			int *pIndices = pCluster->GetControlPointIndices();			// 해당 본에 영향을 받는 정점들																
-			int numBoneVertexIndices = pCluster->GetControlPointIndicesCount(); 
-
 			
+			int numBoneVertexIndices = pCluster->GetControlPointIndicesCount(); 
 			
 			for (int k = 0; k < numBoneVertexIndices; k++)
 			{
@@ -267,58 +257,64 @@ void FBXParser::ReadSkinInfo(FbxNode& fbxNode, FBXDATASET& fbxData, sp<FBXMESHDA
 				VERTEXBLENDINGINFO bi;
 				bi.blendingIndex = curBoneIdx;
 				bi.blendingWeight = tempWeight;
-
-				meshData->verticeDataVec[tempIndex].vertexBlendingInfoVec.push_back(bi);
+								
+				meshData->controlPointDataVec[tempIndex].vertexBlendingInfoVec.push_back(bi);
 			}
 
-			// Animation 정보
-			
-			FbxAnimStack* animStack = _scene->GetSrcObject<FbxAnimStack>(0);
-			FbxString animStackName = animStack->GetName();
-			
-			FbxTakeInfo* takeInfo = _scene->GetTakeInfo(animStackName);
-			FbxTime start = takeInfo->mLocalTimeSpan.GetStart();
-			FbxTime end = takeInfo->mLocalTimeSpan.GetStop();
-			
-			boneDataVec[curBoneIdx]->start = static_cast<int>(start.GetFrameCount(FbxTime::eFrames24));
-			boneDataVec[curBoneIdx]->end = static_cast<int>(end.GetFrameCount(FbxTime::eFrames24));
-			KEYFRAME** currAnim = &boneDataVec[curBoneIdx]->pAnimation;
-
-			for (FbxLongLong l = start.GetFrameCount(FbxTime::eFrames24); l <= end.GetFrameCount(FbxTime::eFrames24); ++l)
-			{
-				*currAnim = new KEYFRAME();
-
-				FbxTime currTime;
-				currTime.SetFrame(l, FbxTime::eFrames24);
-				
-				(*currAnim)->frame = l;								
-				FbxAMatrix currentTransformOffset = fbxNode.EvaluateGlobalTransform(currTime);// *transform;
-				(*currAnim)->globalTransform = currentTransformOffset.Inverse() * pCluster->GetLink()->EvaluateGlobalTransform(currTime);
-
-				currAnim = &((*currAnim)->pNext);
-			} // for l
 		} // for j
 	} // for i
+	
+	ReadAnimation(fbxNode, boneDataVec);
 
+	// 스키닝 정보 4개로 맞추기
 	VERTEXBLENDINGINFO tempBlendInfo;
 	tempBlendInfo.blendingIndex = 0;
 	tempBlendInfo.blendingWeight = 0.0f;
-
-	for (size_t i = 0; i < meshData->verticeDataVec.size(); ++i)
+	for (size_t i = 0; i < meshData->controlPointDataVec.size(); ++i)
 	{
-		for (size_t j = meshData->verticeDataVec[i].vertexBlendingInfoVec.size(); j < 4; ++j)
-		{
-			meshData->verticeDataVec[i].vertexBlendingInfoVec.push_back(tempBlendInfo);
+		for (size_t j = meshData->controlPointDataVec[i].vertexBlendingInfoVec.size(); j < 4; ++j)
+		{			
+			meshData->controlPointDataVec[i].vertexBlendingInfoVec.push_back(tempBlendInfo);			
 		}
-		meshData->verticeDataVec[i].SortBlendingInfoByWeight();
 	}
-	
 
 	for (auto data : boneDataVec)
 		data.reset();
 
 	boneDataVec.clear();
 }
+
+void FBXParser::ReadAnimation(FbxNode& fbxNode, std::vector<sp<FBXBONEDATA>>& boneDataVec)
+{
+	FbxAnimStack* pAnimStack = _scene->GetSrcObject<FbxAnimStack>(0);
+	FbxString animStackName = pAnimStack->GetName();
+
+	FbxAMatrix transform;
+	GetGeometryMatrix(fbxNode, transform);
+
+	FbxTakeInfo* takeInfo = _scene->GetTakeInfo(animStackName);
+	FbxTime start = takeInfo->mLocalTimeSpan.GetStart();
+	FbxTime end = takeInfo->mLocalTimeSpan.GetStop();
+
+	for (uint i = 0; i < boneDataVec.size(); ++i)
+	{
+		boneDataVec[i]->start = static_cast<int>(start.GetFrameCount(FbxTime::eFrames24));
+		boneDataVec[i]->end = static_cast<int>(end.GetFrameCount(FbxTime::eFrames24));
+
+		for (FbxLongLong l = start.GetFrameCount(FbxTime::eFrames24); l <= end.GetFrameCount(FbxTime::eFrames24); ++l)
+		{
+			KEYFRAME* pAnim = new KEYFRAME();
+
+			FbxTime currTime;
+			currTime.SetFrame(l, FbxTime::eFrames24);
+			pAnim->frame = l;
+
+			pAnim->globalTransform = boneDataVec[i]->pNode->EvaluateGlobalTransform(currTime) * boneDataVec[i]->globalBindposeInverse;
+			boneDataVec[i]->animVec.push_back(sp<KEYFRAME>(pAnim));
+		} // for l
+	}
+}
+
 
 void FBXParser::ReadMesh(FbxNode& fbxNode, FBXDATASET& fbxData, int index, int parentIndex)
 {
@@ -338,7 +334,20 @@ void FBXParser::ReadMesh(FbxNode& fbxNode, FBXDATASET& fbxData, int index, int p
 
 	SKINNEDVERTEX tempVertex;
 
-	// vertex, index 정보 읽기
+	// Control Point 방식으로 읽기
+	// 버텍스 스키닝 정보가 Control Point방시으로만 읽어들일 수 있어서 Control Point방식으로 읽어들인 후
+	// Triangle 방식으로 복사 해야함
+	int ctrlPointCount = pMesh->GetControlPointsCount();
+	for (int i = 0; i < ctrlPointCount; ++i)
+	{
+		ReadPositionControlPoint(*pMesh, i, tempVertex.vertex.position);
+		meshData->controlPointDataVec.push_back(tempVertex);
+	}
+
+	// Skin정보 읽기
+	ReadSkinInfo(fbxNode, fbxData, meshData);
+
+	// Color, Normal, UV, Tangent 값 읽기
 	for (int i = 0; i < polygonCount; ++i)
 	{
 		// polygon 안에 버텍스가 몇개 있는지. 보통 3개, 4개인 경우도 있음. triangulate 함수를 쓰면 모두 3개로 변경
@@ -347,34 +356,61 @@ void FBXParser::ReadMesh(FbxNode& fbxNode, FBXDATASET& fbxData, int index, int p
 		{
 			int ctrlPointIndex = pMesh->GetPolygonVertex(i, j);
 
+			ReadColor(*pMesh, ctrlPointIndex, vertexCount, meshData->controlPointDataVec[ctrlPointIndex].vertex.color);
+			ReadNormal(*pMesh, ctrlPointIndex, vertexCount, meshData->controlPointDataVec[ctrlPointIndex].vertex.normal);
+			ReadUV(*pMesh, ctrlPointIndex, vertexCount, meshData->controlPointDataVec[ctrlPointIndex].vertex.texCoord);
+			ReadTangent(*pMesh, ctrlPointIndex, vertexCount, meshData->controlPointDataVec[ctrlPointIndex].vertex.tangent);
 			
+			vertexCount++;
+		}
+	}
 
-			ReadPosition(*pMesh, ctrlPointIndex, tempVertex.vertex.position);
-			ReadColor(*pMesh, ctrlPointIndex, vertexCount, tempVertex.vertex.color);
-			ReadNormal(*pMesh, ctrlPointIndex, vertexCount, tempVertex.vertex.normal);
-			ReadUV(*pMesh, ctrlPointIndex, vertexCount, tempVertex.vertex.texCoord);
-			ReadTangent(*pMesh, ctrlPointIndex, vertexCount, tempVertex.vertex.tangent);
-			
+	vertexCount = 0;
+	for (int i = 0; i < polygonCount; ++i)
+	{
+		for (int j = 0; j < 3; ++j)
+		{
+			int ctrlPointIndex = pMesh->GetPolygonVertex(i, j);
+
+			tempVertex = meshData->controlPointDataVec[ctrlPointIndex];
+			tempVertex.SortBlendingInfoByWeight();
+
 			meshData->verticeDataVec.push_back(tempVertex); // vertex 값
-			meshData->indiceDataVec.push_back(vertexCount); // index 값
+			//meshData->indiceDataVec.push_back(vertexCount); // index 값
 
 			vertexCount++;
 		}
 	}
 
-	// Skin정보 읽기
-	ReadSkinInfo(fbxNode, fbxData, meshData);
+	//reverse(meshData->verticeDataVec.begin(), meshData->verticeDataVec.end());
 	
 	// Local Matrix 값 읽기
-	ReadMatrix(fbxNode, meshData->local, meshData->world);
+	ReadMatrix(fbxNode, meshData->local, meshData->worldParent);
 
 	// 이름 읽기
 	StringUtil::SetName(fbxNode.GetName(), meshData->name);
 
+	Optimize(meshData);
+
 	fbxData.fbxDataVec.push_back(meshData);
 }
 
-void FBXParser::ReadPosition(FbxMesh& mesh, int ctrlPointIndex, Vector3& position)
+void FBXParser::ReadPositionControlPoint(FbxMesh& mesh, int ctrlPointCount, Vector3& position)
+{
+	position.x = static_cast<float>(mesh.GetControlPointAt(ctrlPointCount).mData[0]);
+	if (_existAnimation)
+	{
+		position.y = static_cast< float >(mesh.GetControlPointAt(ctrlPointCount).mData[1]);
+		position.z = static_cast< float >(mesh.GetControlPointAt(ctrlPointCount).mData[2]);
+	}
+	else
+	{
+		position.y = static_cast< float >(mesh.GetControlPointAt(ctrlPointCount).mData[2]);
+		position.z = static_cast< float >(mesh.GetControlPointAt(ctrlPointCount).mData[1]);
+	}
+}
+
+void FBXParser::ReadlPositionTriangle(FbxMesh& mesh, int ctrlPointIndex, Vector3& position)
 {
 	FbxVector4* pCtrlPoint = mesh.GetControlPoints();
 
@@ -599,4 +635,50 @@ void FBXParser::ReadTangent(FbxMesh& mesh, int ctrlPointIndex, int vertexCount, 
 		}
 		break;
 	}
+}
+void FBXParser::Optimize(sp<FBXMESHDATA> meshData)
+{
+	
+	std::vector<SKINNEDVERTEX> optVec;
+	bool exist = false;
+
+	DWORD j = 0;
+	for (DWORD i = 0; i < meshData->verticeDataVec.size(); ++i)
+	{
+		for (j = 0; j < optVec.size(); ++j)
+		{
+			if (meshData->verticeDataVec[i].vertex == optVec[j].vertex/* &&
+				meshData->verticeDataVec[i].vertexBlendingInfoVec.empty() == false &&
+				meshData->verticeDataVec[i].vertexBlendingInfoVec[0] == optVec[j].vertexBlendingInfoVec[0] && 
+				meshData->verticeDataVec[i].vertexBlendingInfoVec[1] == optVec[j].vertexBlendingInfoVec[1] &&
+				meshData->verticeDataVec[i].vertexBlendingInfoVec[2] == optVec[j].vertexBlendingInfoVec[2] &&
+				meshData->verticeDataVec[i].vertexBlendingInfoVec[3] == optVec[j].vertexBlendingInfoVec[3]*/)
+			{	
+				exist = true;
+				break;
+			}
+		}
+
+		if (!exist)
+		{
+			optVec.push_back(meshData->verticeDataVec[i]);
+		}
+		
+		meshData->indiceDataVec.push_back(j);
+
+		j = 0;
+		exist = false;
+	}
+
+	meshData->verticeDataVec.swap(optVec);
+}
+
+void FBXParser::GetGeometryMatrix(FbxNode& fbxNode, FbxAMatrix& matrix)
+{
+	FbxVector4 lT = fbxNode.GetGeometricTranslation(FbxNode::eSourcePivot);
+	FbxVector4 lR = fbxNode.GetGeometricRotation(FbxNode::eSourcePivot);
+	FbxVector4 lS = fbxNode.GetGeometricScaling(FbxNode::eSourcePivot);
+
+	matrix = FbxAMatrix(lT, lR, lS);
+	matrix.SetS(FbxVector4(1.0f, -1.0f, 1.0f));
 }
