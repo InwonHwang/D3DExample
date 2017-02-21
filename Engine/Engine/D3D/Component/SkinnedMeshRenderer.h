@@ -20,7 +20,8 @@ public:
 	// Test¿ë
 	//void ApplyMatrix(IDirect3DDevice9& device);
 	void ApplyMatrix(IDirect3DDevice9& device);
-	void Test(IDirect3DDevice9& device, int frame);
+	void Test(IDirect3DDevice9& device, sp<Animation> animation, int frame);
+
 	void SetBone(BoneDataVec b)
 	{
 		_boneDataVec = b;

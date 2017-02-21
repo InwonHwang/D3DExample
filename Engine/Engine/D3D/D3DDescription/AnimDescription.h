@@ -2,26 +2,32 @@
 
 #include "..\..\Core\Core.h"
 
-typedef struct tagAnimationKey	// 애니메이션 키
+typedef struct tagVectorKey	// 애니메이션 키
 {
 	int frame;
 	Vector3 value;
-}ANIMATIONKEY, *LPANIMATIONKEY;
+}VECTORKEY, *LPVECTORKEY;
+
+typedef struct tagQuaternionKey	// 애니메이션 키
+{
+	int frame;
+	Quaternion value;
+}QUATERNIONKEY, *LPQUATERNIONKEY;
 
 typedef struct tagAnimKeySet
 {
 	tagAnimKeySet() {}
 	~tagAnimKeySet()
 	{
-		std::vector<ANIMATIONKEY> emptyData;
-		scale.swap(emptyData);
-		rotation.swap(emptyData);
-		position.swap(emptyData);
+		std::vector<VECTORKEY> emptyData;
+		scale.swap(std::vector<VECTORKEY>());
+		rotation.swap(std::vector<QUATERNIONKEY>());
+		position.swap(std::vector<VECTORKEY>());
 	}
 
-	std::vector<ANIMATIONKEY> scale;
-	std::vector<ANIMATIONKEY> rotation;
-	std::vector<ANIMATIONKEY> position;
+	std::vector<VECTORKEY> scale;
+	std::vector<QUATERNIONKEY> rotation;
+	std::vector<VECTORKEY> position;
 	int length;
 	int start;
 	int end;

@@ -20,32 +20,32 @@ void Animation::Destroy()
 
 bool Animation::Create(std::vector<sp<FBXBONEDATA>> fbxBoneDataVec)
 {	
-	sp<AnimationCurve> pAnimCurve;
+	sp<AnimationCurve> pAnimCurve;	
+	sp<KEYFRAME> pKeyFrame;
+	Vector3 v(0, 0, 0);
+	Quaternion q(0, 0, 0, 0);
 	
 	for (auto boneData : fbxBoneDataVec)
 	{
-		sp<KEYFRAME> temp;
-
 		pAnimCurve.reset(new AnimationCurve);
 		pAnimCurve->SetBoneName(boneData->name);
+		
 
 		for (uint i = 0; i < boneData->animVec.size(); ++i)
 		{
-			temp = boneData->animVec[i];
+			pKeyFrame = boneData->animVec[i];
 
-			FbxAMatrix tempMatrix = temp->globalTransform;
-			int frame = (static_cast<int>(temp->frame) - boneData->start) * 60;
+			FbxAMatrix tempMatrix = pKeyFrame->globalTransform;
+			int frame = (static_cast<int>(pKeyFrame->frame) - boneData->start) * 60;
 
-			Vector3 value;
+			v = FbxDXUtil::ToVector3(tempMatrix.GetS());			
+			pAnimCurve->SetScaleKey(frame, v);
 
-			value = FbxDXUtil::ToVector3(tempMatrix.GetS());
-			pAnimCurve->SetScaleKey(frame, value);
+			q = FbxDXUtil::ToQuaternion(tempMatrix.GetQ());
+			pAnimCurve->SetRotationKey(frame, q);
 
-			value = FbxDXUtil::ToVector3(tempMatrix.GetR());
-			pAnimCurve->SetRotationKey(frame, value);
-
-			value = FbxDXUtil::ToVector3(tempMatrix.GetT());
-			pAnimCurve->SetPositionKey(frame, value);
+			v = FbxDXUtil::ToVector3(tempMatrix.GetT());
+			pAnimCurve->SetPositionKey(frame, v);
 		}
 	
 

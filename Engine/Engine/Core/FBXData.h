@@ -79,12 +79,11 @@ typedef struct tagKeyframe
 {
 	FbxLongLong frame;
 	FbxAMatrix globalTransform;
-	tagKeyframe* pNext;
+	String name;
 
 	tagKeyframe()
 	{
 		frame = 0;
-		pNext = nullptr;
 		globalTransform.SetIdentity();
 	}
 }KEYFRAME, *LPKEYFRAME;

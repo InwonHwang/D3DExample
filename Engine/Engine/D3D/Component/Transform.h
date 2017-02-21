@@ -2,7 +2,7 @@
 
 #include "..\..\Core\Core.h"
 #include "Component.h"
-#include "TransformImpl.h"
+#include "D3DComponentImlp\TransformImpl.h"
 
 class Transform : public Component
 {
@@ -16,30 +16,32 @@ public:
 	virtual void Destroy() override;
 
 	// friend private 함수로 바꾸기
-	void Update(IDirect3DDevice9& device);
+	void Update(IDirect3DDevice9* pDevice);
 	void UpdateWorldMatrix();
-	//
 
-	void SetLocalScale(const Vector3& scale);
-	void SetLocalRotation(const Quaternion& rotation);
-	void SetLocalPosition(const Vector3& position);
+	void SetLocalScale(const Vector3& inScale);
+	void SetLocalRotation(const Quaternion& inRotation);
+	void SetLocalPosition(const Vector3& inPosition);
 
-	Vector3 GetLocalScale() const;
-	Quaternion GetLocalRotation() const;
-	Vector3 GetLocalEulerAngle() const;
-	Vector3 GetLocalPosition() const;
+	void GetLocalScale(Vector3& outLocalScale) const;
+	void GetLocalRotation(Quaternion& outLocalRotation) const;
+	void GetLocalEulerAngle(Vector3& outLocalEulerAngle) const;
+	void GetLocalPosition(Vector3& outLocalPosition) const;
 
-	Vector3 GetScale() const;
-	Quaternion GetRotation() const;
-	Vector3 GetEulerAngle() const;
-	Vector3 GetPosition() const;
+	void GetScale(Vector3& outScale) const;
+	void GetRotation(Quaternion& outRotation) const;
+	void GetEulerAngle(Vector3& outEulerAngle) const;
+	void GetPosition(Vector3& outPosition) const;
 
-	Vector3 GetAxisX() const;
-	Vector3 GetAxisY() const;
-	Vector3 GetAxisZ() const;
+	void GetAxisX(Vector3& outAxisX) const;
+	void GetAxisY(Vector3& outAxisY) const;
+	void GetAxisZ(Vector3& outAxisZ) const;
 
 	// friend private 함수로 바꾸기
-	D3DXMATRIX GetMatrix() const;
+	void GetMatrixWorld(D3DXMATRIX& outMatWorld) const
+	{
+		outMatWorld = _impl->_matLocal * _impl->_matWorldParent;
+	}
 
 private:
 	std::vector<sp<Component>>*	_components;
@@ -70,65 +72,75 @@ inline sp<T> Transform::AddComponent()
 	return component;
 }
 
-inline Vector3 Transform::GetLocalScale() const
+inline void Transform::Update(IDirect3DDevice9* pDevice)
 {
-	return _impl->GetLocalScale();
+	_impl->Update(pDevice);
 }
 
-inline Quaternion Transform::GetLocalRotation() const
+inline void Transform::UpdateWorldMatrix()
 {
-	return _impl->GetLocalRotation();
+	_impl->UpdateMatrix();
 }
 
-inline Vector3 Transform::GetLocalEulerAngle() const
+inline void Transform::SetLocalScale(const Vector3& scale)
 {
-	return _impl->GetLocalEulerAngle();
+	_impl->SetLocalScale(scale);
 }
 
-inline Vector3 Transform::GetLocalPosition() const
+inline void Transform::SetLocalRotation(const Quaternion& rotation)
 {
-	return _impl->GetLocalPosition();
+	_impl->SetLocalRotation(rotation);
 }
 
-inline Vector3 Transform::GetScale() const
+inline void Transform::SetLocalPosition(const Vector3& position)
 {
-	return _impl->GetScale();
+	_impl->SetLocalPosition(position);
 }
 
-inline Quaternion Transform::GetRotation() const
+inline void Transform::GetLocalScale(Vector3& outLocalScale) const
 {
-	return _impl->GetRotation();
+	_impl->GetLocalScale(outLocalScale);
 }
 
-inline Vector3 Transform::GetEulerAngle() const
+inline void Transform::GetLocalRotation(Quaternion& outLocalRotation) const
 {
-	return _impl->GetEulerAngle();
+	_impl->GetLocalRotation(outLocalRotation);
+}
+inline void Transform::GetLocalEulerAngle(Vector3& outLocalEulerAngle) const
+{
+	_impl->GetLocalEulerAngle(outLocalEulerAngle);
+}
+inline void Transform::GetLocalPosition(Vector3& outLocalPosition) const
+{
+	_impl->GetLocalPosition(outLocalPosition);
 }
 
-inline Vector3 Transform::GetPosition() const
+inline void Transform::GetScale(Vector3& outScale) const
 {
-	return _impl->GetPosition();
+	_impl->GetScale(outScale);
+}
+inline void Transform::GetRotation(Quaternion& outRotation) const
+{
+	_impl->GetRotation(outRotation);
+}
+inline void Transform::GetEulerAngle(Vector3& outEulerAngle) const
+{
+	_impl->GetEulerAngle(outEulerAngle);
+}
+inline void Transform::GetPosition(Vector3& outPosition) const
+{
+	_impl->GetPosition(outPosition);
 }
 
-inline Vector3 Transform::GetAxisX() const
+inline void Transform::GetAxisX(Vector3& outAxisX) const
 {
-	return _impl->GetAxisX();
+	_impl->GetAxisX(outAxisX);
 }
-
-inline Vector3 Transform::GetAxisY() const
+inline void Transform::GetAxisY(Vector3& outAxisY) const
 {
-	return _impl->GetAxisY();
+	_impl->GetAxisY(outAxisY);
 }
-
-inline Vector3 Transform::GetAxisZ() const
+inline void Transform::GetAxisZ(Vector3& outAxisZ) const
 {
-	return _impl->GetAxisZ();
+	_impl->GetAxisZ(outAxisZ);
 }
-
-inline D3DXMATRIX Transform::GetMatrix() const
-{
-	return _impl->GetMatrix();
-}
-
-
-

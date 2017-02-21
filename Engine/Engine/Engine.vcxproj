@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="D3D\Component\D3DComponentImlp\ComponentImpl.cpp" />
     <ClCompile Include="Core\Timer.cpp" />
     <ClCompile Include="D3D\D3DStructure\AnimationCurve.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
@@ -176,7 +177,7 @@
     <ClCompile Include="D3D\Component\Transform.cpp" />
     <ClCompile Include="D3D\ResourceBase\VertexBuffer.cpp" />
     <ClCompile Include="D3D\Resource\TransformData.cpp" />
-    <ClCompile Include="D3D\Component\TransformImpl.cpp" />
+    <ClCompile Include="D3D\Component\D3DComponentImlp\TransformImpl.cpp" />
     <ClCompile Include="D3D\Component\SpriteRenderer.cpp" />
     <ClCompile Include="D3D\Resource\SurfaceMaterial.cpp" />
     <ClCompile Include="D3D\Resource\TerrainData.cpp" />
@@ -189,6 +190,7 @@
     <ClCompile Include="D3D\Component\SkinnedMeshRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="D3D\Component\D3DComponentImlp\ComponentImpl.h" />
     <ClInclude Include="Core\Timer.h" />
     <ClInclude Include="D3D\D3DStructure\AnimationCurve.h" />
     <ClInclude Include="D3D\D3DStructure\D3DStructure.h" />
@@ -244,7 +246,8 @@
     <ClInclude Include="D3D\Component\Transform.h" />
     <ClInclude Include="D3D\ResourceBase\VertexBuffer.h" />
     <ClInclude Include="D3D\Resource\TransformData.h" />
-    <ClInclude Include="D3D\Component\TransformImpl.h" />
+    <ClInclude Include="D3D\Component\D3DComponentImlp\TransformImpl.h" />
+    <ClInclude Include="D3D\Component\D3DComponentImlp\TransformImplBase.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

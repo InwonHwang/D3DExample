@@ -26,7 +26,6 @@ Vector3 FbxDXUtil::ToVector3(const FbxDouble3 &m) {
 
 D3DXMATRIX FbxDXUtil::ToDXMatrix(const FbxAMatrix &mtx)
 {
-
 	D3DXMATRIX ret;
 
 	for (int i = 0; i < 4; ++i)

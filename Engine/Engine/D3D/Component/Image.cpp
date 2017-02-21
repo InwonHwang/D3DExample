@@ -29,7 +29,7 @@ void Image::Draw(IDirect3DDevice9& device)
 	IDirect3DTexture9* texture = _texture->GetD3DTexture();
 						 
 	D3DXVECTOR3 center(0.0f, 0.0f, 0.0f);   
-	D3DXVECTOR3 position(50.0f, 50.0f, 0.0f); 
+	D3DXVECTOR3 position(50.0f, 50.0f, 0.0f);
 
 	if(texture)
 		_sprite->Draw(texture, NULL, &center, &position, D3DCOLOR_ARGB(255, 255, 255, 255));

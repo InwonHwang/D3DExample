@@ -10,33 +10,34 @@ public:
 	virtual void Destroy() override;
 
 	// friend class SpriteRenderer private함수로 바꾸기
-	void SetMatrix(const D3DXMATRIX& matrix);
-	void SetMatrixParent(const D3DXMATRIX& matrix);
-	D3DXMATRIX GetMatrix() const;
-	D3DXMATRIX GetMatrixParent() const;
+	void SetMatrixLocal(const D3DXMATRIX& matrix);
+	void SetMatrixWorldParent(const D3DXMATRIX& matrix);
+	D3DXMATRIX GetMatrixLocal() const;
+	D3DXMATRIX GetMatrixWorldParent() const;
 
-private:
-	D3DXMATRIX _transform;
-	D3DXMATRIX _transformParent;
+private:	
+	D3DXMATRIX _matLocal;
+	D3DXMATRIX _matWorldParent;
 };
 
-inline void TransformData::SetMatrix(const D3DXMATRIX& matrix)
+inline void TransformData::SetMatrixLocal(const D3DXMATRIX& matrix)
 {
-	_transform = matrix;
+	_matLocal = matrix;
 }
 
-inline void TransformData::SetMatrixParent(const D3DXMATRIX& matrix)
+inline void TransformData::SetMatrixWorldParent(const D3DXMATRIX& matrix)
 {
-	_transformParent = matrix;
+	_matWorldParent = matrix;
 }
 
-inline D3DXMATRIX TransformData::GetMatrix() const
+
+inline D3DXMATRIX TransformData::GetMatrixLocal() const
 {
-	return _transform;
+	return _matLocal;
 }
 
-inline D3DXMATRIX TransformData::GetMatrixParent() const
+inline D3DXMATRIX TransformData::GetMatrixWorldParent() const
 {
-	return _transformParent;
+	return _matWorldParent;
 }
 

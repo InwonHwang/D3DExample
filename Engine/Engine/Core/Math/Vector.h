@@ -50,6 +50,7 @@ public:
 	bool operator != (const Vector3&) const;
 
 public:
+	static void Lerp(Vector3& outVec, const Vector3& v1, const Vector3& v2, float frame);
 	static float GetDistance(const Vector3& v1, const Vector3& v2);
 	static float GetLength(const Vector3& v);
 };

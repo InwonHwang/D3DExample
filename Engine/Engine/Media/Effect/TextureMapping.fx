@@ -23,11 +23,21 @@
 float4x4 gWorldMatrix : World;
 float4x4 gViewMatrix : View;
 float4x4 gProjectionMatrix : Projection;
+float4x4 FinalTransforms[35];
 
 struct VS_INPUT
 {
 	float4 mPosition : POSITION;
 	float2 mTexCoord : TEXCOORD0;
+};
+
+struct VS_SKINNEDINPUT
+{
+	float4 position : POSITION;
+	float4 normal : NORMAL;
+	float2 texCoord : TEXCOORD;
+	float4 weights : BLENDWEIGHT;
+	unsigned int4 boneIndices : BLENDINDICES;
 };
 
 struct VS_OUTPUT
@@ -36,17 +46,25 @@ struct VS_OUTPUT
 	float2 mTexCoord : TEXCOORD0;
 };
 
-VS_OUTPUT TextureMapping_Pass_0_Vertex_Shader_vs_main(VS_INPUT Input)
+VS_OUTPUT VertexBlend(VS_SKINNEDINPUT input)
 {
-	VS_OUTPUT Output;
+	VS_OUTPUT output = (VS_OUTPUT)0;
+	float4 p = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	float lastWeight = 0.0f;
 
-	Output.mPosition = mul(Input.mPosition, gWorldMatrix);
-	Output.mPosition = mul(Output.mPosition, gViewMatrix);
-	Output.mPosition = mul(Output.mPosition, gProjectionMatrix);
+	// This next code segment computes formula (3).
+	for (int i = 0; i < 4; ++i)
+	{
+		lastWeight += input.weights[i];
+		p += input.weights[i] * mul(input.position, FinalTransforms[input.boneIndices[i]]);
+	}
+	p.w = 1.0f;
 
-	Output.mTexCoord = Input.mTexCoord;
-
-	return Output;
+	output.mPosition = mul(p, gWorldMatrix);
+	output.mPosition = mul(output.mPosition, gViewMatrix);
+	output.mPosition = mul(output.mPosition, gProjectionMatrix);
+	output.mTexCoord = input.texCoord;
+	return output;
 }
 
 texture DiffuseMap_Tex : DiffuseMap;
@@ -74,7 +92,7 @@ technique TextureMapping
 {
 	pass Pass_0
 	{
-		VertexShader = compile vs_2_0 TextureMapping_Pass_0_Vertex_Shader_vs_main();
+		VertexShader = compile vs_2_0 VertexBlend();
 		PixelShader = compile ps_2_0 TextureMapping_Pass_0_Pixel_Shader_ps_main();
 	}
 }

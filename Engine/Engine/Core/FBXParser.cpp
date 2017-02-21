@@ -309,7 +309,8 @@ void FBXParser::ReadAnimation(FbxNode& fbxNode, std::vector<sp<FBXBONEDATA>>& bo
 			currTime.SetFrame(l, FbxTime::eFrames24);
 			pAnim->frame = l;
 
-			pAnim->globalTransform = boneDataVec[i]->pNode->EvaluateGlobalTransform(currTime) * boneDataVec[i]->globalBindposeInverse;
+			pAnim->globalTransform = boneDataVec[i]->pNode->EvaluateGlobalTransform(currTime) *boneDataVec[i]->globalBindposeInverse;			 
+			StringUtil::SetName(boneDataVec[i]->pNode->GetName(), pAnim->name);
 			boneDataVec[i]->animVec.push_back(sp<KEYFRAME>(pAnim));
 		} // for l
 	}

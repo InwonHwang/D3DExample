@@ -31,6 +31,12 @@ public:
 	void BeginPass(uint i);
 	void EndPass();
 
+	//test¿ë
+	ID3DXEffect* GetD3DEffect()
+	{
+		return _effect->GetD3DEffect();			
+	}
+
 private:
 	sp<ParamEffectVec>	_paramEffect;
 	sp<Effect>			_effect;
@@ -38,7 +44,7 @@ private:
 };
 
 inline void SurfaceMaterial::SetFloat(const String& semantic, float value)
-{
+{	
 	assert(_effect && "null reference : _effect");	
 
 #ifdef _UNICODE
@@ -72,7 +78,7 @@ inline void SurfaceMaterial::SetMatrix(const String& semantic, const D3DXMATRIX&
 	str.assign(semantic.begin(), semantic.end());
 	_effect->GetD3DEffect()->SetMatrix(str.c_str(), &matrix);
 #else
-	_effect->GetD3DEffect()->SetMatrix(semantic.c_str(), &matrix);
+	_effect->GetD3DEffect()->SetMatrixLocal(semantic.c_str(), &matrix);
 #endif	
 }
 

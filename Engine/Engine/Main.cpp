@@ -55,42 +55,38 @@ void SetRenderState()
 
 void processInput()
 {
-	if (GetAsyncKeyState('W')) transformCamera1->SetLocalPosition(transformCamera1->GetLocalPosition() + Vector3(0, 0, MOVESPEED));
-	if (GetAsyncKeyState('S')) transformCamera1->SetLocalPosition(transformCamera1->GetLocalPosition() + Vector3(0, 0, -MOVESPEED));
-	if (GetAsyncKeyState('A')) transformCamera1->SetLocalPosition(transformCamera1->GetLocalPosition() + Vector3(-MOVESPEED, 0, 0));
-	if (GetAsyncKeyState('D')) transformCamera1->SetLocalPosition(transformCamera1->GetLocalPosition() + Vector3(MOVESPEED, 0, 0));
-	if (GetAsyncKeyState('R')) transformCamera1->SetLocalPosition(transformCamera1->GetLocalPosition() + Vector3(0, MOVESPEED, 0));
-	if (GetAsyncKeyState('F')) transformCamera1->SetLocalPosition(transformCamera1->GetLocalPosition() + Vector3(0, -MOVESPEED, 0));
+	Vector3 camPos;
+	transformCamera1->GetLocalPosition(camPos);
+	if (GetAsyncKeyState('W')) transformCamera1->SetLocalPosition(camPos + Vector3(0, 0, MOVESPEED));
+	if (GetAsyncKeyState('S')) transformCamera1->SetLocalPosition(camPos + Vector3(0, 0, -MOVESPEED));
+	if (GetAsyncKeyState('A')) transformCamera1->SetLocalPosition(camPos + Vector3(-MOVESPEED, 0, 0));
+	if (GetAsyncKeyState('D')) transformCamera1->SetLocalPosition(camPos + Vector3(MOVESPEED, 0, 0));
+	if (GetAsyncKeyState('R')) transformCamera1->SetLocalPosition(camPos + Vector3(0, MOVESPEED, 0));
+	if (GetAsyncKeyState('F')) transformCamera1->SetLocalPosition(camPos + Vector3(0, -MOVESPEED, 0));
 
-	if (GetAsyncKeyState('1'))
-	{
-		cam = 1;
-	}
-	if (GetAsyncKeyState('2'))
-	{
-		cam = 2;
-	}
-
+	Vector3 eulerAngle;
+	Vector3 resultAngle;
+	transformCamera1->GetLocalEulerAngle(eulerAngle);
 	if (GetAsyncKeyState('I'))
 	{
-		Vector3 euler = transformCamera1->GetLocalEulerAngle() + Vector3(-ROTATIONSPEED, 0, 0);
-		transformCamera1->SetLocalRotation(Quaternion::Euler(euler.x, euler.y, euler.z));
+		resultAngle = eulerAngle + Vector3(-ROTATIONSPEED, 0, 0);
+		transformCamera1->SetLocalRotation(Quaternion::Euler(resultAngle.x, resultAngle.y, resultAngle.z));
 	}
 	if (GetAsyncKeyState('K'))
-	{
-		Vector3 euler = transformCamera1->GetLocalEulerAngle() + Vector3(ROTATIONSPEED, 0, 0);
-		transformCamera1->SetLocalRotation(Quaternion::Euler(euler.x, euler.y, euler.z));
+	{		
+		resultAngle = eulerAngle + Vector3(ROTATIONSPEED, 0, 0);
+		transformCamera1->SetLocalRotation(Quaternion::Euler(resultAngle.x, resultAngle.y, resultAngle.z));
 	}
 	if (GetAsyncKeyState('J'))
 	{
-		Vector3 euler = transformCamera1->GetLocalEulerAngle() + Vector3(0, -ROTATIONSPEED, 0);
-		transformCamera1->SetLocalRotation(Quaternion::Euler(euler.x, euler.y, euler.z));
+		resultAngle = eulerAngle + Vector3(0, -ROTATIONSPEED, 0);
+		transformCamera1->SetLocalRotation(Quaternion::Euler(resultAngle.x, resultAngle.y, resultAngle.z));
 	}
 	if (GetAsyncKeyState('L'))
 	{
-		Vector3 euler = transformCamera1->GetLocalEulerAngle() + Vector3(0, ROTATIONSPEED, 0);
-		transformCamera1->SetLocalRotation(Quaternion::Euler(euler.x, euler.y, euler.z));
-	}	
+		resultAngle = eulerAngle + Vector3(0, ROTATIONSPEED, 0);
+		transformCamera1->SetLocalRotation(Quaternion::Euler(resultAngle.x, resultAngle.y, resultAngle.z));
+	}
 }
 
 void Init()
@@ -104,7 +100,7 @@ void Init()
 	FBXMgr::Instance()->Init();
 	fbxManager = FBXMgr::Instance()->Get();
 
-	bool t = fbxParser.Init(*fbxManager, _T(""));
+	fbxParser.Init(*fbxManager, _T(""));
 	fbxParser.Load(fbxDataSet);
 	sp<FBXMESHDATA> meshData;
 	for (auto data : fbxDataSet.fbxDataVec)
@@ -154,18 +150,17 @@ void Init()
 	//Transform
 	Transform* trc1 = Memory<Transform>::OrderedAlloc(sizeof(Transform));
 	transformCamera1.reset(trc1, Memory<Transform>::OrderedFree);
-	/*transformCamera1->SetLocalPosition(Vector3(0, 500, 0));
-	transformCamera1->SetLocalRotation(Quaternion::Euler(90, 0, 0));*/
-	transformCamera1->SetLocalPosition(Vector3(0, 0, 500));
-	transformCamera1->SetLocalRotation(Quaternion::Euler(0, 180, 0));
+	transformCamera1->SetLocalPosition(Vector3(0, 0, -500));
 	camera1 = transformCamera1->AddComponent<Camera>();
 	camera1->SetTransform(transformCamera1);
 
+
+
 	////Terrain
-	//Transform* trt = Memory<Transform>::OrderedAlloc(sizeof(Transform));
-	//transformTerrain.reset(trt, Memory<Transform>::OrderedFree);
-	//transformTerrain->AddComponent<Terrain>()->SetTerrainData(terrainData);
-	//transformTerrain->SetLocalPosition(Vector3(0, 0, 0));
+	/*Transform* trt = Memory<Transform>::OrderedAlloc(sizeof(Transform));
+	transformTerrain.reset(trt, Memory<Transform>::OrderedFree);
+	transformTerrain->AddComponent<Terrain>()->SetTerrainData(terrainData);
+	transformTerrain->SetLocalPosition(Vector3(0, 0, 0));*/
 
 	//Mesh Renderer
 	Transform* trm = Memory<Transform>::OrderedAlloc(sizeof(Transform));
@@ -175,7 +170,7 @@ void Init()
 	transformMesh->GetComponent<SkinnedMeshRenderer>()->SetMaterial(0, materialMesh);
 	transformMesh->GetComponent<SkinnedMeshRenderer>()->SetBone(boneDataVec);
 		
-	frustum.reset(new Frustum);
+	frustum.reset(new Frustum);	
 
 	SetRenderState();
 }
@@ -210,12 +205,14 @@ void RenderBone()
 		int frame = time % animation->GetAnimCurveVec()->data()[i]->GetLength();
 		D3DXMATRIX m;		
 
-		animation->GetAnimCurveVec()->data()[i]->GetAnimatedMatrix(frame, m);
+		//animation->GetAnimCurveVec()->data()[i]->GetAnimatedMatrix(frame, m);
+		m = FbxDXUtil::ToDXMatrix(boneDataVec[i]->animVec[(frame - (frame%60))/60]->globalTransform);
+		
 		
 		device->SetTransform(D3DTS_WORLD, &m);
 		device->SetFVF(BOXVERTEX::FVF);
 		device->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, 8, 12, idx, D3DFMT_INDEX32, vtx, sizeof BOXVERTEX);
-	}
+	}	
 }
 
 void Render()
@@ -232,24 +229,18 @@ void Render()
 
 		//RenderBone();
 
-		D3DXMATRIX world;
-		D3DXMatrixIdentity(&world);
-		//device->SetTransform(D3DTS_WORLD, &world);
-		frustum->Make(camera1->GetViewMatrix() * camera1->GetProjMatrix());
+		//frustum->Make(camera1->GetViewMatrix() * camera1->GetProjMatrix());
 		//frustum->Draw(*device);
 
-		material->SetMatrix(_T("gViewMatrix"), camera1->GetViewMatrix());
+		/*material->SetMatrix(_T("gViewMatrix"), camera1->GetViewMatrix());
 		material->SetMatrix(_T("gProjectionMatrix"), camera1->GetProjMatrix());
-		material->SetTexture(_T("DiffuseMap_Tex"), textureMesh);
+		material->SetTexture(_T("DiffuseMap_Tex"), textureMesh);*/
 
 		
-		/*transformMesh->UpdateWorldMatrix();
-		material->SetMatrix(_T("gWorldMatrix"), transformMesh->GetMatrix());
-		transformMesh->Update(*device);*/
 		appTimer.Update();
 		uint time = appTimer.GetElapsedTime();
 		int frame = time % animation->GetAnimCurveVec()->data()[0]->GetLength();
-		transformMesh->GetComponent<SkinnedMeshRenderer>()->Test(*device, frame / 60);
+		transformMesh->GetComponent<SkinnedMeshRenderer>()->Test(*device, animation, frame);
 		
 		//transformTerrain->UpdateWorldMatrix();
 		//transformTerrain->Update(*device);
