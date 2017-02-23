@@ -4,8 +4,9 @@
 #include "Component.h"
 #include "D3DComponentImlp\TransformImpl.h"
 
-class Transform : public Component
+class Transform : public Component, public boost::enable_shared_from_this<Transform>
 {
+	friend TransformImpl;
 public:
 	Transform();
 	virtual ~Transform();
@@ -47,6 +48,11 @@ public:
 		_impl->GetMatrixWorldParent(matWorldParent);
 		outMatWorld = matLocal * matWorldParent;
 	}
+
+	void SetParent(sp<Transform> pParent);
+	uint GetChildCount() const;
+	sp<Transform> GetParent() const;
+	sp<Transform> GetChild(uint index) const;
 
 private:
 	std::vector<sp<Component>>*	_components;
@@ -148,4 +154,37 @@ inline void Transform::GetAxisY(Vector3& outAxisY) const
 inline void Transform::GetAxisZ(Vector3& outAxisZ) const
 {
 	_impl->GetAxisZ(outAxisZ);
+}
+
+inline void Transform::SetParent(sp<Transform> pParent)
+{
+	_impl->SetParent(pParent, shared_from_this());
+}
+
+inline uint Transform::GetChildCount() const
+{
+	return _impl->GetChildCount();
+}
+
+inline sp<Transform> Transform::GetParent() const
+{
+	wp<Transform> tempTransform = _impl->GetParent();
+
+	if (tempTransform.expired())
+		return nullptr;
+
+	return tempTransform.lock();
+}
+
+inline sp<Transform> Transform::GetChild(uint index) const
+{
+	wp<Transform> tempTransform = _impl->GetChild(index);
+
+	if (tempTransform.expired())
+		return nullptr;
+
+	// 라이프사이클이 Transform 이 TransformImpl보다 길다.
+	// TransformImpl이 있으면 Transform도 존재
+
+	return tempTransform.lock();
 }

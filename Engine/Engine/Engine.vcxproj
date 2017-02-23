@@ -99,6 +99,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3d9.lib;d3dx10d.lib;d3dx9d.lib;dxerr.lib;dxguid.lib;libfbxsdk-mt.lib;winmm.lib;comctl32.lib;legacy_stdio_definitions.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <FxCompile>
+      <ShaderType>Effect</ShaderType>
+      <ShaderModel>2.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -248,6 +252,9 @@
     <ClInclude Include="D3D\Resource\TransformData.h" />
     <ClInclude Include="D3D\Component\D3DComponentImlp\TransformImpl.h" />
     <ClInclude Include="D3D\Component\D3DComponentImlp\TransformImplBase.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Media\Effect\TextureMapping.fx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

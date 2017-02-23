@@ -6,7 +6,9 @@ Transform::Transform()
 {
 	_components = new std::vector<sp<Component>>();
 	TransformImpl* impl = Memory<TransformImpl>::OrderedAlloc(sizeof(TransformImpl));
-	_impl.reset(impl, Memory<TransformImpl>::OrderedFree);
+	_impl.reset(impl, Memory<TransformImpl>::OrderedFree);	
+	//Transform* tempTransform = this;
+	//_impl->SetTransform(tempTransform);
 }
 
 Transform::~Transform()

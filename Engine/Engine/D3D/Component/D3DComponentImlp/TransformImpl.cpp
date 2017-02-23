@@ -31,6 +31,14 @@ void TransformImpl::Update(IDirect3DDevice9* pDevice)
 {
 	assert(pDevice);
 
+	if (!_pParent.expired())
+	{
+		_pParent.lock()->GetMatrixWorld(*_matWorldParent);
+		_matWorldParent->_11 = 1.0f;
+		_matWorldParent->_22 = 1.0f;
+		_matWorldParent->_33 = 1.0f;
+	}
+
 	D3DXMATRIX matWorld = *_matLocal * *_matWorldParent;
 	pDevice->SetTransform(D3DTS_WORLD, &matWorld);
 }
@@ -112,29 +120,20 @@ void TransformImpl::InternalMatrixToTranslation(const D3DXMATRIX& matrix, Vector
 	D3DXMatrixDecompose(&s, &r, &outPosition, &matrix);
 }
 
-void TransformImpl::SetParent(wp<Transform> pParent) const
+void TransformImpl::SetParent(sp<Transform> pParent, sp<Transform> pTransform)
 {
+	assert(pTransform);
 	// pParent가 nullptr일때 sceneNode를 부모로 할 예정.
-	/*if (!_pParent.expired())
-	{
-		_pParent.lock()->
-	}*/
-}
-uint TransformImpl::GetChildCount() const
-{
-	assert(_pChildrenVec);
-
-	return _pChildrenVec->size();
-}
-wp<Transform> TransformImpl::GetParent() const
-{
-	return _pParent;
-}
-wp<Transform> TransformImpl::GetChild(uint index) const
-{
-	assert(_pChildrenVec);
-
-	return _pChildrenVec->data()[index];
+	
+	//wp<Transform> pThis = pTransform;
+	
+	if (!_pParent.expired())
+	{		
+		_pParent.lock()->_impl->InternalRemoveChild(pTransform);		
+	}
+	
+	_pParent = pParent;
+	_pParent.lock()->_impl->InternalAddChild(pTransform);
 }
 
 void TransformImpl::InternalAddChild(wp<Transform> pChild)
@@ -148,7 +147,7 @@ void TransformImpl::InternalRemoveChild(wp<Transform> pChild)
 	assert(_pChildrenVec);
 
 	for (auto it = _pChildrenVec->begin(); it != _pChildrenVec->end(); ++it)
-	{
+	{		
 		if (!it->expired() && it->lock() == pChild.lock())
 		{
 			_pChildrenVec->erase(it);

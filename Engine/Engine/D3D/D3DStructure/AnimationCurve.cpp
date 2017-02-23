@@ -54,7 +54,7 @@ void AnimationCurve::GetAnimatedMatrix(int frame, D3DXMATRIX& matrix) const
 	Vector3 v(0, 0, 0);
 	Quaternion q(0, 0, 0, 0);
 
-	//D3DXMatrixIdentity(&matrix);
+	D3DXMatrixIdentity(&matrix);
 
 	if (GetRotationKey(frame, q)) {
 		D3DXMatrixRotationQuaternion(&matrix, &q);

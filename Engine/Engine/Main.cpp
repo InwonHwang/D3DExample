@@ -20,7 +20,7 @@ FBXDATASET fbxDataSet;
 FBXParser fbxParser;
 
 sp<Texture> textureMesh;
-
+sp<Sprite> sprite;
 sp<Effect> effect;
 sp<SurfaceMaterial> material;
 sp<SurfaceMaterial> materialMesh;
@@ -32,23 +32,17 @@ sp<Animation> animation;
 sp<Transform> transformCamera1;
 //sp<Transform> transformTerrain;
 sp<Transform> transformMesh;
+sp<Transform> transformSprite1;
+sp<Transform> transformSprite2;
 
 sp<Camera> camera1;
 sp<Frustum> frustum;
 
 std::vector<sp<FBXBONEDATA>> boneDataVec;
-std::vector<D3DXMATRIX> matLocalVec;
-std::vector<D3DXMATRIX> matWorldVec;
-D3DXMATRIX rootLocal;
-D3DXMATRIX rootWorldParent;
-D3DXMATRIX meshLocal;
-D3DXMATRIX meshWorldParent;
-
-int cam = 1;
 
 void SetRenderState()
 {
-	Device::Instance()->Get()->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+	//Device::Instance()->Get()->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
 	device->SetRenderState(D3DRS_ZENABLE, TRUE);
 	device->LightEnable(0, true);
 }
@@ -107,9 +101,7 @@ void Init()
 	{
 		if (data->dataType == FBXDATA::eMesh)
 		{
-			meshData = boost::static_pointer_cast<FBXMESHDATA>(data);
-			meshLocal = FbxDXUtil::ToDXMatrix(meshData->local);
-			meshWorldParent = FbxDXUtil::ToDXMatrix(meshData->worldParent);
+			meshData = boost::static_pointer_cast<FBXMESHDATA>(data);			
 		}
 		else if (data->dataType == FBXDATA::eBone)
 		{
@@ -118,9 +110,7 @@ void Init()
 		}
 		else if (data->dataType == FBXDATA::eTransform)
 		{
-			sp<FBXTRANSFORMDATA> temp = boost::static_pointer_cast<FBXTRANSFORMDATA>(data);
-			rootLocal = FbxDXUtil::ToDXMatrix(temp->local);
-			rootWorldParent = FbxDXUtil::ToDXMatrix(temp->worldParent);
+			sp<FBXTRANSFORMDATA> temp = boost::static_pointer_cast<FBXTRANSFORMDATA>(data);			
 		}
 	}
 	
@@ -147,6 +137,9 @@ void Init()
 	animation = resourceManager.Create<Animation>();
 	animation->Create(boneDataVec);
 
+	sprite = resourceManager.Create<Sprite>();
+	sprite->Create(*device, textureMesh);
+
 	//Transform
 	Transform* trc1 = Memory<Transform>::OrderedAlloc(sizeof(Transform));
 	transformCamera1.reset(trc1, Memory<Transform>::OrderedFree);
@@ -154,7 +147,22 @@ void Init()
 	camera1 = transformCamera1->AddComponent<Camera>();
 	camera1->SetTransform(transformCamera1);
 
+	Transform* trs1 = Memory<Transform>::OrderedAlloc(sizeof(Transform));
+	transformSprite1.reset(trs1, Memory<Transform>::OrderedFree);
+	transformSprite1->AddComponent<SpriteRenderer>()->SetSprite(sprite);
+	transformSprite1->GetComponent<SpriteRenderer>()->SetMaterialCount(1);
+	transformSprite1->GetComponent<SpriteRenderer>()->SetMaterial(0, material);
+	transformSprite1->SetLocalScale(Vector3(0.3f, 0.3f, 0.3f));
+	transformSprite1->SetLocalPosition(Vector3(-50, 0, 0));
 
+	Transform* trs2 = Memory<Transform>::OrderedAlloc(sizeof(Transform));
+	transformSprite2.reset(trs2, Memory<Transform>::OrderedFree);
+	transformSprite2->AddComponent<SpriteRenderer>()->SetSprite(sprite);
+	transformSprite2->GetComponent<SpriteRenderer>()->SetMaterialCount(1);
+	transformSprite2->GetComponent<SpriteRenderer>()->SetMaterial(0, material);
+	transformSprite2->SetLocalScale(Vector3(0.3f, 0.3f, 0.3f));
+	transformSprite2->SetLocalPosition(Vector3(100, 0, 0));
+	transformSprite2->SetParent(transformSprite1);
 
 	////Terrain
 	/*Transform* trt = Memory<Transform>::OrderedAlloc(sizeof(Transform));
@@ -232,15 +240,27 @@ void Render()
 		//frustum->Make(camera1->GetViewMatrix() * camera1->GetProjMatrix());
 		//frustum->Draw(*device);
 
-		/*material->SetMatrix(_T("gViewMatrix"), camera1->GetViewMatrix());
+		material->SetMatrix(_T("gViewMatrix"), camera1->GetViewMatrix());
 		material->SetMatrix(_T("gProjectionMatrix"), camera1->GetProjMatrix());
-		material->SetTexture(_T("DiffuseMap_Tex"), textureMesh);*/
+		material->SetTexture(_T("DiffuseMap_Tex"), textureMesh);
 
+		D3DXMATRIX matWorld;
+		transformSprite1->GetMatrixWorld(matWorld);
+		transformSprite1->UpdateWorldMatrix();
+		transformSprite1->Update(device);
+		material->SetMatrix(_T("gWorldMatrix"), matWorld);
+		transformSprite1->GetComponent<SpriteRenderer>()->Draw(*device);
+
+		transformSprite2->GetMatrixWorld(matWorld);
+		transformSprite2->UpdateWorldMatrix();
+		transformSprite2->Update(device);
+		material->SetMatrix(_T("gWorldMatrix"), matWorld);
+		transformSprite2->GetComponent<SpriteRenderer>()->Draw(*device);
 		
-		appTimer.Update();
+		/*appTimer.Update();
 		uint time = appTimer.GetElapsedTime();
 		int frame = time % animation->GetAnimCurveVec()->data()[0]->GetLength();
-		transformMesh->GetComponent<SkinnedMeshRenderer>()->Test(*device, animation, frame);
+		transformMesh->GetComponent<SkinnedMeshRenderer>()->Test(*device, animation, frame);*/
 		
 		//transformTerrain->UpdateWorldMatrix();
 		//transformTerrain->Update(*device);
