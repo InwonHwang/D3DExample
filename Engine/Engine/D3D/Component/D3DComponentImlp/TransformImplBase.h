@@ -8,7 +8,18 @@ class TransformImplBase : public ComponentImpl
 	//friend class ComponentImpl;
 	friend class Transform;
 public:
-	virtual ~TransformImplBase() {}
+	TransformImplBase()
+	{
+		_matLocal.reset(new D3DXMATRIX);
+		_matWorldParent.reset(new D3DXMATRIX);
+		D3DXMatrixIdentity(_matLocal.get());
+		D3DXMatrixIdentity(_matWorldParent.get());
+	}
+	virtual ~TransformImplBase()
+	{
+		_matLocal.reset();
+		_matWorldParent.reset();
+	}
 
 	virtual void Update(IDirect3DDevice9* device) = 0;
 	virtual void UpdateMatrix() = 0;
@@ -32,7 +43,7 @@ public:
 	virtual void GetAxisZ(Vector3& outAxisZ) const = 0;
 	
 protected:
-	D3DXMATRIX _matLocal;
-	D3DXMATRIX _matWorldParent;
+	sp<D3DXMATRIX> _matLocal;
+	sp<D3DXMATRIX> _matWorldParent;
 };
 

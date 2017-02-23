@@ -40,7 +40,12 @@ public:
 	// friend private 함수로 바꾸기
 	void GetMatrixWorld(D3DXMATRIX& outMatWorld) const
 	{
-		outMatWorld = _impl->_matLocal * _impl->_matWorldParent;
+		D3DXMATRIX matLocal;
+		D3DXMATRIX matWorldParent;	
+
+		_impl->GetMatrixLocal(matLocal);
+		_impl->GetMatrixWorldParent(matWorldParent);
+		outMatWorld = matLocal * matWorldParent;
 	}
 
 private:

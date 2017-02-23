@@ -1,8 +1,12 @@
 #pragma once
 #include "TransformImplBase.h"
+//#include "..\Transform.h"
+
+class Transform;
 
 class TransformImpl : public TransformImplBase
 {
+	typedef std::vector<wp<Transform>> TransformVec;
 public:
 	TransformImpl();
 	~TransformImpl();
@@ -28,7 +32,18 @@ public:
 	virtual void GetAxisY(Vector3& outAxisY) const override;
 	virtual void GetAxisZ(Vector3& outAxisZ) const override;
 
+	void GetMatrixLocal(D3DXMATRIX& outMatLocal) const;
+	void GetMatrixWorldParent(D3DXMATRIX& outMatLocal) const;
+
+	void SetParent(wp<Transform> pParent) const;
+	uint GetChildCount() const;
+	wp<Transform> GetParent() const;
+	wp<Transform> GetChild(uint index) const;
+
 private:
+	void InternalAddChild(wp<Transform> pChild);
+	void InternalRemoveChild(wp<Transform> pChild);
+
 	void InternalSetScale(const Vector3& s);
 	void InternalSetRotation(const Quaternion& q);
 	void InternalSetTranslation(const Vector3& t);
@@ -40,71 +55,83 @@ private:
 
 
 private:
-	Vector3*		_scale;
-	Quaternion*		_rotation;
-	Vector3*		_position;
+	sp<Vector3>		_pScale;
+	sp<Quaternion>	_pRotation;
+	sp<Vector3>		_pPosition;
+	sp<Vector3>		_pAxisX;
+	sp<Vector3>		_pAxisY;
+	sp<Vector3>		_pAxisZ;
 
-	Vector3*		_axisX;
-	Vector3*		_axisY;
-	Vector3*		_axisZ;
+	wp<Transform>	_pParent;
+	sp<TransformVec> _pChildrenVec;
 };
 
 inline void TransformImpl::GetLocalScale(Vector3& outLocalScale) const
 {
-	InternalMatrixToScale(_matLocal, outLocalScale);
+	InternalMatrixToScale(*_matLocal, outLocalScale);
 }
 
 inline void TransformImpl::GetLocalRotation(Quaternion& outLocalRotation) const
 {
-	InternalMatrixToRotation(_matLocal, outLocalRotation);
+	InternalMatrixToRotation(*_matLocal, outLocalRotation);
 }
 
 inline void TransformImpl::GetLocalEulerAngle(Vector3& outLocalEulerAngle) const
 {
 	Quaternion outLocalRotation;
-	InternalMatrixToRotation(_matLocal, outLocalRotation);
+	InternalMatrixToRotation(*_matLocal, outLocalRotation);
 	outLocalEulerAngle =  Quaternion::ToEulerAngle(outLocalRotation);
 }
 
 inline void TransformImpl::GetLocalPosition(Vector3& outLocalPosition) const
 {
-	InternalMatrixToTranslation(_matLocal, outLocalPosition);
+	InternalMatrixToTranslation(*_matLocal, outLocalPosition);
 }
 
 inline void TransformImpl::GetScale(Vector3& outScale) const
 {
-	InternalMatrixToScale(_matLocal * _matWorldParent, outScale);
+	InternalMatrixToScale(*_matLocal * *_matWorldParent, outScale);
 }
 
 inline void TransformImpl::GetRotation(Quaternion& outRotation) const
 {
-	InternalMatrixToRotation(_matLocal, outRotation);
+	InternalMatrixToRotation(*_matLocal, outRotation);
 }
 
 inline void TransformImpl::GetEulerAngle(Vector3& outEulerAngle) const
 {
 	Quaternion outLocalRotation;
-	InternalMatrixToRotation(_matLocal * _matWorldParent, outLocalRotation);
+	InternalMatrixToRotation(*_matLocal * *_matWorldParent, outLocalRotation);
 	outEulerAngle = Quaternion::ToEulerAngle(outLocalRotation);
 }
 
 inline void TransformImpl::GetPosition(Vector3& outPosition) const
 {
-	InternalMatrixToTranslation(_matLocal * _matWorldParent, outPosition);
+	InternalMatrixToTranslation(*_matLocal * *_matWorldParent, outPosition);
 }
 
 inline void TransformImpl::GetAxisX(Vector3& outAxisX) const
 {
-	outAxisX = *_axisX;
+	outAxisX = *_pAxisX;
 }
 
 inline void TransformImpl::GetAxisY(Vector3& outAxisY) const
 {
-	outAxisY = *_axisY;
+	outAxisY = *_pAxisY;
 }
 
 inline void TransformImpl::GetAxisZ(Vector3& outAxisZ) const
 {
-	outAxisZ = *_axisZ;	
+	outAxisZ = *_pAxisZ;	
+}
+
+inline void TransformImpl::GetMatrixLocal(D3DXMATRIX& outMatLocal) const
+{
+	outMatLocal = *_matLocal;
+}
+
+inline void TransformImpl::GetMatrixWorldParent(D3DXMATRIX& outMatWorldParent) const
+{
+	outMatWorldParent = *_matWorldParent;
 }
 

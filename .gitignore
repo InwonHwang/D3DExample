@@ -1,5 +1,7 @@
 # Created by https://www.gitignore.io/api/visualstudio,c++
 
+#Engine/ThirdParty/
+
 ### C++ ###
 # Prerequisites
 *.d

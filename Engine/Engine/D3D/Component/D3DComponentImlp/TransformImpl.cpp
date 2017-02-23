@@ -1,35 +1,37 @@
 #include "TransformImpl.h"
-
-extern ResourceManager resourceManager;
+#include "..\Transform.h"
 
 TransformImpl::TransformImpl()
+	: TransformImplBase()
 {
-	D3DXMatrixIdentity(&_matLocal);
-	D3DXMatrixIdentity(&_matWorldParent);
-	_scale = new Vector3(1.0f, 1.0f, 1.0f);
-	_rotation = new Quaternion(Quaternion::Euler(0.0f, 0.0f, 0.0f));	
-	_position = new Vector3(0.0f, 0.0f, 0.0f);
-	_axisX = new Vector3(1.0f, 0.0f, 0.0f);
-	_axisY = new Vector3(0.0f, 1.0f, 0.0f);
-	_axisZ = new Vector3(0.0f, 0.0f, 1.0f);
+	_pScale.reset(new Vector3(1.0f, 1.0f, 1.0f));
+	_pRotation.reset(new Quaternion(0, 0, 0, 0));
+	_pPosition.reset(new Vector3(0.0f, 0.0f, 0.0f));
+	_pAxisX.reset(new Vector3(1.0f, 0.0f, 0.0f));
+	_pAxisY.reset(new Vector3(0.0f, 1.0f, 0.0f));
+	_pAxisZ.reset(new Vector3(0.0f, 0.0f, 1.0f));
+	
+	_pChildrenVec.reset(new TransformVec);
 }
 
 
 TransformImpl::~TransformImpl()
 {
-	SafeDelete<Vector3>(_scale);
-	SafeDelete<Quaternion>(_rotation);
-	SafeDelete<Vector3>(_position);
-	SafeDelete<Vector3>(_axisX);
-	SafeDelete<Vector3>(_axisY);
-	SafeDelete<Vector3>(_axisZ);
+	_pScale.reset();
+	_pRotation.reset();
+	_pPosition.reset();
+	_pAxisX.reset();
+	_pAxisY.reset();
+	_pAxisZ.reset();
+
+	_pChildrenVec.reset();
 }
 
 void TransformImpl::Update(IDirect3DDevice9* pDevice)
 {
 	assert(pDevice);
 
-	D3DXMATRIX matWorld = _matLocal * _matWorldParent;
+	D3DXMATRIX matWorld = *_matLocal * *_matWorldParent;
 	pDevice->SetTransform(D3DTS_WORLD, &matWorld);
 }
 
@@ -55,38 +57,38 @@ void TransformImpl::SetLocalPosition(const Vector3& position)
 
 void TransformImpl::InternalSetScale(const Vector3& s)
 {
-	*_scale = s;
+	*_pScale = s;
 }
 
 void TransformImpl::InternalSetRotation(const Quaternion& q)
 {
-	*_rotation = q;
+	*_pRotation = q;
 
 	D3DXMATRIX matRot;
 	D3DXMatrixRotationQuaternion(&matRot, &q);
 
-	D3DXVec3TransformCoord(_axisX, &Vector3(1.0f, 0.0f, 0.0f), &matRot);
-	D3DXVec3TransformCoord(_axisY, &Vector3(0.0f, 1.0f, 0.0f), &matRot);
-	D3DXVec3TransformCoord(_axisZ, &Vector3(0.0f, 0.0f, 1.0f), &matRot);
-	D3DXVec3Normalize(_axisX, _axisX);
-	D3DXVec3Normalize(_axisY, _axisY);
-	D3DXVec3Normalize(_axisZ, _axisZ);
+	D3DXVec3TransformCoord(_pAxisX.get(), &Vector3(1.0f, 0.0f, 0.0f), &matRot);
+	D3DXVec3TransformCoord(_pAxisY.get(), &Vector3(0.0f, 1.0f, 0.0f), &matRot);
+	D3DXVec3TransformCoord(_pAxisZ.get(), &Vector3(0.0f, 0.0f, 1.0f), &matRot);
+	D3DXVec3Normalize(_pAxisX.get(), _pAxisX.get());
+	D3DXVec3Normalize(_pAxisY.get(), _pAxisY.get());
+	D3DXVec3Normalize(_pAxisZ.get(), _pAxisZ.get());
 }
 
 void TransformImpl::InternalSetTranslation(const Vector3& t)
 {
-	*_position = t;
+	*_pPosition = t;
 }
 
 void TransformImpl::InternalUpdateWorldMatrix()
 {
 	D3DXMATRIX scale, rotation , translation;
 	
-	D3DXMatrixScaling(&scale, _scale->x, _scale->y, _scale->z);
-	D3DXMatrixRotationQuaternion(&rotation, _rotation);
-	D3DXMatrixTranslation(&translation, _position->x, _position->y, _position->z);
+	D3DXMatrixScaling(&scale, _pScale->x, _pScale->y, _pScale->z);
+	D3DXMatrixRotationQuaternion(&rotation, _pRotation.get());
+	D3DXMatrixTranslation(&translation, _pPosition->x, _pPosition->y, _pPosition->z);
 
-	_matLocal = scale * rotation * translation;	
+	*_matLocal = scale * rotation * translation;	
 }
 
 void TransformImpl::InternalMatrixToScale(const D3DXMATRIX& matrix, Vector3& outScale) const
@@ -108,4 +110,49 @@ void TransformImpl::InternalMatrixToTranslation(const D3DXMATRIX& matrix, Vector
 	Vector3 s;
 	Quaternion r;
 	D3DXMatrixDecompose(&s, &r, &outPosition, &matrix);
+}
+
+void TransformImpl::SetParent(wp<Transform> pParent) const
+{
+	// pParent가 nullptr일때 sceneNode를 부모로 할 예정.
+	/*if (!_pParent.expired())
+	{
+		_pParent.lock()->
+	}*/
+}
+uint TransformImpl::GetChildCount() const
+{
+	assert(_pChildrenVec);
+
+	return _pChildrenVec->size();
+}
+wp<Transform> TransformImpl::GetParent() const
+{
+	return _pParent;
+}
+wp<Transform> TransformImpl::GetChild(uint index) const
+{
+	assert(_pChildrenVec);
+
+	return _pChildrenVec->data()[index];
+}
+
+void TransformImpl::InternalAddChild(wp<Transform> pChild)
+{
+	assert(_pChildrenVec);
+
+	_pChildrenVec->push_back(pChild);
+}
+void TransformImpl::InternalRemoveChild(wp<Transform> pChild)
+{
+	assert(_pChildrenVec);
+
+	for (auto it = _pChildrenVec->begin(); it != _pChildrenVec->end(); ++it)
+	{
+		if (!it->expired() && it->lock() == pChild.lock())
+		{
+			_pChildrenVec->erase(it);
+			break;
+		}
+	}
 }

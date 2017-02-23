@@ -11,6 +11,7 @@ Transform::Transform()
 
 Transform::~Transform()
 {
+	_impl.reset();
 }
 
 void Transform::Destroy()
