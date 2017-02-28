@@ -1,13 +1,13 @@
 #pragma once
-#include "ResourcePoolImpl.h"
+#include "ResourceTable.h"
 
 template<typename T>
-class ResourcePool : public ResourcePoolImpl
+class ResourcePool : public ResourceTable
 {
 	typedef boost::object_pool<T> Pool;
 
 public:
-	ResourcePool(ResourcePoolHandle handle)	: ResourcePoolImpl(handle) {}
+	ResourcePool(ResourcePoolID handle)	: ResourceTable(handle) {}
 	~ResourcePool() {}
 
 	//sp<T> Load();
@@ -33,7 +33,7 @@ sp<T> ResourcePool<T>::Create()
 	else
 	{
 		_resourceCount++;
-		ResourceHandle handle = GenerateResourceHandle();
+		ResourceID handle = GenerateResourceHandle();
 		T* resource = _allocator.construct(handle, this);
 		sp<T> newReousrce(resource, [](const void*) {});
 		RegisterResource(handle, newReousrce);

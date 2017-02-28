@@ -9,7 +9,7 @@ class SurfaceMaterial : public ResourceItem
 	typedef std::vector<D3DXPARAMETER_DESC> ParamEffectVec;
 
 public:
-	SurfaceMaterial(ResourceHandle handle, ResourcePoolImpl* pool);
+	SurfaceMaterial(ResourceID handle, ResourceTable* pool);
 	~SurfaceMaterial();
 
 	virtual void Destroy() override;
@@ -20,6 +20,8 @@ public:
 	void SetInt(const String& semantic, int value);
 	void SetMatrix(const String& semantic, const D3DXMATRIX& matrix);
 	void SetTexture(const String& semantic, const sp<Texture> texture);
+	void SetMatrixArray(const String& semantic, const D3DXMATRIX* pMatrix, uint count);
+	void SetMatrixPointerArray(const String& semantic, const D3DXMATRIX** ppMatrix, uint count);
 
 	// friend class SpriteRenderer private함수로 바꾸기
 	uint GetParamCount() const;							// effect 파일 안에 parameter 개수
@@ -78,9 +80,32 @@ inline void SurfaceMaterial::SetMatrix(const String& semantic, const D3DXMATRIX&
 	str.assign(semantic.begin(), semantic.end());
 	_effect->GetD3DEffect()->SetMatrix(str.c_str(), &matrix);
 #else
-	_effect->GetD3DEffect()->SetMatrixLocal(semantic.c_str(), &matrix);
+	_effect->GetD3DEffect()->SetMatrix(semantic.c_str(), &matrix);
 #endif	
 }
+
+inline void SurfaceMaterial::SetMatrixArray(const String& semantic, const D3DXMATRIX* pMatrix, uint count)
+{
+#ifdef _UNICODE
+	std::string str;
+	str.assign(semantic.begin(), semantic.end());
+	_effect->GetD3DEffect()->SetMatrixArray(str.c_str(), pMatrix, count);
+#else
+	_effect->GetD3DEffect()->SetMatrixArray(semantic.c_str(), pMatrix, count);
+#endif	
+}
+
+inline void SurfaceMaterial::SetMatrixPointerArray(const String& semantic, const D3DXMATRIX** ppMatrix, uint count)
+{
+#ifdef _UNICODE
+	std::string str;
+	str.assign(semantic.begin(), semantic.end());
+	_effect->GetD3DEffect()->SetMatrixPointerArray(str.c_str(), ppMatrix, count);
+#else
+	_effect->GetD3DEffect()->SetMatrixPointerArray(semantic.c_str(), ppMatrix, count);
+#endif	
+}
+
 
 inline void SurfaceMaterial::SetTexture(const String& semantic, const sp<Texture> texture)
 {

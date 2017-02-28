@@ -1,6 +1,6 @@
 #include "IndexBuffer.h"
 
-IndexBuffer::IndexBuffer(ResourceHandle handle, ResourcePoolImpl* pool)
+IndexBuffer::IndexBuffer(ResourceID handle, ResourceTable* pool)
 	: ResourceItem(handle, pool),
 	_ib(nullptr)
 {

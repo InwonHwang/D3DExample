@@ -2,7 +2,7 @@
 
 extern ResourceManager resourceManager;
 
-TerrainData::TerrainData(ResourceHandle handle, ResourcePoolImpl* pool)
+TerrainData::TerrainData(ResourceID handle, ResourceTable* pool)
 	: ResourceItem(handle, pool),
 	_vb(nullptr),
 	_ib(nullptr),
@@ -41,7 +41,7 @@ bool TerrainData::Create(IDirect3DDevice9& device, int width, const std::vector<
 	int sizeIB = (_width - 1) * (_width - 1) * 2 * sizeof(INDEX);
 	float coordIncrementSize = 1.0f / (float)_width;	// uv값 증가략
 
-	if (!_vb->CreateVertexBuffer(device, sizeVB, 0, D3DPOOL_MANAGED))
+	if (!_vb->CreateVertexBuffer(device, sizeVB, 0, 0, D3DPOOL_MANAGED))
 		return false;	
 
 	if (!_ib->CreateIndexBuffer(device, sizeIB, 0, D3DPOOL_DEFAULT))

@@ -32,9 +32,6 @@ public:
 	virtual void GetAxisY(Vector3& outAxisY) const override;
 	virtual void GetAxisZ(Vector3& outAxisZ) const override;
 
-	void GetMatrixLocal(D3DXMATRIX& outMatLocal) const;
-	void GetMatrixWorldParent(D3DXMATRIX& outMatLocal) const;
-
 	// 인지를 shared_ptr로 쓰면 this 포인터를 못씀
 	// 쓰려면 enable_shared_from_this 를 상속 받아서 shared_from_this() 함수를 써야함
 	void SetParent(sp<Transform> pParent, sp<Transform> pTransform);
@@ -57,7 +54,6 @@ private:
 	void InternalMatrixToScale(const D3DXMATRIX& matrix, Vector3& outScale) const;
 	void InternalMatrixToRotation(const D3DXMATRIX& matrix, Quaternion& outRotation) const;
 	void InternalMatrixToTranslation(const D3DXMATRIX& matrix, Vector3& outPosition) const;
-
 
 private:
 	sp<Vector3>		_pScale;
@@ -146,28 +142,18 @@ inline void TransformImpl::GetAxisZ(Vector3& outAxisZ) const
 	outAxisZ = *_pAxisZ;	
 }
 
-inline void TransformImpl::GetMatrixLocal(D3DXMATRIX& outMatLocal) const
-{
-	assert(_matLocal);
-	outMatLocal = *_matLocal;
-}
-
-inline void TransformImpl::GetMatrixWorldParent(D3DXMATRIX& outMatWorldParent) const
-{
-	assert(_matWorldParent);
-	outMatWorldParent = *_matWorldParent;
-}
-
 inline uint TransformImpl::GetChildCount() const
 {
 	assert(_pChildrenVec);
 
 	return _pChildrenVec->size();
 }
+
 inline wp<Transform> TransformImpl::GetParent() const
 {
 	return _pParent;
 }
+
 inline wp<Transform> TransformImpl::GetChild(uint index) const
 {
 	assert(_pChildrenVec);

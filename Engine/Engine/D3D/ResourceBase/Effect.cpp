@@ -1,6 +1,6 @@
 #include "Effect.h"
 
-Effect::Effect(ResourceHandle handle, ResourcePoolImpl* pool)
+Effect::Effect(ResourceID handle, ResourceTable* pool)
 	: ResourceItem(handle, pool),
 	_effect(nullptr)
 {
@@ -36,9 +36,15 @@ bool Effect::CreateEffect(IDirect3DDevice9& device, const String& fileName)
 	// 컴파일 에러를 출력한다.
 	if (!_effect && pError)
 	{
-		//int size = pError->GetBufferSize();
-		//void *ack = pError->GetBufferPointer();
+		int size = pError->GetBufferSize();
+		void *ack = pError->GetBufferPointer();
 
+		char* error = new char[size];
+		memcpy(error, ack, size);
+
+		MessageBoxA(GetActiveWindow(), error, error, 0);
+
+		delete[] error;
 		return false;
 	}
 	

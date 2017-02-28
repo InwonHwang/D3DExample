@@ -7,7 +7,7 @@ class TerrainData : public ResourceItem
 {
 	typedef std::vector<Vector3> HeightMapVec;
 public:
-	TerrainData(ResourceHandle handle, ResourcePoolImpl* pool);
+	TerrainData(ResourceID handle, ResourceTable* pool);
 	~TerrainData();
 
 	virtual void Destroy() override;

@@ -7,7 +7,7 @@ class Animation : public ResourceItem
 {
 	typedef std::vector<sp<AnimationCurve>> AnimCurveVec;
 public:
-	Animation(ResourceHandle handle, ResourcePoolImpl* pool);
+	Animation(ResourceID handle, ResourceTable* pool);
 	~Animation();
 
 	virtual void Destroy() override;

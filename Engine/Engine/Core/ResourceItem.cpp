@@ -1,7 +1,7 @@
 #include "ResourceItem.h"
 #include "ResourcePool.h"
 
-ResourceItem::ResourceItem(ResourceHandle handle, ResourcePoolImpl* pool)
+ResourceItem::ResourceItem(ResourceID handle, ResourceTable* pool)
 	: _handle(handle),
 	_pool(pool)	
 {

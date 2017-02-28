@@ -2,7 +2,7 @@
 
 extern ResourceManager resourceManager;
 
-Sprite::Sprite(ResourceHandle handle, ResourcePoolImpl* pool)
+Sprite::Sprite(ResourceID handle, ResourceTable* pool)
 	: ResourceItem(handle, pool),
 	_vb(nullptr),
 	_ib(nullptr),
@@ -29,7 +29,7 @@ bool Sprite::Create(IDirect3DDevice9& device, sp<Texture> texture)
 	_vb = resourceManager.Create<VertexBuffer>(); // VertexBuffer Pool로 VertexBuffer만들기	
 	_ib = resourceManager.Create<IndexBuffer>(); // IndexBuffer Pool로 IndexBuffer만들기
 	
-	if (_vb->CreateVertexBuffer(device, sizeof(STATICMESHVERTEX) * 4, 0, D3DPOOL_MANAGED) == false)
+	if (_vb->CreateVertexBuffer(device, sizeof(STATICMESHVERTEX) * 4, 0, 0, D3DPOOL_MANAGED) == false)
 		return false;
 	
 	if (_ib->CreateIndexBuffer(device, sizeof(INDEX) * 2, 0, D3DPOOL_MANAGED) == false)

@@ -4,7 +4,7 @@
 class IndexBuffer : public ResourceItem
 {
 public:
-	IndexBuffer(ResourceHandle handle, ResourcePoolImpl* pool);
+	IndexBuffer(ResourceID handle, ResourceTable* pool);
 	~IndexBuffer();
 
 	virtual void Destroy() override;

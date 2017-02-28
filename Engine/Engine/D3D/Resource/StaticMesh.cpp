@@ -2,7 +2,7 @@
 
 extern ResourceManager resourceManager;
 
-StaticMesh::StaticMesh(ResourceHandle handle, ResourcePoolImpl* pool)
+StaticMesh::StaticMesh(ResourceID handle, ResourceTable* pool)
 	: Mesh(handle, pool)
 {
 }
@@ -30,7 +30,7 @@ bool StaticMesh::Create(IDirect3DDevice9& device, sp<FBXMESHDATA> fbxData)
 	_vb = resourceManager.Create<VertexBuffer>();
 	_ib = resourceManager.Create<IndexBuffer>();
 
-	if (!_vb->CreateVertexBuffer(device, _vertexCount * sizeof(STATICMESHVERTEX), 0, D3DPOOL_MANAGED))
+	if (!_vb->CreateVertexBuffer(device, _vertexCount * sizeof(STATICMESHVERTEX), 0, 0, D3DPOOL_MANAGED))
 		return false;
 
 	if (!_ib->CreateIndexBuffer(device, _primitiveCount * sizeof(INDEX), 0, D3DPOOL_MANAGED))

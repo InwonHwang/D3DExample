@@ -6,7 +6,7 @@
 class Mesh : public ResourceItem
 {
 public:
-	Mesh(ResourceHandle handle, ResourcePoolImpl* pool);
+	Mesh(ResourceID handle, ResourceTable* pool);
 	virtual ~Mesh();
 
 	virtual void Destroy() override;

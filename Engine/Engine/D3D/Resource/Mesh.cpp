@@ -1,6 +1,6 @@
 #include "Mesh.h"
 
-Mesh::Mesh(ResourceHandle handle, ResourcePoolImpl* pool)
+Mesh::Mesh(ResourceID handle, ResourceTable* pool)
 	: ResourceItem(handle, pool),
 	_vb(nullptr),
 	_ib(nullptr),

@@ -20,12 +20,10 @@
 //--------------------------------------------------------------//
 // Pass 0
 //--------------------------------------------------------------//
-string TextureMapping_Pass_0_Model : ModelData = ".\\Sphere.x";
-
 float4x4 gWorldMatrix : World;
 float4x4 gViewMatrix : View;
 float4x4 gProjectionMatrix : Projection;
-float4x3 gMatrixPalette[64] : MatrixArray;
+float4x4 gFinalTransforms[29] : BoneMatrixArray;
 
 struct VS_INPUT
 {
@@ -35,10 +33,11 @@ struct VS_INPUT
 
 struct VS_SKINNEDINPUT
 {
-	float4 mPosition : POSITION;
-	float2 mTexCoord : TEXCOORD0;	
-	float4 mWeights : TEXCOORD1;
-	float4 mBoneIndices : TEXCOORD2;
+	float4 position : POSITION;
+	float4 normal : NORMAL;
+	float2 texCoord : TEXCOORD;
+	float4 weights : BLENDWEIGHT;
+	unsigned int4 boneIndices : BLENDINDICES;
 };
 
 struct VS_OUTPUT
@@ -47,26 +46,28 @@ struct VS_OUTPUT
 	float2 mTexCoord : TEXCOORD0;
 };
 
-VS_OUTPUT vs_main(VS_SKINNEDINPUT Input)
+VS_OUTPUT VertexBlend(VS_INPUT input)
 {
-	VS_OUTPUT Output = (VS_OUTPUT)0;
-	//int4 IndexVector = D3DCOLORtoUBYTE4(Input.mBoneIndices);
-
-	float3 p = { 0.0f, 0.0f, 0.0f };
+	VS_OUTPUT output = (VS_OUTPUT)0;
+	/*float4 p = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	float lastWeight = 0.0f;
 
 	for (int i = 0; i < 4; ++i)
 	{
-		p += Input.mWeights[i] * mul(Input.mPosition, gMatrixPalette[Input.mBoneIndices[i]]);
+		lastWeight += input.weights[i];
+		p += input.weights[i] * mul(input.position, gFinalTransforms[input.boneIndices[i]]);
 	}
+	p.w = 1.0f;*/
 
-	Output.mPosition = mul(float4(p, 1), gWorldMatrix);
-	Output.mPosition = mul(Output.mPosition, gViewMatrix);
-	Output.mPosition = mul(Output.mPosition, gProjectionMatrix);
-	Output.mTexCoord = Input.mTexCoord;
-
-	return Output;
+	//output.mPosition = mul(p, gWorldMatrix);
+	output.mPosition = mul(input.mPosition, gWorldMatrix);
+	output.mPosition = mul(output.mPosition, gViewMatrix);
+	output.mPosition = mul(output.mPosition, gProjectionMatrix);
+	output.mTexCoord = input.mTexCoord;
+	return output;
 }
-texture DiffuseMap_Tex;
+
+texture DiffuseMap_Tex : DiffuseMap;
 
 sampler2D DiffuseSampler = sampler_state
 {
@@ -78,7 +79,7 @@ struct PS_INPUT
 	float2 mTexCoord : TEXCOORD0;
 };
 
-float4 ps_main(PS_INPUT Input) : COLOR
+float4 TextureMapping_Pass_0_Pixel_Shader_ps_main(PS_INPUT Input) : COLOR
 {
 	float4 albedo = tex2D(DiffuseSampler, Input.mTexCoord);
 	return albedo.rgba;
@@ -91,8 +92,8 @@ technique TextureMapping
 {
 	pass Pass_0
 	{
-		VertexShader = compile vs_2_0 vs_main();
-		PixelShader = compile ps_2_0 ps_main();
+		VertexShader = compile vs_2_0 VertexBlend();
+		PixelShader = compile ps_2_0 TextureMapping_Pass_0_Pixel_Shader_ps_main();
 	}
 }
 

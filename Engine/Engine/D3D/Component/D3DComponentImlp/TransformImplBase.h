@@ -7,9 +7,11 @@ class TransformImplBase : public ComponentImpl
 	//friend class ComponentImpl;
 public:
 	TransformImplBase()
+		: _parentID(-1)
 	{
 		_matLocal.reset(new D3DXMATRIX);
 		_matWorldParent.reset(new D3DXMATRIX);
+		_name.reset(new String(_T("GameObject")));
 		D3DXMatrixIdentity(_matLocal.get());
 		D3DXMatrixIdentity(_matWorldParent.get());
 	}
@@ -39,9 +41,23 @@ public:
 	virtual void GetAxisX(Vector3& outAxisX) const abstract;
 	virtual void GetAxisY(Vector3& outAxisY) const abstract;
 	virtual void GetAxisZ(Vector3& outAxisZ) const abstract;
+
+	D3DXMATRIX* GetMatrixLocal() const
+	{
+		assert(_matLocal);
+		return _matLocal.get();
+	}
+
+	D3DXMATRIX* GetMatrixWorldParent() const
+	{
+		assert(_matWorldParent);
+		return _matWorldParent.get();
+	}
 	
-protected:
-	sp<D3DXMATRIX> _matLocal;
-	sp<D3DXMATRIX> _matWorldParent;
+protected:	
+	sp<D3DXMATRIX>	_matLocal;
+	sp<D3DXMATRIX>	_matWorldParent;
+	sp<String>		_name;
+	int				_parentID;
 };
 

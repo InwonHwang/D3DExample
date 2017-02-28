@@ -1,28 +1,28 @@
-#include "ResourcePoolImpl.h"
+#include "ResourceTable.h"
 
 
 
-ResourcePoolImpl::ResourcePoolImpl(ResourcePoolHandle handle)
+ResourceTable::ResourceTable(ResourcePoolID handle)
 	: _handle(handle)
 {
 }
 
 
-ResourcePoolImpl::~ResourcePoolImpl()
+ResourceTable::~ResourceTable()
 {
 }
 
-String ResourcePoolImpl::GetName(ResourceHandle handle)
+String ResourceTable::GetName(ResourceID handle)
 {
 	return _nameMap[handle];
 }
 
-void ResourcePoolImpl::SetName(ResourceHandle handle, const String& name)
+void ResourceTable::SetName(ResourceID handle, const String& name)
 {
 	_nameMap[handle] = name;	
 }
 
-sp<ResourceItem> ResourcePoolImpl::GetResource(ResourceHandle handle)
+sp<ResourceItem> ResourceTable::GetResource(ResourceID handle)
 {
 	auto it = _resourceMap.find(handle);
 
@@ -32,9 +32,9 @@ sp<ResourceItem> ResourcePoolImpl::GetResource(ResourceHandle handle)
 	return nullptr;
 }
 
-sp<ResourceItem> ResourcePoolImpl::GetResource(const String& name)
+sp<ResourceItem> ResourceTable::GetResource(const String& name)
 {
-	ResourceHandle handle = GetResourceHandle(name);
+	ResourceID handle = GetResourceHandle(name);
 	auto it = _resourceMap.find(handle);
 
 	if (it != _resourceMap.end())
@@ -43,7 +43,7 @@ sp<ResourceItem> ResourcePoolImpl::GetResource(const String& name)
 	return nullptr;
 }
 
-void ResourcePoolImpl::Clear()
+void ResourceTable::Clear()
 {	
 	for (auto r : _resourceMap)
 	{
@@ -53,7 +53,7 @@ void ResourcePoolImpl::Clear()
 	_resourceMap.clear();
 }
 
-ResourceHandle ResourcePoolImpl::GetResourceHandle(const String& name)
+ResourceID ResourceTable::GetResourceHandle(const String& name)
 {
 	for (auto it = _nameMap.begin(); it != _nameMap.end(); ++it)
 	{
@@ -64,7 +64,7 @@ ResourceHandle ResourcePoolImpl::GetResourceHandle(const String& name)
 	return InvalidHandle;
 }
 
-sp<ResourceItem> ResourcePoolImpl::GetEmptyResource()
+sp<ResourceItem> ResourceTable::GetEmptyResource()
 {
 	for (auto it = _resourceMap.begin(); it != _resourceMap.end(); ++it)
 	{
@@ -78,7 +78,7 @@ sp<ResourceItem> ResourcePoolImpl::GetEmptyResource()
 	return nullptr;
 }
 
-void ResourcePoolImpl::RegisterResource(ResourceHandle handle, const sp<ResourceItem> resource)
+void ResourceTable::RegisterResource(ResourceID handle, const sp<ResourceItem> resource)
 {
 	auto it = _resourceMap.find(handle);
 
@@ -89,7 +89,7 @@ void ResourcePoolImpl::RegisterResource(ResourceHandle handle, const sp<Resource
 	_resourceMap[handle] = resource;
 }
 
-sp<ResourceItem> ResourcePoolImpl::UnregisterResource(ResourceHandle handle)
+sp<ResourceItem> ResourceTable::UnregisterResource(ResourceID handle)
 {
 	auto it = _resourceMap.find(handle);
 	
@@ -104,7 +104,7 @@ sp<ResourceItem> ResourcePoolImpl::UnregisterResource(ResourceHandle handle)
 	return nullptr;
 }
 
-ResourceHandle ResourcePoolImpl::GenerateResourceHandle() const
+ResourceID ResourceTable::GenerateResourceHandle() const
 {
 	for (uint i = 0; i < _resourceCount; ++i)
 	{

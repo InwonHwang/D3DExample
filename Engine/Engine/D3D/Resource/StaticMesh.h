@@ -5,7 +5,7 @@
 class StaticMesh : public Mesh
 {
 public:
-	StaticMesh(ResourceHandle handle, ResourcePoolImpl* pool);
+	StaticMesh(ResourceID handle, ResourceTable* pool);
 	~StaticMesh();
 
 	virtual void Destroy() override;

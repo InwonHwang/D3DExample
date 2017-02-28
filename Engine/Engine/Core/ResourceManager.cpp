@@ -19,7 +19,7 @@ void ResourceManager::Destroy()
 	_poolMap.clear();
 }
 
-ResourcePoolHandle ResourceManager::GenerateResourcePoolHandle() const
+ResourcePoolID ResourceManager::GenerateResourcePoolHandle() const
 {	
 	return _poolMap.size() + 1;
 }

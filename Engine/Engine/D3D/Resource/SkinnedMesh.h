@@ -5,14 +5,14 @@ class SkinnedMesh : public Mesh
 {
 	typedef std::vector<int> BoneIndexVec;
 public:
-	SkinnedMesh(ResourceHandle handle, ResourcePoolImpl* pool);
+	SkinnedMesh(ResourceID handle, ResourceTable* pool);
 	~SkinnedMesh();
 
 	virtual void Destroy() override;
 
 	virtual bool Create(IDirect3DDevice9& device, sp<FBXMESHDATA> fbxData) override;
 
-	sp<std::vector<int>> GetBoneIndex() const;	
+	//sp<std::vector<int>> GetBoneIndex() const;	
 
 	// 소프트웨어 스키닝 테스트용
 public:
@@ -24,8 +24,8 @@ private:
 	sp<BoneIndexVec> _boneIndexVec;
 };
 
-inline sp<SkinnedMesh::BoneIndexVec> SkinnedMesh::GetBoneIndex() const
-{
-	return _boneIndexVec;
-}
+//inline sp<SkinnedMesh::BoneIndexVec> SkinnedMesh::GetBoneIndex() const
+//{
+//	return _boneIndexVec;
+//}
 

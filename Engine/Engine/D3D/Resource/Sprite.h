@@ -6,7 +6,7 @@
 class Sprite : public ResourceItem
 {
 public:
-	Sprite(ResourceHandle handle, ResourcePoolImpl* pool);
+	Sprite(ResourceID handle, ResourceTable* pool);
 	~Sprite();
 
 	virtual void Destroy() override;

@@ -2,9 +2,9 @@
 #include "BitFlag.h"
 #include "DataTypes.h"
 
-class ResourcePoolImpl;
+class ResourceTable;
 
-typedef unsigned int ResourceHandle;
+typedef unsigned int ResourceID;
 
 class ResourceItem
 {
@@ -16,12 +16,12 @@ public:
 	};
 
 public:
-	ResourceItem(ResourceHandle handle, ResourcePoolImpl* pool);
+	ResourceItem(ResourceID handle, ResourceTable* pool);
 	virtual ~ResourceItem();
 
 	virtual void Destroy() abstract;
 
-	ResourceHandle GetHandle() const;
+	ResourceID GetHandle() const;
 	String GetName() const;
 	void SetName(const String& name) const;
 
@@ -36,8 +36,8 @@ protected:
 
 protected:
 	flag32			  _flagState;		// 리소스 상태 저장.
-	ResourceHandle	  _handle;			// 핸들값을 통해서 다른정보를 얻을 수 있음.	
-	ResourcePoolImpl* _pool;
+	ResourceID	  _handle;			// 핸들값을 통해서 다른정보를 얻을 수 있음.	
+	ResourceTable* _pool;
 };
 
 inline bool ResourceItem::IsLoaded() const
@@ -49,7 +49,7 @@ inline bool ResourceItem::IsBackup() const
 	return _flagState.check(eBackup);
 }
 
-inline ResourceHandle ResourceItem::GetHandle() const
+inline ResourceID ResourceItem::GetHandle() const
 {
 	return _handle;
 }

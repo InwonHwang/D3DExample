@@ -2,7 +2,7 @@
 
 extern ResourceManager resourceManager;
 
-SkinnedMesh::SkinnedMesh(ResourceHandle handle, ResourcePoolImpl* pool)
+SkinnedMesh::SkinnedMesh(ResourceID handle, ResourceTable* pool)
 	: Mesh(handle, pool)
 {
 	_boneIndexVec.reset(new BoneIndexVec);
@@ -38,55 +38,52 @@ bool SkinnedMesh::Create(IDirect3DDevice9& device, sp<FBXMESHDATA> fbxData)
 	_vb = resourceManager.Create<VertexBuffer>();
 	_ib = resourceManager.Create<IndexBuffer>();
 
-	if (!_vb->CreateVertexBuffer(device, _vertexCount * sizeof(SKINNEDMESHVERTEX), 0, D3DPOOL_MANAGED))
+	if (!_vb->CreateVertexBuffer(device, _vertexCount * sizeof(SKINNEDMESHVERTEX), 0, SKINNEDMESHVERTEX::FVF, D3DPOOL_MANAGED))
 		return false;
 
 	if (!_ib->CreateIndexBuffer(device, _primitiveCount * sizeof(INDEX), 0, D3DPOOL_MANAGED))
 		return false;
 
-	if (!_vb->CreateVertexDeclaration(device, SkinnedMeshDec))
-		return false;
+	//if (!_vb->CreateVertexDeclaration(device, SkinnedMeshDec))
+	//	return false;
 
-	std::set<int> boneIndex;	// 정점에 연결된 본 인덱스
+	//std::set<int> boneIndex;	// 정점에 연결된 본 인덱스
 
 	void * pData = nullptr;
 	if (_vb->Lock(0, _vertexCount * sizeof(SKINNEDMESHVERTEX), &pData, 0))
 	{
 		SKINNEDMESHVERTEX* pVertice = static_cast<SKINNEDMESHVERTEX*>(pData);
 		SKINNEDMESHVERTEX vertex;
+		//DWORD idx[4];
 
 		for (int i = 0; i < _vertexCount; ++i)
 		{
 			vertex.position = fbxData->verticeDataVec[i].vertex.position;
 			//vertex.color = fbxData->verticeDataVec[i].vertex.color;
-			vertex.normal = fbxData->verticeDataVec[i].vertex.normal;
+			//vertex.normal = fbxData->verticeDataVec[i].vertex.normal;
 			vertex.texCoord = fbxData->verticeDataVec[i].vertex.texCoord;
 			//vertex.tangent = fbxData->verticeDataVec[i].vertex.tangent;
 
-			vertex.index[0] = fbxData->verticeDataVec[i].vertexBlendingInfoVec[0].blendingIndex;
-			vertex.index[1] = fbxData->verticeDataVec[i].vertexBlendingInfoVec[1].blendingIndex;
-			vertex.index[2] = fbxData->verticeDataVec[i].vertexBlendingInfoVec[2].blendingIndex;
-			vertex.index[3] = fbxData->verticeDataVec[i].vertexBlendingInfoVec[3].blendingIndex;
-			boneIndex.insert(vertex.index[0]);
-			boneIndex.insert(vertex.index[1]);
-			boneIndex.insert(vertex.index[2]);
-			boneIndex.insert(vertex.index[3]);
-			
-			vertex.weight[0] = float(fbxData->verticeDataVec[i].vertexBlendingInfoVec[0].blendingWeight);
-			vertex.weight[1] = float(fbxData->verticeDataVec[i].vertexBlendingInfoVec[1].blendingWeight);
-			vertex.weight[2] = float(fbxData->verticeDataVec[i].vertexBlendingInfoVec[2].blendingWeight);
-			vertex.weight[3] = float(fbxData->verticeDataVec[i].vertexBlendingInfoVec[3].blendingWeight);
 
 			
+			for (int j = 0; j < 4; ++j)
+			{				
+				//idx[j] = fbxData->verticeDataVec[i].vertexBlendingInfoVec[j].blendingIndex;
+				vertex.index[j] = float(fbxData->verticeDataVec[i].vertexBlendingInfoVec[j].blendingIndex);
+				//boneIndex.insert(idx[j]);
+				vertex.weight[j] = float(fbxData->verticeDataVec[i].vertexBlendingInfoVec[j].blendingWeight);
+			}
+
+			//vertex.index = ((idx[3]) << 24 | (idx[2]) << 16 | (idx[1]) << 8 | (idx[0]));
+			
 			pSkinnedMeshVertex[i] = vertex;
-			pVertexDraw[i].normal = vertex.normal;
 			*pVertice++ = vertex;
 		}
 
 		_vb->Unlock();
 	}
 
-	_boneIndexVec->assign(boneIndex.begin(), boneIndex.end());
+	//_boneIndexVec->assign(boneIndex.begin(), boneIndex.end());
 	
 	pData = nullptr;
 	if (_ib->Lock(0, _primitiveCount * sizeof(INDEX), &pData, 0))

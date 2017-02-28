@@ -7,6 +7,7 @@
 class SkinnedMeshRenderer : public Component
 {
 	typedef std::vector<sp<FBXBONEDATA>> BoneDataVec;
+	typedef std::vector<D3DXMATRIX> BoneMatrixVec;
 	typedef std::vector<sp<SurfaceMaterial>> MaterialVec;
 public:
 	SkinnedMeshRenderer();
@@ -19,7 +20,7 @@ public:
 	
 	// Test¿ë
 	//void ApplyMatrix(IDirect3DDevice9& device);
-	void ApplyMatrix(IDirect3DDevice9& device);
+	void ApplyMatrix(sp<Animation> animation, int frame);
 	void Test(IDirect3DDevice9& device, sp<Animation> animation, int frame);
 
 	void SetBone(BoneDataVec b)
@@ -34,6 +35,9 @@ public:
 private:
 	sp<MaterialVec>	_materials;
 	sp<SkinnedMesh>	_mesh;
+
+	D3DXMATRIX* temp;
+	sp<BoneMatrixVec> _matrix;
 
 	BoneDataVec _boneDataVec;
 };

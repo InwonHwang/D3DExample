@@ -4,7 +4,7 @@
 class Effect : public ResourceItem
 {
 public:
-	Effect(ResourceHandle handle, ResourcePoolImpl* pool);
+	Effect(ResourceID handle, ResourceTable* pool);
 	~Effect();
 
 	virtual void Destroy() override;

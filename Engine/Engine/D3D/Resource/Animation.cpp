@@ -2,7 +2,7 @@
 
 
 
-Animation::Animation(ResourceHandle handle, ResourcePoolImpl* pool)
+Animation::Animation(ResourceID handle, ResourceTable* pool)
 	: ResourceItem(handle, pool)
 {
 	_animCurveVec.reset(new AnimCurveVec);

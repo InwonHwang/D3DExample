@@ -4,7 +4,7 @@
 
 class ResourceManager
 {
-	typedef std::map<ResourcePoolHandle, sp<ResourcePoolImpl>> ResourcePoolMap;	
+	typedef std::map<ResourcePoolID, sp<ResourceTable>> ResourcePoolMap;	
 public:
 	ResourceManager();
 	~ResourceManager();
@@ -21,7 +21,7 @@ private:
 	template<typename T>
 	sp<ResourcePool<T>> FindResourcePool() const;				// 자료형으로 리소스 풀 찾기...
 
-	ResourcePoolHandle GenerateResourcePoolHandle() const;		// 새로 생생되는 리소스풀 핸들을 생성.
+	ResourcePoolID GenerateResourcePoolHandle() const;		// 새로 생생되는 리소스풀 핸들을 생성.
 
 private:
 	ResourcePoolMap _poolMap;
@@ -43,7 +43,7 @@ sp<T> ResourceManager::Create()
 template<typename T>
 sp<ResourcePool<T>> ResourceManager::CreateResourcePool()
 {
-	ResourcePoolHandle handle = GenerateResourcePoolHandle();	
+	ResourcePoolID handle = GenerateResourcePoolHandle();	
 	sp<ResourcePool<T>> ret = sp<ResourcePool<T>>(new ResourcePool<T>(handle));
 	_poolMap[handle] = ret;
 

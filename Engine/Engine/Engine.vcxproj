@@ -174,13 +174,12 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Core\ResourceItem.cpp" />
     <ClCompile Include="Core\ResourceManager.cpp" />
-    <ClCompile Include="Core\ResourcePoolImpl.cpp" />
+    <ClCompile Include="Core\ResourceTable.cpp" />
     <ClCompile Include="D3D\ResourceBase\Texture.cpp" />
     <ClCompile Include="D3D\Component\Image.cpp" />
     <ClCompile Include="D3D\Resource\Sprite.cpp" />
     <ClCompile Include="D3D\Component\Transform.cpp" />
     <ClCompile Include="D3D\ResourceBase\VertexBuffer.cpp" />
-    <ClCompile Include="D3D\Resource\TransformData.cpp" />
     <ClCompile Include="D3D\Component\D3DComponentImlp\TransformImpl.cpp" />
     <ClCompile Include="D3D\Component\SpriteRenderer.cpp" />
     <ClCompile Include="D3D\Resource\SurfaceMaterial.cpp" />
@@ -216,7 +215,7 @@
     <ClInclude Include="Core\DataTypes.h" />
     <ClInclude Include="Core\ResourcePool.h" />
     <ClInclude Include="Core\ResourceManager.h" />
-    <ClInclude Include="Core\ResourcePoolImpl.h" />
+    <ClInclude Include="Core\ResourceTable.h" />
     <ClInclude Include="Core\Debug.h" />
     <ClInclude Include="Core\Singleton.h" />
     <ClInclude Include="D3D\Component\Component.h" />
@@ -246,14 +245,16 @@
     <ClInclude Include="D3D\Resource\SkinnedMesh.h" />
     <ClInclude Include="D3D\Resource\StaticMesh.h" />
     <ClInclude Include="D3D\Component\SkinnedMeshRenderer.h" />
+    <ClInclude Include="Core\TableImpl.h" />
+    <ClInclude Include="ThirdParty\Stdafx.h" />
     <ClInclude Include="ThirdParty\ThirdParty.h" />
     <ClInclude Include="D3D\Component\Transform.h" />
     <ClInclude Include="D3D\ResourceBase\VertexBuffer.h" />
-    <ClInclude Include="D3D\Resource\TransformData.h" />
     <ClInclude Include="D3D\Component\D3DComponentImlp\TransformImpl.h" />
     <ClInclude Include="D3D\Component\D3DComponentImlp\TransformImplBase.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Media\Effect\SkinnedDefault.fx" />
     <FxCompile Include="Media\Effect\TextureMapping.fx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

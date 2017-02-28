@@ -11,9 +11,7 @@
 
 #include <fbxsdk.h>
 
-#include <cassert>
-#include <fstream>
-#include <algorithm>
+#include "Stdafx.h"
 
 template<typename T>
 using sp = boost::shared_ptr<T>;

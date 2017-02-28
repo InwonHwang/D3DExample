@@ -1,6 +1,6 @@
 #include "Texture.h"
 
-Texture::Texture(ResourceHandle handle, ResourcePoolImpl* pool)
+Texture::Texture(ResourceID handle, ResourceTable* pool)
 	: ResourceItem(handle, pool)
 {
 }

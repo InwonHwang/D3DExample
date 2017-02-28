@@ -58,11 +58,11 @@ bool FBXParser::Init(FbxManager& fbxManager, const String& fileName)
 	pFbxImporter->Destroy();
 
 	// triangle방식으로 변경 (ctrl point 방식 X)
-	/*FbxGeometryConverter converter(&fbxManager);
+	FbxGeometryConverter converter(&fbxManager);
 	converter.Triangulate(_scene, true);
 
 	// 좌표계 설정
-	FbxAxisSystem axisSystem = FbxAxisSystem::DirectX;
+	/*FbxAxisSystem axisSystem = FbxAxisSystem::DirectX;
 
 	if (_scene->GetGlobalSettings().GetAxisSystem() != axisSystem)
 	{
@@ -348,24 +348,6 @@ void FBXParser::ReadMesh(FbxNode& fbxNode, FBXDATASET& fbxData, int index, int p
 	// Skin정보 읽기
 	ReadSkinInfo(fbxNode, fbxData, meshData);
 
-	// Color, Normal, UV, Tangent 값 읽기
-	for (int i = 0; i < polygonCount; ++i)
-	{
-		// polygon 안에 버텍스가 몇개 있는지. 보통 3개, 4개인 경우도 있음. triangulate 함수를 쓰면 모두 3개로 변경
-		int polygonSize = pMesh->GetPolygonSize(i);
-		for (int j = 0; j < polygonSize; ++j)
-		{
-			int ctrlPointIndex = pMesh->GetPolygonVertex(i, j);
-
-			ReadColor(*pMesh, ctrlPointIndex, vertexCount, meshData->controlPointDataVec[ctrlPointIndex].vertex.color);
-			ReadNormal(*pMesh, ctrlPointIndex, vertexCount, meshData->controlPointDataVec[ctrlPointIndex].vertex.normal);
-			ReadUV(*pMesh, ctrlPointIndex, vertexCount, meshData->controlPointDataVec[ctrlPointIndex].vertex.texCoord);
-			ReadTangent(*pMesh, ctrlPointIndex, vertexCount, meshData->controlPointDataVec[ctrlPointIndex].vertex.tangent);
-			
-			vertexCount++;
-		}
-	}
-
 	vertexCount = 0;
 	for (int i = 0; i < polygonCount; ++i)
 	{
@@ -375,6 +357,12 @@ void FBXParser::ReadMesh(FbxNode& fbxNode, FBXDATASET& fbxData, int index, int p
 
 			tempVertex = meshData->controlPointDataVec[ctrlPointIndex];
 			tempVertex.SortBlendingInfoByWeight();
+
+			ReadColor(*pMesh, ctrlPointIndex, vertexCount, tempVertex.vertex.color);
+			ReadNormal(*pMesh, ctrlPointIndex, vertexCount, tempVertex.vertex.normal);
+			ReadUV(*pMesh, ctrlPointIndex, vertexCount, tempVertex.vertex.texCoord);
+			ReadTangent(*pMesh, ctrlPointIndex, vertexCount, tempVertex.vertex.tangent);
+
 
 			meshData->verticeDataVec.push_back(tempVertex); // vertex 값
 			//meshData->indiceDataVec.push_back(vertexCount); // index 값

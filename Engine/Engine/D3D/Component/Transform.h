@@ -41,12 +41,7 @@ public:
 	// friend private 함수로 바꾸기
 	void GetMatrixWorld(D3DXMATRIX& outMatWorld) const
 	{
-		D3DXMATRIX matLocal;
-		D3DXMATRIX matWorldParent;	
-
-		_impl->GetMatrixLocal(matLocal);
-		_impl->GetMatrixWorldParent(matWorldParent);
-		outMatWorld = matLocal * matWorldParent;
+		outMatWorld = *_impl->GetMatrixLocal() * *_impl->GetMatrixWorldParent();
 	}
 
 	void SetParent(sp<Transform> pParent);

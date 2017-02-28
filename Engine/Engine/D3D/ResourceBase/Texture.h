@@ -9,7 +9,7 @@ public:
 		eMipmap		
 	};
 public:
-	Texture(ResourceHandle handle, ResourcePoolImpl* pool);
+	Texture(ResourceID handle, ResourceTable* pool);
 	virtual ~Texture();
 	
 	virtual void Destroy() override;

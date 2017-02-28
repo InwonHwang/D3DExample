@@ -4,12 +4,12 @@
 class VertexBuffer : public ResourceItem
 {
 public:
-	VertexBuffer(ResourceHandle handle, ResourcePoolImpl* pool);
+	VertexBuffer(ResourceID handle, ResourceTable* pool);
 	~VertexBuffer();
 
 	virtual void Destroy() override;
 		
-	bool CreateVertexBuffer(IDirect3DDevice9& device, int size, DWORD usage, D3DPOOL pool);
+	bool CreateVertexBuffer(IDirect3DDevice9& device, int size, DWORD usage, DWORD fvf, D3DPOOL pool);
 	bool CreateVertexDeclaration(IDirect3DDevice9& device, const D3DVERTEXELEMENT9* vertexElement);
 
 	bool Lock(int offset, int size, void** ppData, DWORD flags);

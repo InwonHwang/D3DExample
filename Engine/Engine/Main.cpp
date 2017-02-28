@@ -23,15 +23,16 @@ sp<Texture> textureMesh;
 sp<Sprite> sprite;
 sp<Effect> effect;
 sp<SurfaceMaterial> material;
-sp<SurfaceMaterial> materialMesh;
 sp<TerrainData> terrainData;
 sp<SkinnedMesh> mesh;
+sp<StaticMesh> staticMesh;
 sp<Animation> animation;
 
 
 sp<Transform> transformCamera1;
 //sp<Transform> transformTerrain;
 sp<Transform> transformMesh;
+sp<Transform> transformStaticMesh;
 sp<Transform> transformSprite1;
 sp<Transform> transformSprite2;
 
@@ -125,14 +126,14 @@ void Init()
 	material = resourceManager.Create<SurfaceMaterial>();
 	material->SetEffect(effect);
 
-	materialMesh = resourceManager.Create<SurfaceMaterial>();
-	materialMesh->SetEffect(effect);
-
 	terrainData = resourceManager.Create<TerrainData>();
 	terrainData->Create(*device, _T("Media\\Terrain\\coastMountain64.raw"));
 
 	mesh = resourceManager.Create<SkinnedMesh>();
 	mesh->Create(*device, meshData);
+
+	staticMesh = resourceManager.Create<StaticMesh>();
+	staticMesh->Create(*device, meshData);
 
 	animation = resourceManager.Create<Animation>();
 	animation->Create(boneDataVec);
@@ -175,8 +176,15 @@ void Init()
 	transformMesh.reset(trm, Memory<Transform>::OrderedFree);
 	transformMesh->AddComponent<SkinnedMeshRenderer>()->SetMesh(mesh);
 	transformMesh->GetComponent<SkinnedMeshRenderer>()->SetMaterialCount(1);
-	transformMesh->GetComponent<SkinnedMeshRenderer>()->SetMaterial(0, materialMesh);
+	transformMesh->GetComponent<SkinnedMeshRenderer>()->SetMaterial(0, material);
 	transformMesh->GetComponent<SkinnedMeshRenderer>()->SetBone(boneDataVec);
+
+	//transformStaticMesh
+	Transform* trsm = Memory<Transform>::OrderedAlloc(sizeof(Transform));
+	transformStaticMesh.reset(trm, Memory<Transform>::OrderedFree);
+	transformStaticMesh->AddComponent<MeshRenderer>()->SetMesh(staticMesh);
+	transformStaticMesh->GetComponent<MeshRenderer>()->SetMaterialCount(1);
+	transformStaticMesh->GetComponent<MeshRenderer>()->SetMaterial(0, material);
 		
 	frustum.reset(new Frustum);	
 
@@ -241,11 +249,10 @@ void Render()
 		//frustum->Draw(*device);
 
 		material->SetMatrix(_T("gViewMatrix"), camera1->GetViewMatrix());
-		material->SetMatrix(_T("gProjectionMatrix"), camera1->GetProjMatrix());
+		material->SetMatrix(_T("gProjectionMatrix"), camera1->GetProjMatrix());		
 		material->SetTexture(_T("DiffuseMap_Tex"), textureMesh);
-
-		D3DXMATRIX matWorld;
-		transformSprite1->GetMatrixWorld(matWorld);
+		
+		/*transformSprite1->GetMatrixWorld(matWorld);
 		transformSprite1->UpdateWorldMatrix();
 		transformSprite1->Update(device);
 		material->SetMatrix(_T("gWorldMatrix"), matWorld);
@@ -255,12 +262,27 @@ void Render()
 		transformSprite2->UpdateWorldMatrix();
 		transformSprite2->Update(device);
 		material->SetMatrix(_T("gWorldMatrix"), matWorld);
-		transformSprite2->GetComponent<SpriteRenderer>()->Draw(*device);
+		transformSprite2->GetComponent<SpriteRenderer>()->Draw(*device);*/
 		
-		/*appTimer.Update();
+		appTimer.Update();
 		uint time = appTimer.GetElapsedTime();
 		int frame = time % animation->GetAnimCurveVec()->data()[0]->GetLength();
-		transformMesh->GetComponent<SkinnedMeshRenderer>()->Test(*device, animation, frame);*/
+
+		D3DXMATRIX matWorld;
+		//D3DXMatrixIdentity(&matWorld);
+		transformMesh->GetMatrixWorld(matWorld);
+		material->SetMatrix(_T("gWorldMatrix"), matWorld);
+		//transformMesh->GetComponent<SkinnedMeshRenderer>()->Test(*device, animation, frame);
+		transformMesh->GetComponent<SkinnedMeshRenderer>()->ApplyMatrix(animation, frame);
+		transformMesh->GetComponent<SkinnedMeshRenderer>()->Draw(*device);
+
+		//D3DXMATRIX matWorld;
+		////D3DXMatrixIdentity(&matWorld);
+		//transformStaticMesh->GetMatrixWorld(matWorld);
+		//material->SetMatrix(_T("gWorldMatrix"), matWorld);
+		//transformStaticMesh->GetComponent<MeshRenderer>()->Draw(*device);
+
+		//transformMesh->GetComponent<SkinnedMeshRenderer>()->Test(*device, animation, frame);
 		
 		//transformTerrain->UpdateWorldMatrix();
 		//transformTerrain->Update(*device);

@@ -13,6 +13,6 @@
 #include "ResourceItem.h"
 #include "ResourceManager.h"
 #include "ResourcePool.h"
-#include "ResourcePoolImpl.h"
+#include "ResourceTable.h"
 #include "Singleton.h"
 #include "Timer.h"

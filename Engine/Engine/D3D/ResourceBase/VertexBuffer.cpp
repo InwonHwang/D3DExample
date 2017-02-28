@@ -1,7 +1,7 @@
 #include "VertexBuffer.h"
 
 
-VertexBuffer::VertexBuffer(ResourceHandle handle, ResourcePoolImpl* pool)
+VertexBuffer::VertexBuffer(ResourceID handle, ResourceTable* pool)
 	: ResourceItem(handle, pool),
 	_vb(nullptr),
 	_decVertex(nullptr)
@@ -21,12 +21,15 @@ void VertexBuffer::Destroy()
 	ResourceItem::Clear();
 }
 
-bool VertexBuffer::CreateVertexBuffer(IDirect3DDevice9& device, int size, DWORD usage, D3DPOOL pool)
+bool VertexBuffer::CreateVertexBuffer(IDirect3DDevice9& device, int size, DWORD usage, DWORD fvf, D3DPOOL pool)
 {
 	SafeRelease<IDirect3DVertexBuffer9>(_vb);
 
 	HRESULT hr = 0;
-	if (FAILED(hr = device.CreateVertexBuffer(size, usage, 0, pool, &_vb, NULL)))
+	if (FAILED(hr = device.CreateVertexBuffer(size, usage, (D3DFVF_XYZ | D3DFVF_TEX3 |
+		D3DFVF_TEXCOORDSIZE2(0) |		// texture
+		D3DFVF_TEXCOORDSIZE4(1) |		// blend weight
+		D3DFVF_TEXCOORDSIZE4(2)), pool, &_vb, NULL)))
 	{
 		DebugError(hr);
 		return false;

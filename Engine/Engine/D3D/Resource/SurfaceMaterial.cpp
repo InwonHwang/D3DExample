@@ -2,7 +2,7 @@
 
 
 
-SurfaceMaterial::SurfaceMaterial(ResourceHandle handle, ResourcePoolImpl* pool)
+SurfaceMaterial::SurfaceMaterial(ResourceID handle, ResourceTable* pool)
 	: ResourceItem(handle, pool),
 	_paramEffect(nullptr),
 	_effect(nullptr)
@@ -27,6 +27,8 @@ void SurfaceMaterial::SetEffect(const sp<Effect> effect)
 {
 	_effect = effect;
 	_paramEffect->clear();
+
+	assert(_effect->GetD3DEffect());
 
 	D3DXEFFECT_DESC effectDesc = { 0, };
 
